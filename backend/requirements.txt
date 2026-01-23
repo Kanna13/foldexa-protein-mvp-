@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pydantic
+python-multipartuvicorn app.main:app --reload
+pytest
+httpx
+requests
