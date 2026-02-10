@@ -1,0 +1,131 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import { Dna, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Button } from "./Button";
+import { cn } from "@/lib/utils";
+
+const navLinks = [
+    { name: "Platform", href: "#platform" },
+    { name: "History", href: "/app/history" },
+    { name: "About", href: "#about" },
+    { name: "Team", href: "/team" },
+];
+
+interface NavbarProps {
+    variant?: "default" | "light" | "contrast";
+}
+
+export function Navbar({ variant = "default" }: NavbarProps) {
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
+
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    // "contrast" = Always black background, white text (High visibility on white pages)
+    // "light" = Transparent then white on scroll (Standard clean)
+    // "default" = Transparent then black on scroll (Dark mode)
+
+    const isContrast = variant === "contrast";
+    const isLight = variant === "light";
+
+    // If contrast, always white text. If light, dark text.
+    const textColor = isContrast ? "text-white" : (isLight ? "text-neutral-900" : "text-white");
+    const subTextColor = isContrast ? "text-white hover:text-white" : (isLight ? "text-neutral-500 hover:text-neutral-900" : "text-white hover:text-white");
+
+    // Background logic
+    let navBg = "bg-transparent";
+    let borderClass = "";
+
+    if (isContrast) {
+        // Always black padding, minimal transparency
+        navBg = "bg-[#0A0A0A] border-b border-white/5 shadow-sm";
+    } else if (isScrolled) {
+        navBg = isLight ? "bg-white/80 backdrop-blur-md" : "bg-black/80 backdrop-blur-md";
+        borderClass = isLight ? "border-black/5" : "border-white/5";
+    }
+
+    return (
+        <motion.nav
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            className={cn(
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4", // Reduced py for tighter feel
+                navBg,
+                borderClass
+            )}
+        >
+            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+                {/* Logo */}
+                <Link href="/" className="flex items-center gap-2 group">
+                    <div className="relative w-8 h-8 flex items-center justify-center">
+                        <Dna className={cn("w-8 h-8 transition-transform group-hover:animate-spin-slow", (isLight && !isContrast) ? "text-emerald-600" : "text-emerald-400")} />
+                    </div>
+                    <span className={cn("text-xl font-bold tracking-tight", textColor)}>Foldexa</span>
+                </Link>
+
+                {/* Desktop Links */}
+                <div className="hidden md:flex items-center gap-8">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.name}
+                            href={link.href}
+                            className={cn("text-sm font-medium transition-colors font-mono", subTextColor)}
+                        >
+                            {link.name}
+                        </Link>
+                    ))}
+                </div>
+
+                {/* CTA */}
+                <div className="hidden md:flex items-center gap-4">
+                    <Button variant="ghost" size="sm" className={cn(textColor, "hover:bg-white/10")}>Log In</Button>
+                    <Link href="/app/new">
+                        <Button variant="primary" size="sm" className="gap-1">Start Folding</Button>
+                    </Link>
+                </div>
+
+                {/* Mobile Toggle */}
+                <button
+                    className={cn("md:hidden", textColor)}
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                    {mobileMenuOpen ? <X /> : <Menu />}
+                </button>
+            </div>
+
+            {/* Mobile Menu */}
+            {mobileMenuOpen && (
+                <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="md:hidden bg-[#0A0A0A] border-b border-white/10"
+                >
+                    <div className="flex flex-col p-6 gap-4">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.name}
+                                href={link.href}
+                                className="text-lg text-white font-mono"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
+                        <Link href="/app/new" onClick={() => setMobileMenuOpen(false)}>
+                            <Button className="w-full">Start Folding</Button>
+                        </Link>
+                    </div>
+                </motion.div>
+            )}
+        </motion.nav>
+    );
+}

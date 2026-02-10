@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # --- Infrastructure ---
+  postgres:
+    image: postgres:16-alpine
+    container_name: foldexa-postgres
+    environment:
+      POSTGRES_USER: foldexa
+      POSTGRES_PASSWORD: foldexa_password
+      POSTGRES_DB: foldexa
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U foldexa" ]
+
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: foldexa-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: foldexa-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # --- Application Services ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: foldexa-api
+    command: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/storage:/app/storage
+      - ./Weights:/weights # Mount weights so backend can verify them
+    env_file:
+      - ./backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://foldexa:foldexa_password@postgres:5432/foldexa
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - S3_ENDPOINT=http://minio:9000
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: foldexa-worker
+    command: celery -A app.core.celery_app worker --loglevel=info
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/storage:/app/storage
+      - /var/run/docker.sock:/var/run/docker.sock # Essential for DooD
+      - ./Weights:/weights # Mount weights for worker to pass to model containers if needed
+      - foldexa_workspace:/workspace_share # Shared volume for model execution
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - redis
+      - postgres
+      - minio
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://foldexa:foldexa_password@postgres:5432/foldexa
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - S3_ENDPOINT=http://minio:9000
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: foldexa-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  foldexa_workspace:
+    name: foldexa_workspace_shared

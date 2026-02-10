@@ -4,3 +4,29 @@ __pycache__/
 .DS_Store
 node_modules/
 .env
+
+# ML weights / models
+Weights/
+*.pt
+*.ckpt
+*.bin
+
+# archives
+*.zip
+*.tar.gz
+
+# pipeline source repos
+RFdiffusion-main/
+diffab-main/
+af2-gamma-eval-main/
+
+# large files
+*.pdb
+*.pptx
+*.key
+
+# python cache
+__pycache__/
+
+# mac
+.DS_Store
