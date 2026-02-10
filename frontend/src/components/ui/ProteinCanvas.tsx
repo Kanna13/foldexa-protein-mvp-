@@ -3,7 +3,7 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Sphere, MeshDistortMaterial, Environment } from "@react-three/drei";
 import { Suspense } from "react";
-import { motion } from "framer-motion-3d";
+
 
 export function ProteinCanvas() {
     return (
