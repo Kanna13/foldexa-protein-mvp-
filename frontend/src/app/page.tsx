@@ -66,7 +66,7 @@ export default function Home() {
               transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
               className="text-lg md:text-xl text-neutral-300 max-w-2xl leading-relaxed font-light tracking-wide"
             >
-              Foldexa is an accurate and intelligent protein structure prediction platform.
+              An accurate and intelligent protein structure prediction platform.
               Accelerate drug discovery with next-generation AI models.
             </motion.p>
 
