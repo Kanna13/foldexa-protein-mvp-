@@ -28,7 +28,7 @@ export default function Home() {
       {/* --- SECTION 1: DARK HERO (Sticky Effect) --- */}
       {/* Reduced height to 200vh for snappier scroll */}
       <div className="h-[200vh]">
-        <section className="sticky top-0 min-h-[100svh] w-full overflow-hidden flex flex-col items-center justify-center relative bg-black">
+        <section className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-center relative bg-black">
 
           {/* Background Visual (Covers Everything) */}
           <motion.div

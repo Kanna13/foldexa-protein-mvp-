@@ -14,7 +14,7 @@ export function HeroVisual() {
                     muted
                     playsInline
                     style={{ willChange: "transform" }}
-                    className="w-full h-full object-cover object-center opacity-60 mix-blend-screen scale-110 md:scale-100 transition-transform duration-700"
+                    className="w-full h-full object-cover opacity-60 mix-blend-screen"
                     poster="/hero-bg.png"
                 >
                     {/* Place your video file in frontend/public/hero.mp4 */}
@@ -26,7 +26,7 @@ export function HeroVisual() {
                     <img
                         src="/hero-bg.png"
                         alt="Cinematic Protein Structure Advertisement"
-                        className="w-full h-full object-cover object-center animate-ken-burns opacity-70 scale-110 md:scale-100"
+                        className="w-full h-full object-cover animate-ken-burns opacity-70"
                     />
                 </div>
 
