@@ -108,7 +108,7 @@ export function PricingSection() {
                             transition={{ duration: 0.5, delay: idx * 0.1 }}
                             viewport={{ once: true }}
                             className={`relative p-8 rounded-3xl border flex flex-col h-full ${tier.isPopular
-                                ? "bg-white/5 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.1)] scale-105 z-10"
+                                ? "bg-white/5 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.1)] md:scale-105 z-10"
                                 : "bg-neutral-800/50 border-white/5 hover:border-white/10"
                                 } backdrop-blur-sm transition-all`}
                         >

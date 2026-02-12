@@ -31,10 +31,10 @@ export function HeroVisual() {
                 </div>
 
                 {/* Minimalistic Dark Fade Overlay */}
-                <div className="absolute inset-0 bg-black/70" />
+                <div className="absolute inset-0 bg-black/60" />
 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-[#050505]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black" />
 
                 {/* Fallback Gradient (Simplified for performance) */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 to-transparent opacity-50" />
