@@ -13,6 +13,7 @@ export function HeroVisual() {
                     loop
                     muted
                     playsInline
+                    style={{ willChange: "transform" }}
                     className="w-full h-full object-cover opacity-60 mix-blend-screen"
                     poster="/hero-bg.png"
                 >
@@ -29,8 +30,7 @@ export function HeroVisual() {
                     />
                 </div>
 
-                {/* Minimalistic Dark Fade Overlay (Dull Black effect) */}
-                <div className="absolute inset-0 bg-black/60" />
+                {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-[#050505]" />
 
                 {/* Fallback Gradient (Simplified for performance) */}

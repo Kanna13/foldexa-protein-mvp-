@@ -26,13 +26,13 @@ export default function Home() {
       <Navbar />
 
       {/* --- SECTION 1: DARK HERO (Sticky Effect) --- */}
-      {/* Increased height to 325vh for longer black background scroll */}
-      <div className="h-[350vh]">
+      {/* Reduced height to 200vh for snappier scroll */}
+      <div className="h-[200vh]">
         <section className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-center relative">
 
           {/* Background Visual (Covers Everything) */}
           <motion.div
-            style={{ opacity: heroOpacity, scale: heroScale }}
+            style={{ opacity: heroOpacity, scale: heroScale, willChange: "transform, opacity" }}
             className="absolute inset-0 z-0"
           >
             <HeroVisual />
