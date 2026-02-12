@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 
 export function HeroVisual() {
     return (
-        <div className="w-full h-full min-h-[100vh] relative overflow-hidden bg-black">
+        <div className="w-full h-[100dvh] relative overflow-hidden bg-black">
 
             {/* Video Background */}
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 flex items-center justify-center">
                 <video
                     autoPlay
                     loop
                     muted
                     playsInline
                     style={{ willChange: "transform" }}
-                    className="w-full h-full object-cover opacity-60 mix-blend-screen"
+                    className="w-full h-full object-cover object-center opacity-60 mix-blend-screen scale-110 md:scale-100 transition-transform duration-700"
                     poster="/hero-bg.png"
                 >
                     {/* Place your video file in frontend/public/hero.mp4 */}
@@ -22,16 +22,16 @@ export function HeroVisual() {
                 </video>
 
                 {/* Fallback Animated AI Image (Visible if video fails) */}
-                <div className="absolute inset-0 -z-10">
+                <div className="absolute inset-0 -z-10 flex items-center justify-center">
                     <img
                         src="/hero-bg.png"
                         alt="Cinematic Protein Structure Advertisement"
-                        className="w-full h-full object-cover animate-ken-burns opacity-70"
+                        className="w-full h-full object-cover object-center animate-ken-burns opacity-70 scale-110 md:scale-100"
                     />
                 </div>
 
                 {/* Minimalistic Dark Fade Overlay */}
-                <div className="absolute inset-0 bg-black/75" />
+                <div className="absolute inset-0 bg-black/70" />
 
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-[#050505]" />
