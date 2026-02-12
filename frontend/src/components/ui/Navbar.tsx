@@ -69,6 +69,7 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                     <div className="relative w-8 h-8 flex items-center justify-center">
                         <Dna className={cn("w-8 h-8 transition-transform group-hover:animate-spin-slow", (isLight && !isContrast) ? "text-emerald-600" : "text-emerald-400")} />
                     </div>
+                    <span className={cn("text-xl font-bold tracking-tight", textColor)}>Foldexa</span>
 
 
                 </Link>
