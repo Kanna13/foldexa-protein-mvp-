@@ -7,6 +7,7 @@ import { HeroVisual } from "@/components/ui/HeroVisual";
 import { ArrowRight, Play, ChevronsDown } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
+import { PricingSection } from "@/components/marketing/PricingSection";
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -367,7 +368,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SECTION 6: CONTACT --- */}
+      {/* --- SECTION 6: PRICING --- */}
+      <PricingSection />
+
+      {/* --- SECTION 7: CONTACT --- */}
       <section id="contact" className="bg-white py-32">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-5xl font-bold mb-8">Get in Touch</h2>

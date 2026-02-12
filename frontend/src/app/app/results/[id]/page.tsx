@@ -6,7 +6,7 @@ import { Download, Share2, X, ChevronRight, FileText, Activity, Dna } from "luci
 import { api, JobResult } from "@/lib/api";
 import { useState, useEffect, use } from "react";
 import { cn } from "@/lib/utils";
-import { ProteinViewer } from "@/components/protein/ProteinViewer";
+
 import Link from "next/link";
 
 export default function ResultsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -126,66 +126,41 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
                     ))}
                 </div>
 
-                {/* Dashboard Grid */}
-                <div className="grid lg:grid-cols-3 gap-8">
+                {/* Dashboard Grid - Centered Single Column Layout */}
+                <div className="max-w-4xl mx-auto space-y-8">
 
-                    {/* Left Column: Metrics & Data */}
-                    <div className="lg:col-span-1 space-y-6">
-
-                        {/* Key Metrics Card */}
-                        <div className="bg-white rounded-2xl border border-neutral-100 p-6 shadow-sm">
-                            <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest mb-6">Key Metrics</h3>
-                            <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                    <p className="text-xs text-neutral-400 mb-1">Mean pLDDT</p>
-                                    <p className="text-3xl font-mono font-medium text-neutral-900">{plddt.toFixed(1)}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-neutral-400 mb-1">Max pLDDT</p>
-                                    <p className="text-3xl font-mono font-medium text-emerald-600">{maxPlddt.toFixed(1)}</p>
-                                </div>
+                    {/* Key Metrics Card */}
+                    <div className="bg-white rounded-2xl border border-neutral-100 p-8 shadow-sm">
+                        <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest mb-6">Key Metrics</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            <div>
+                                <p className="text-xs text-neutral-400 mb-1">Mean pLDDT</p>
+                                <p className="text-4xl font-mono font-medium text-neutral-900">{plddt.toFixed(1)}</p>
                             </div>
+                            <div>
+                                <p className="text-xs text-neutral-400 mb-1">Max pLDDT</p>
+                                <p className="text-4xl font-mono font-medium text-emerald-600">{maxPlddt.toFixed(1)}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-neutral-400 mb-1">Rank</p>
+                                <p className="text-4xl font-mono font-medium text-neutral-900">{rank}</p>
+                            </div>
+
                         </div>
-
-                        {/* Detailed Stats */}
-                        <div className="bg-white rounded-2xl border border-neutral-100 overflow-hidden shadow-sm">
-                            <div className="px-6 py-4 border-b border-neutral-50 bg-neutral-50/50">
-                                <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Quality Analysis</h3>
-                            </div>
-                            <div className="divide-y divide-neutral-50">
-                                {result.metrics.map((metric, idx) => (
-                                    <div key={idx} className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 transition-colors">
-                                        <span className="text-sm text-neutral-600 capitalize">{metric.metric_name.replace(/_/g, " ")}</span>
-                                        <span className="font-mono text-sm font-medium text-neutral-900">{metric.metric_value.toFixed(3)}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
                     </div>
 
-                    {/* Right Column: Visualization */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-neutral-900 rounded-3xl overflow-hidden shadow-2xl relative h-[600px] border border-neutral-800 group">
-                            <ProteinViewer
-                                pdbUrl={downloadUrl}
-                                className="w-full h-full opacity-90 transition-opacity group-hover:opacity-100"
-                            />
-
-                            {/* Overlay Controls */}
-                            <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between pointer-events-none">
-                                <div className="bg-black/80 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 pointer-events-auto">
-                                    <p className="text-xs font-mono text-emerald-400 flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                        Interactive Viewer Live
-                                    </p>
+                    {/* Detailed Stats */}
+                    <div className="bg-white rounded-2xl border border-neutral-100 overflow-hidden shadow-sm">
+                        <div className="px-6 py-4 border-b border-neutral-50 bg-neutral-50/50">
+                            <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Quality Analysis</h3>
+                        </div>
+                        <div className="divide-y divide-neutral-50">
+                            {result.metrics.map((metric, idx) => (
+                                <div key={idx} className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 transition-colors">
+                                    <span className="text-sm text-neutral-600 capitalize">{metric.metric_name.replace(/_/g, " ")}</span>
+                                    <span className="font-mono text-sm font-medium text-neutral-900">{metric.metric_value.toFixed(3)}</span>
                                 </div>
-                                <div className="pointer-events-auto">
-                                    <Button size="sm" variant="secondary" className="bg-white/10 text-white border-white/10 hover:bg-white/20 backdrop-blur-md">
-                                        Reset View
-                                    </Button>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
 
