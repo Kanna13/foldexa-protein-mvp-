@@ -94,7 +94,7 @@ export function PricingSection() {
                         viewport={{ once: true }}
                         className="text-xl text-neutral-400 max-w-2xl mx-auto"
                     >
-                        Unlock the full potential of Foldexa with plans designed for every stage of your research.
+                        Unlock the full potential of your research with plans designed for every stage of your work.
                     </motion.p>
                 </div>
 
