@@ -160,7 +160,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="pt-16"
+            className="border-t border-gray-200 pt-16"
           >
             <h3 className="text-sm font-mono uppercase tracking-widest text-gray-400 mb-8 text-center">Our Partners</h3>
             <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -358,7 +358,7 @@ export default function Home() {
       </section>
 
       {/* --- SECTION 5: OUR VISION --- */}
-      <section className="bg-neutral-900 text-white py-32">
+      <section className="bg-gradient-to-br from-neutral-900 to-neutral-800 text-white py-32">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-5xl font-bold mb-8">Our Vision</h2>
           <p className="text-2xl text-gray-300 leading-relaxed">
