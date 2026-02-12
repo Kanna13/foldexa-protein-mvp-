@@ -6,8 +6,7 @@ export function HeroVisual() {
     return (
         <div className="relative w-full min-h-screen overflow-hidden bg-black">
 
-            {/* Background Image */}
-            <div className="absolute inset-0 -z-10">
+            <div className="absolute inset-0">
                 <img
                     src="/hero-bg.png"
                     alt="Protein background"
