@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
-      <body className="font-sans antialiased text-foreground bg-background selection:bg-primary selection:text-black">
+      <body className="font-sans antialiased text-foreground bg-background">
         {children}
       </body>
     </html>

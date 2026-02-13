@@ -136,20 +136,17 @@ export default function Home() {
                   {
                     name: "DiffAb",
                     desc: "Antibody CDR Design",
-                    color:
-                      "bg-emerald-500 ring-2 ring-emerald-200 shadow-[0_0_10px_rgba(16,185,129,0.8)]",
+                    color: "bg-emerald-500",
                   },
                   {
                     name: "RFdiffusion",
                     desc: "Scaffold Generation",
-                    color:
-                      "bg-cyan-500 ring-2 ring-cyan-200 shadow-[0_0_10px_rgba(34,211,238,0.8)]",
+                    color: "bg-cyan-500",
                   },
                   {
                     name: "AlphaFold2",
                     desc: "Structure Validation",
-                    color:
-                      "bg-amber-500 ring-2 ring-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.8)]",
+                    color: "bg-amber-500",
                   },
                 ].map((model, idx) => (
                   <motion.div
