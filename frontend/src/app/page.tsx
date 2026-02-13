@@ -200,13 +200,12 @@ export default function Home() {
                   key={partner.name}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
-                  whileHover={{ y: -5 }}
                   transition={{ duration: 0.4, delay: idx * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all cursor-pointer group flex flex-col items-center justify-center text-center h-full"
+                  className="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center h-full"
                 >
                   <div className="h-24 flex items-center justify-center mb-6 w-full">
-                    <div className="relative w-full h-full max-w-[200px] flex items-center justify-center transition-all duration-300 filter grayscale group-hover:grayscale-0 opacity-80 group-hover:opacity-100">
+                    <div className="relative w-full h-full max-w-[200px] flex items-center justify-center">
                       <Image
                         src={partner.logo}
                         alt={`${partner.name} Logo`}
@@ -216,7 +215,7 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                  <h4 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-emerald-600 transition-colors">{partner.name}</h4>
+                  <h4 className="text-xl font-bold mb-2 text-gray-900">{partner.name}</h4>
                   <p className="text-sm text-gray-500 font-medium">{partner.desc}</p>
                 </motion.div>
               ))}
