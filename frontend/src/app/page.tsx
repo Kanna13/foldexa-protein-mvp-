@@ -78,7 +78,7 @@ export default function Home() {
               className="flex flex-col sm:flex-row items-center gap-4"
             >
               <Link href="/app/new">
-                <Button variant="primary" size="lg" className="min-w-[200px] shadow-[0_0_20px_rgba(0,255,148,0.2)] hover:shadow-[0_0_30px_rgba(0,255,148,0.4)] transition-shadow duration-500 h-14 px-8 text-lg">
+                <Button variant="primary" size="lg" className="min-w-[200px] shadow-[0_0_20px_rgba(0,217,126,0.15)] hover:shadow-[0_0_30px_rgba(0,217,126,0.3)] transition-shadow duration-500 h-14 px-8 text-lg">
                   Start Folding <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
