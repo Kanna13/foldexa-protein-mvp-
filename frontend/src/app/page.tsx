@@ -224,20 +224,28 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
-              className="mt-12 text-center"
+              className="mt-20 text-center"
             >
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="inline-block bg-gradient-to-r from-blue-50 to-purple-50 px-8 py-6 rounded-2xl border-2 border-blue-200"
-              >
-                <p className="text-2xl font-bold text-gray-900 mb-2">You can be our next partner</p>
-                <p className="text-gray-600 mb-4">Join leading institutions in advancing protein engineering</p>
-                <Link href="#contact">
-                  <Button variant="primary" size="lg" className="shadow-lg">
-                    Partner With Us <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
-                </Link>
-              </motion.div>
+              <div className="inline-block relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-3xl blur-xl transform group-hover:scale-105 transition-transform duration-500 opacity-0 group-hover:opacity-100" />
+                <motion.div
+                  className="relative bg-white px-12 py-10 rounded-3xl border border-neutral-200 shadow-sm overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 opacity-50" />
+
+                  <h3 className="text-3xl font-bold text-neutral-900 mb-3 tracking-tight">Become a Partner</h3>
+                  <p className="text-lg text-neutral-500 mb-8 max-w-md mx-auto leading-relaxed">
+                    Join KAIST, Solbridge, and other leading institutions in advancing the future of protein engineering.
+                  </p>
+
+                  <Link href="#contact">
+                    <Button variant="primary" size="lg" className="min-w-[200px] shadow-lg hover:shadow-emerald-500/20">
+                      Partner With Us <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         </div>
