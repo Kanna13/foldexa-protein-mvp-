@@ -8,6 +8,7 @@ import { ArrowRight, Play, ChevronsDown } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 import { PricingSection } from "@/components/marketing/PricingSection";
+import Image from "next/image";
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -180,22 +181,43 @@ export default function Home() {
             className="border-t border-gray-200 pt-16"
           >
             <h3 className="text-sm font-mono uppercase tracking-widest text-gray-400 mb-8 text-center">Our Partners</h3>
-            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {[
-                { name: "Solbridge", desc: "International School of Business" },
-                { name: "KAIST", desc: "Korea Advanced Institute of Science" }
+                {
+                  name: "Solbridge",
+                  desc: "International School of Business",
+                  logo: "/logos/SOLBRIDGE-logo.png",
+                  height: 60
+                },
+                {
+                  name: "KAIST",
+                  desc: "Korea Advanced Institute of Science",
+                  logo: "/logos/Kaist.png",
+                  height: 50
+                }
               ].map((partner, idx) => (
                 <motion.div
                   key={partner.name}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
+                  whileHover={{ y: -5 }}
                   transition={{ duration: 0.4, delay: idx * 0.1 }}
                   viewport={{ once: true }}
-                  whileHover={{ scale: 1.05 }}
-                  className="bg-white p-8 rounded-2xl border-2 border-gray-200 text-center hover:border-blue-400 transition-colors cursor-pointer"
+                  className="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all cursor-pointer group flex flex-col items-center justify-center text-center h-full"
                 >
-                  <h4 className="text-3xl font-bold mb-2">{partner.name}</h4>
-                  <p className="text-gray-500">{partner.desc}</p>
+                  <div className="h-24 flex items-center justify-center mb-6 w-full">
+                    <div className="relative w-full h-full max-w-[200px] flex items-center justify-center transition-all duration-300 filter grayscale group-hover:grayscale-0 opacity-80 group-hover:opacity-100">
+                      <Image
+                        src={partner.logo}
+                        alt={`${partner.name} Logo`}
+                        width={200}
+                        height={100}
+                        className="object-contain max-h-full w-auto"
+                      />
+                    </div>
+                  </div>
+                  <h4 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-emerald-600 transition-colors">{partner.name}</h4>
+                  <p className="text-sm text-gray-500 font-medium">{partner.desc}</p>
                 </motion.div>
               ))}
             </div>
