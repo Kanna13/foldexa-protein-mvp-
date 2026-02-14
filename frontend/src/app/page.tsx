@@ -81,7 +81,7 @@ export default function Home() {
               className="flex flex-col sm:flex-row items-center gap-4"
             >
               <Link href="/app/new">
-                <Button variant="primary" size="lg" className="min-w-[200px] transition-all duration-500 h-12 px-8 text-lg bg-emerald-500 hover:bg-emerald-600 text-white font-semibold border-0">
+                <Button variant="primary" size="lg" className="min-w-[200px] transition-all duration-500 h-12 px-8 text-lg bg-emerald-500 hover:bg-emerald-600 text-black font-semibold border-0">
                   Start Folding <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
@@ -231,7 +231,7 @@ export default function Home() {
               </p>
 
               <Link href="#contact">
-                <Button className="min-w-[200px] bg-primary text-black hover:bg-primary-dark hover:text-white border-0 h-12 px-8 text-lg font-medium transition-colors">
+                <Button className="min-w-[200px] bg-transparent border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white h-12 px-8 text-lg font-bold transition-all duration-300 rounded-full shadow-sm hover:shadow-md">
                   Partner With Us <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
