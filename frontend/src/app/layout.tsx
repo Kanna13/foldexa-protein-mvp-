@@ -23,6 +23,30 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/logos/foldexa-logo.png",
+    shortcut: "/logos/foldexa-logo.png",
+    apple: "/logos/foldexa-logo.png",
+  },
+  openGraph: {
+    title: "Foldexa | Engineering Life, Digitally",
+    description: "Accurate and intelligent protein structure prediction platform.",
+    url: "https://foldexa.bio",
+    siteName: "Foldexa",
+    images: [
+      {
+        url: "/logos/foldexa-logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Foldexa Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Foldexa | Engineering Life, Digitally",
+    description: "Accurate and intelligent protein structure prediction platform.",
+    images: ["/logos/foldexa-logo.png"],
   },
 };
 
