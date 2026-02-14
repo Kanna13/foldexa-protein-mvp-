@@ -58,7 +58,8 @@ export default function Home() {
               className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[1.1] text-[#FFFFF0] drop-shadow-2xl"
             >
               Engineering <br />
-              <span className="text-[#FFFFF0] font-bold tracking-tight">Life. Digitally.</span>
+              <span className="text-[#FFFFF0] font-bold tracking-tight">Life. </span>
+              <span className="text-neutral-400 font-bold tracking-tight">Digitally.</span>
             </motion.h1>
 
             <motion.p
