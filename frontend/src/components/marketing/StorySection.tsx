@@ -138,14 +138,17 @@ export function StorySection() {
                                 {/* Content */}
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-6">
-                                        <div className="relative w-14 h-14 rounded-full overflow-hidden border border-neutral-700 group-hover:border-white/20 transition-colors">
+                                        <motion.div
+                                            layoutId={`founder-img-${founder.id}`}
+                                            className="relative w-14 h-14 rounded-full overflow-hidden border border-neutral-700 group-hover:border-white/20 transition-colors"
+                                        >
                                             <Image
                                                 src={founder.image}
                                                 alt={founder.name}
                                                 fill
                                                 className="object-cover"
                                             />
-                                        </div>
+                                        </motion.div>
                                         <div>
                                             <h3 className="text-xl font-bold text-white leading-tight">{founder.name}</h3>
                                             <p className="text-sm text-neutral-500 font-medium">{founder.role}</p>
@@ -185,31 +188,43 @@ export function StorySection() {
                                         <motion.div
                                             layoutId={`card-${founder.id}`}
                                             key={founder.id}
-                                            className="w-full max-w-4xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative"
+                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative"
                                         >
                                             {/* Close Button */}
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); setSelectedId(null); }}
-                                                className="absolute top-6 right-6 z-20 w-10 h-10 bg-neutral-800/50 hover:bg-neutral-700 rounded-full flex items-center justify-center text-white transition-colors"
+                                                className="absolute top-6 right-6 z-20 w-10 h-10 bg-black/20 hover:bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors border border-white/10"
                                             >
                                                 <X className="w-5 h-5" />
                                             </button>
 
                                             <div className="grid md:grid-cols-5 h-full max-h-[85vh] overflow-y-auto">
-                                                {/* Sidebar (Visual) */}
-                                                <div className={`md:col-span-2 p-10 bg-gradient-to-br ${founder.color} relative flex flex-col justify-between`}>
-                                                    <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl mb-8">
+                                                {/* Sidebar (Visual with Background Image) */}
+                                                <div className="md:col-span-2 relative min-h-[300px] md:min-h-full">
+                                                    {/* Expanded Image Background */}
+                                                    <motion.div
+                                                        layoutId={`founder-img-${founder.id}`}
+                                                        className="absolute inset-0 z-0"
+                                                    >
                                                         <Image
                                                             src={founder.image}
                                                             alt={founder.name}
                                                             fill
-                                                            className="object-cover"
+                                                            className="object-cover brightness-90"
                                                         />
-                                                    </div>
+                                                    </motion.div>
 
-                                                    <div className="mt-auto">
+                                                    {/* Gradient Overlay for Text Readability */}
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        transition={{ duration: 0.5, delay: 0.2 }}
+                                                        className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/40 to-transparent"
+                                                    />
+
+                                                    <div className="relative z-20 h-full flex flex-col justify-end p-8 md:p-10">
                                                         <h3 className="text-3xl md:text-3xl font-bold text-white mb-2">{founder.name}</h3>
-                                                        <p className="text-lg text-white/80 font-medium">{founder.role}</p>
+                                                        <p className="text-lg text-emerald-400 font-medium">{founder.role}</p>
                                                     </div>
                                                 </div>
 
