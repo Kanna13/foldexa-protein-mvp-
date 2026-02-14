@@ -114,7 +114,7 @@ export function StorySection() {
                     {/* Scroll Area */}
                     <div
                         ref={scrollContainerRef}
-                        className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto pb-8 md:pb-0 snap-x snap-mandatory scrollbar-hide"
+                        className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                         style={{ WebkitOverflowScrolling: 'touch' }}
                     >
                         {FOUNDERS.map((founder) => (
@@ -188,7 +188,8 @@ export function StorySection() {
                                         <motion.div
                                             layoutId={`card-${founder.id}`}
                                             key={founder.id}
-                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative"
+                                            onClick={() => setSelectedId(null)}
+                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative cursor-zoom-out"
                                         >
                                             {/* Close Button */}
                                             <button
