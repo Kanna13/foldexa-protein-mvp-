@@ -249,7 +249,7 @@ export default function Home() {
             className="text-center mb-20"
           >
             <h2 className="text-6xl font-mono font-bold tracking-tighter mb-4 text-neutral-900">Simple. Powerful. Fast.</h2>
-            <p className="text-xl text-primary font-medium">Four steps to breakthrough protein designs</p>
+            <p className="text-xl text-neutral-600 font-medium">Four steps to breakthrough protein designs</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -288,7 +288,7 @@ export default function Home() {
                 className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-emerald-500/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] transition-all duration-300"
               >
                 <div className="relative z-10">
-                  <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center mb-6 text-black shadow-sm shadow-emerald-500/20">
+                  <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center mb-6 text-black shadow-sm shadow-emerald-500/20 border-2 border-black">
                     <span className="font-mono text-sm font-bold">{item.step}</span>
                   </div>
 
