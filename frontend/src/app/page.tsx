@@ -262,59 +262,58 @@ export default function Home() {
             <p className="text-xl text-gray-500">Four steps to breakthrough protein designs</p>
           </motion.div>
 
-          <div className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {[
               {
-                step: "1",
+                step: "01",
                 title: "Upload Structure",
                 desc: "Drop your PDB file or paste sequence",
                 detail: "Supports PDB, FASTA, and custom formats"
               },
               {
-                step: "2",
+                step: "02",
                 title: "Choose Pipeline",
                 desc: "Select DiffAb, RFdiffusion, or full pipeline",
                 detail: "AI automatically recommends optimal model"
               },
               {
-                step: "3",
+                step: "03",
                 title: "Generate",
                 desc: "Our AI models create optimized variants",
                 detail: "Real-time progress tracking and ETA"
               },
               {
-                step: "4",
+                step: "04",
                 title: "Analyze Results",
                 desc: "Interactive 3D viewer with quality metrics",
                 detail: "Download PDB, sequences, and reports"
               },
-            ].map((item) => (
-              <div
+            ].map((item, idx) => (
+              <motion.div
                 key={item.step}
-                className="group"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
+                viewport={{ once: true }}
+                className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-neutral-200 hover:shadow-xl transition-all duration-300"
               >
-                <div
-                  className="flex items-start gap-6 p-8 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 transition-all duration-300"
-                >
-                  <div className="flex-shrink-0">
-                    <div
-                      className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white font-bold text-xl"
-                    >
-                      {item.step}
-                    </div>
+                <div className="absolute top-8 right-8 text-4xl font-bold text-neutral-100 group-hover:text-emerald-500/10 transition-colors select-none">
+                  {item.step}
+                </div>
+
+                <div className="relative z-10">
+                  <div className="w-12 h-12 bg-neutral-50 rounded-2xl flex items-center justify-center mb-6 text-neutral-900 group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                    <span className="font-mono text-sm font-bold">{item.step}</span>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold mb-2 text-black">{item.title}</h3>
-                    <p className="text-lg text-gray-700 mb-1">{item.desc}</p>
-                    <p className="text-sm text-gray-500">{item.detail}</p>
-                  </div>
-                  <div
-                    className="flex-shrink-0 opacity-100"
-                  >
-                    <ArrowRight className="w-6 h-6 text-black" />
+
+                  <h3 className="text-2xl font-bold mb-2 text-neutral-900">{item.title}</h3>
+                  <p className="text-lg text-neutral-600 mb-4">{item.desc}</p>
+
+                  <div className="flex items-center text-sm text-neutral-400 group-hover:text-emerald-600 transition-colors">
+                    {item.detail} <ArrowRight className="ml-2 w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
