@@ -66,7 +66,7 @@ export function Navbar({ variant = "default" }: NavbarProps) {
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-1 group">
-                    <img src="/icon.png" alt="Foldexa Icon" className="w-8 h-8 md:w-9 md:h-9 object-contain" />
+                    <img src="/icon.png" alt="Foldexa Icon" className="w-5 h-5 md:w-6 md:h-6 object-contain" />
                     <span className={cn("text-base font-medium tracking-tight leading-none", textColor === "text-white" ? "text-[#FFFFF0]" : textColor)}>Foldexa</span>
                 </Link>
 
