@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
+import Image from "next/image";
 
 // Founder Data
 const FOUNDERS = [
@@ -16,6 +17,7 @@ const FOUNDERS = [
             "I spent years manually designing sequences, often hitting dead ends. I knew there had to be a way to simulate nature's complexity before ever touching a pipette.",
             "Foldexa is the tool I wish I had: a bridge between biological intuition and computational power."
         ],
+        image: "/images/team/Azamat.jpeg",
         color: "from-emerald-500/20 to-emerald-900/5",
         border: "group-hover:border-emerald-500/50",
         textAccent: "text-emerald-500",
@@ -31,6 +33,7 @@ const FOUNDERS = [
             "I built the Foldexa architecture to be invisible. You shouldn't have to be a cloud engineer to run AlphaFold. You should just focus on the science.",
             "We are building the AWS for biology, one microservice at a time."
         ],
+        image: "/images/team/Kanat.JPG",
         color: "from-blue-500/20 to-blue-900/5",
         border: "group-hover:border-blue-500/50",
         textAccent: "text-blue-500",
@@ -46,6 +49,7 @@ const FOUNDERS = [
             "I saw the gap between academic breakthrough and commercial reality. Foldexa bridges that gap by making high-performance computing accessible to startups and giants alike.",
             "We aren't just building software; we're accelerating the cure."
         ],
+        image: "/images/team/Issabek.png",
         color: "from-purple-500/20 to-purple-900/5",
         border: "group-hover:border-purple-500/50",
         textAccent: "text-purple-500",
@@ -134,8 +138,13 @@ export function StorySection() {
                                 {/* Content */}
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-6">
-                                        <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center font-bold text-lg text-neutral-400 border border-neutral-700">
-                                            {founder.initials}
+                                        <div className="relative w-14 h-14 rounded-full overflow-hidden border border-neutral-700 group-hover:border-white/20 transition-colors">
+                                            <Image
+                                                src={founder.image}
+                                                alt={founder.name}
+                                                fill
+                                                className="object-cover"
+                                            />
                                         </div>
                                         <div>
                                             <h3 className="text-xl font-bold text-white leading-tight">{founder.name}</h3>
@@ -176,7 +185,7 @@ export function StorySection() {
                                         <motion.div
                                             layoutId={`card-${founder.id}`}
                                             key={founder.id}
-                                            className="w-full max-w-3xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative"
+                                            className="w-full max-w-4xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative"
                                         >
                                             {/* Close Button */}
                                             <button
@@ -188,13 +197,18 @@ export function StorySection() {
 
                                             <div className="grid md:grid-cols-5 h-full max-h-[85vh] overflow-y-auto">
                                                 {/* Sidebar (Visual) */}
-                                                <div className={`md:col-span-2 p-10 bg-gradient-to-br ${founder.color} relative flex flex-col justify-end`}>
-                                                    <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center font-bold text-3xl text-white border border-white/10 mb-8">
-                                                        {founder.initials}
+                                                <div className={`md:col-span-2 p-10 bg-gradient-to-br ${founder.color} relative flex flex-col justify-between`}>
+                                                    <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl mb-8">
+                                                        <Image
+                                                            src={founder.image}
+                                                            alt={founder.name}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
                                                     </div>
 
-                                                    <div className="mt-20">
-                                                        <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">{founder.name}</h3>
+                                                    <div className="mt-auto">
+                                                        <h3 className="text-3xl md:text-3xl font-bold text-white mb-2">{founder.name}</h3>
                                                         <p className="text-lg text-white/80 font-medium">{founder.role}</p>
                                                     </div>
                                                 </div>
