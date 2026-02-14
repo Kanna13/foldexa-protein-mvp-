@@ -234,176 +234,174 @@ export default function Home() {
                 </Button>
               </Link>
             </motion.div>
+          </motion.div>
         </div>
-      </motion.div>
-    </motion.div>
-        </div >
-      </section >
+      </section>
 
-    {/* --- SECTION 3: HOW IT WORKS (Premium Grid) --- */ }
-    < section id = "platform" className = "bg-neutral-50/50 py-32 border-t border-neutral-100" >
-      <div className="max-w-5xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
-          <h2 className="text-6xl font-mono font-bold tracking-tighter mb-4 text-neutral-900">Simple. Powerful. Fast.</h2>
-          <p className="text-xl text-primary font-medium">Four steps to breakthrough protein designs</p>
-        </motion.div>
+      {/* --- SECTION 3: HOW IT WORKS (Premium Grid) --- */}
+      <section id="platform" className="bg-neutral-50/50 py-32 border-t border-neutral-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-6xl font-mono font-bold tracking-tighter mb-4 text-neutral-900">Simple. Powerful. Fast.</h2>
+            <p className="text-xl text-primary font-medium">Four steps to breakthrough protein designs</p>
+          </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {[
-            {
-              step: "01",
-              title: "Upload Structure",
-              desc: "Drop your PDB file or paste sequence",
-              detail: "Supports PDB, FASTA, and custom formats"
-            },
-            {
-              step: "02",
-              title: "Choose Pipeline",
-              desc: "Select DiffAb, RFdiffusion, or full pipeline",
-              detail: "AI automatically recommends optimal model"
-            },
-            {
-              step: "03",
-              title: "Generate",
-              desc: "Our AI models create optimized variants",
-              detail: "Real-time progress tracking and ETA"
-            },
-            {
-              step: "04",
-              title: "Analyze Results",
-              desc: "Interactive 3D viewer with quality metrics",
-              detail: "Download PDB, sequences, and reports"
-            },
-          ].map((item, idx) => (
-            <motion.div
-              key={item.step}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
-              viewport={{ once: true }}
-              className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-emerald-500/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] transition-all duration-300"
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              {
+                step: "01",
+                title: "Upload Structure",
+                desc: "Drop your PDB file or paste sequence",
+                detail: "Supports PDB, FASTA, and custom formats"
+              },
+              {
+                step: "02",
+                title: "Choose Pipeline",
+                desc: "Select DiffAb, RFdiffusion, or full pipeline",
+                detail: "AI automatically recommends optimal model"
+              },
+              {
+                step: "03",
+                title: "Generate",
+                desc: "Our AI models create optimized variants",
+                detail: "Real-time progress tracking and ETA"
+              },
+              {
+                step: "04",
+                title: "Analyze Results",
+                desc: "Interactive 3D viewer with quality metrics",
+                detail: "Download PDB, sequences, and reports"
+              },
+            ].map((item, idx) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
+                viewport={{ once: true }}
+                className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-emerald-500/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] transition-all duration-300"
+              >
+                <div className="relative z-10">
+                  <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center mb-6 text-black shadow-sm shadow-emerald-500/20">
+                    <span className="font-mono text-sm font-bold">{item.step}</span>
+                  </div>
+
+                  <h3 className="text-2xl font-bold mb-2 text-neutral-900 group-hover:text-black transition-colors">{item.title}</h3>
+                  <p className="text-lg text-neutral-600 mb-4 group-hover:text-neutral-700 transition-colors">{item.desc}</p>
+
+                  <div className="flex items-center text-sm font-medium text-neutral-400">
+                    {item.detail}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mt-16"
+          >
+            <Link href="/app/new">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button variant="primary" size="lg" className="shadow-xl">
+                  Try It Now <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </motion.div>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* --- SECTION 4: OUR STORY --- */}
+      <section className="bg-white py-32">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-5xl font-bold text-center mb-16">Our Story</h2>
+          <div className="space-y-12">
+            {[
+              {
+                name: "Azamat",
+                age: "",
+                role: "Bioengineer",
+                education: "Studied Bioengineering at KAIST, one of South Korea's top universities",
+                color: "bg-blue-500"
+              },
+              {
+                name: "Kanat Tilekov",
+                age: "22 years old",
+                role: "Software Developer & Data Analyst",
+                education: "Studied at Solbridge International School of Business (South Korea) and gained knowledge in Spain",
+                color: "bg-purple-500"
+              },
+              {
+                name: "Sarzmuza Issabek",
+                age: "21 years old",
+                role: "Sales Person & Business Developer",
+                education: "Studied at Solbridge University in Korea, later moved to Seoul and worked in car export business",
+                color: "bg-orange-500"
+              }
+            ].map((member) => (
+              <div key={member.name} className="flex items-start gap-6 p-8 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-300 flex-shrink-0" />
+                <div>
+                  <h3 className="text-2xl font-bold">{member.name} {member.age && <span className="text-gray-400 text-lg">({member.age})</span>}</h3>
+                  <p className="text-lg text-gray-600 font-medium mb-2">{member.role}</p>
+                  <p className="text-gray-500">{member.education}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- SECTION 5: OUR VISION --- */}
+      <section className="bg-gradient-to-br from-neutral-900 to-neutral-800 text-white py-32">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-5xl font-bold mb-8">Our Vision</h2>
+          <p className="text-2xl text-gray-300 leading-relaxed">
+            To democratize protein engineering and make cutting-edge AI tools accessible to researchers worldwide.
+            We believe that breakthrough discoveries shouldn't be limited by computational barriers.
+          </p>
+        </div>
+      </section>
+
+      {/* --- SECTION 6: PRICING --- */}
+      <PricingSection />
+
+      {/* --- SECTION 7: CONTACT --- */}
+      <section id="contact" className="bg-white py-32">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-5xl font-bold mb-8">Get in Touch</h2>
+          <p className="text-xl text-gray-600 mb-12">
+            Interested in partnering with us or want to learn more? Let's connect!
+          </p>
+          <div className="flex justify-center gap-6">
+            <a
+              href="https://www.linkedin.com/company/foldexa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
             >
-              <div className="relative z-10">
-                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center mb-6 text-black shadow-sm shadow-emerald-500/20">
-                  <span className="font-mono text-sm font-bold">{item.step}</span>
-                </div>
-
-                <h3 className="text-2xl font-bold mb-2 text-neutral-900 group-hover:text-black transition-colors">{item.title}</h3>
-                <p className="text-lg text-neutral-600 mb-4 group-hover:text-neutral-700 transition-colors">{item.desc}</p>
-
-                <div className="flex items-center text-sm font-medium text-neutral-400">
-                  {item.detail}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              LinkedIn
+            </a>
+            <a
+              href="mailto:contact@foldexa.com"
+              className="px-8 py-4 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+            >
+              Email Us
+            </a>
+          </div>
         </div>
+      </section>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <Link href="/app/new">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="primary" size="lg" className="shadow-xl">
-                Try It Now <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </motion.div>
-          </Link>
-        </motion.div>
-      </div>
-      </section >
-
-    {/* --- SECTION 4: OUR STORY --- */ }
-    < section className = "bg-white py-32" >
-      <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-5xl font-bold text-center mb-16">Our Story</h2>
-        <div className="space-y-12">
-          {[
-            {
-              name: "Azamat",
-              age: "",
-              role: "Bioengineer",
-              education: "Studied Bioengineering at KAIST, one of South Korea's top universities",
-              color: "bg-blue-500"
-            },
-            {
-              name: "Kanat Tilekov",
-              age: "22 years old",
-              role: "Software Developer & Data Analyst",
-              education: "Studied at Solbridge International School of Business (South Korea) and gained knowledge in Spain",
-              color: "bg-purple-500"
-            },
-            {
-              name: "Sarzmuza Issabek",
-              age: "21 years old",
-              role: "Sales Person & Business Developer",
-              education: "Studied at Solbridge University in Korea, later moved to Seoul and worked in car export business",
-              color: "bg-orange-500"
-            }
-          ].map((member) => (
-            <div key={member.name} className="flex items-start gap-6 p-8 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
-              <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-300 flex-shrink-0" />
-              <div>
-                <h3 className="text-2xl font-bold">{member.name} {member.age && <span className="text-gray-400 text-lg">({member.age})</span>}</h3>
-                <p className="text-lg text-gray-600 font-medium mb-2">{member.role}</p>
-                <p className="text-gray-500">{member.education}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      </section >
-
-    {/* --- SECTION 5: OUR VISION --- */ }
-    < section className = "bg-gradient-to-br from-neutral-900 to-neutral-800 text-white py-32" >
-      <div className="max-w-4xl mx-auto px-6 text-center">
-        <h2 className="text-5xl font-bold mb-8">Our Vision</h2>
-        <p className="text-2xl text-gray-300 leading-relaxed">
-          To democratize protein engineering and make cutting-edge AI tools accessible to researchers worldwide.
-          We believe that breakthrough discoveries shouldn't be limited by computational barriers.
-        </p>
-      </div>
-      </section >
-
-    {/* --- SECTION 6: PRICING --- */ }
-    < PricingSection />
-
-    {/* --- SECTION 7: CONTACT --- */ }
-    < section id = "contact" className = "bg-white py-32" >
-      <div className="max-w-4xl mx-auto px-6 text-center">
-        <h2 className="text-5xl font-bold mb-8">Get in Touch</h2>
-        <p className="text-xl text-gray-600 mb-12">
-          Interested in partnering with us or want to learn more? Let's connect!
-        </p>
-        <div className="flex justify-center gap-6">
-          <a
-            href="https://www.linkedin.com/company/foldexa"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
-          >
-            LinkedIn
-          </a>
-          <a
-            href="mailto:contact@foldexa.com"
-            className="px-8 py-4 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
-          >
-            Email Us
-          </a>
-        </div>
-      </div>
-      </section >
-
-    </div >
+    </div>
   );
 }
