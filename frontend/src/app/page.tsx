@@ -302,11 +302,11 @@ export default function Home() {
                     <span className="font-mono text-sm font-bold">{item.step}</span>
                   </div>
 
-                  <h3 className="text-2xl font-bold mb-2 text-neutral-900">{item.title}</h3>
-                  <p className="text-lg text-neutral-600 mb-4">{item.desc}</p>
+                  <h3 className="text-2xl font-bold mb-2 text-neutral-900 group-hover:text-black transition-colors">{item.title}</h3>
+                  <p className="text-lg text-neutral-600 mb-4 group-hover:text-neutral-700 transition-colors">{item.desc}</p>
 
-                  <div className="flex items-center text-sm text-neutral-400 group-hover:text-emerald-600 transition-colors">
-                    {item.detail} <ArrowRight className="ml-2 w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                  <div className="flex items-center text-sm font-bold text-primary">
+                    {item.detail} <ArrowRight className="ml-2 w-4 h-4" />
                   </div>
                 </div>
               </motion.div>
