@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { PricingSection } from "@/components/marketing/PricingSection";
 import Image from "next/image";
+import { BenchmarksSection } from "@/components/marketing/BenchmarksSection";
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -320,6 +321,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* --- SECTION 3.5: BENCHMARKS --- */}
+      <BenchmarksSection />
 
       {/* --- SECTION 4: OUR STORY --- */}
       <section className="bg-white py-32">
