@@ -22,9 +22,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: "/logos/foldexa-logo.png",
-    shortcut: "/logos/foldexa-logo.png",
-    apple: "/logos/foldexa-logo.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
   openGraph: {
     title: "Foldexa | Engineering Life, Digitally",

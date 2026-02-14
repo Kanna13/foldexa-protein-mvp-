@@ -53,25 +53,21 @@ export function Navbar({ variant = "default" }: NavbarProps) {
         borderClass = isLight ? "border-black/5" : "border-white/5";
     }
 
-    const logoSrc = "/logos/foldexa-logo.png";
-
     return (
         <motion.nav
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4", // Reduced py for tighter feel
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-2",
                 navBg,
                 borderClass
             )}
         >
-            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-1 group">
-                    <div className="relative w-16 h-16 flex items-center justify-center">
-                        <img src={logoSrc} alt="Foldexa Logo" className="w-full h-full object-contain" />
-                    </div>
-                    <span className={cn("text-xl font-bold tracking-tight", textColor)}>Foldexa</span>
+                <Link href="/" className="flex items-center gap-3 group">
+                    <img src="/icon.png" alt="Foldexa Icon" className="w-6 h-6 md:w-7 md:h-7 object-contain" />
+                    <span className={cn("text-lg font-medium tracking-tight", textColor)}>Foldexa</span>
                 </Link>
 
                 {/* Desktop Links */}
