@@ -130,7 +130,7 @@ export function StorySection() {
                   overflow-hidden
                   ${selectedId === founder.id ? 'opacity-0 pointer-events-none' : 'opacity-100'}
                 `}
-                                whileHover={{ y: -5 }}
+                                whileHover={{ scale: 1.02 }}
                             >
                                 {/* Glow Effect */}
                                 <div className={`absolute inset-0 bg-gradient-to-b ${founder.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
