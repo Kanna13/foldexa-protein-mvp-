@@ -55,7 +55,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.1, ease: "easeOut" }}
-              className="text-4xl md:text-5xl lg:text-6.5xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
+              className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
             >
               Engineering <br />
               <span className="text-white font-bold tracking-tight">Life. Digitally.</span>
