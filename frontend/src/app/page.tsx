@@ -47,15 +47,15 @@ export default function Home() {
               transition={{ duration: 1.2, ease: "easeOut" }}
               className="inline-flex items-center gap-2 px-4 py-1.5 text-primary-dark text-xs font-mono uppercase tracking-[0.2em] opacity-90"
             >
-              <span className="w-2.0 h-2.0 rounded-full bg-primary animate-pulse" />
-              v1.0 Public Beta
+              <span className="w-3.0 h-3.0 rounded-full bg-primary animate-pulse" />
+              v1.0 Foldexa Public Beta
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.1, ease: "easeOut" }}
-              className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
+              className="text-3xl md:text-4xl lg:text-6xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
             >
               Engineering <br />
               <span className="text-white font-bold tracking-tight">Life. Digitally.</span>
@@ -78,11 +78,11 @@ export default function Home() {
               className="flex flex-col sm:flex-row items-center gap-4"
             >
               <Link href="/app/new">
-                <Button variant="primary" size="lg" className="min-w-[200px] shadow-[0_0_20px_rgba(0,217,126,0.15)] hover:shadow-[0_0_30px_rgba(0,217,126,0.3)] transition-shadow duration-500 h-14 px-8 text-lg">
+                <Button variant="primary" size="lg" className="min-w-[200px] shadow-[0_0_20px_rgba(0,217,126,0.15)] hover:shadow-[0_0_30px_rgba(0,217,126,0.3)] transition-shadow duration-500 h-12 px-7.5 text-lg">
                   Start Folding <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
-              <Button variant="glass" size="lg" className="min-w-[200px] h-13 px-8 text-lg bg-black/40 hover:bg-black/60 border-white/20">
+              <Button variant="glass" size="lg" className="min-w-[200px] h-12 px-7.5 text-lg bg-black/40 hover:bg-black/60 border-white/20">
                 <Play className="mr-2 w-4.5 h-4.5 fill-current" /> Watch Demo
               </Button>
             </motion.div>
