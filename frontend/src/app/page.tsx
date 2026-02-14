@@ -295,14 +295,10 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-neutral-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300"
+                className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-emerald-500/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] transition-all duration-300"
               >
-                <div className="absolute top-8 right-8 text-4xl font-bold text-neutral-100 group-hover:text-emerald-500/10 transition-colors select-none">
-                  {item.step}
-                </div>
-
                 <div className="relative z-10">
-                  <div className="w-12 h-12 bg-neutral-50 rounded-2xl flex items-center justify-center mb-6 text-neutral-900 group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                  <div className="w-12 h-12 bg-black rounded-2xl flex items-center justify-center mb-6 text-white group-hover:bg-emerald-500 group-hover:text-black transition-colors duration-300 shadow-sm">
                     <span className="font-mono text-sm font-bold">{item.step}</span>
                   </div>
 
