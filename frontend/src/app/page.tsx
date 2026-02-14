@@ -47,15 +47,15 @@ export default function Home() {
               transition={{ duration: 1.2, ease: "easeOut" }}
               className="inline-flex items-center gap-2 px-4 py-1.5 text-primary-dark text-xs font-mono uppercase tracking-[0.2em] opacity-90"
             >
-              <span className="w-3.0 h-3.0 rounded-full bg-primary animate-pulse" />
-              v1.0 Foldexa Public Beta
+              <span className="w-3.5 h-3.5 rounded-full bg-primary animate-pulse" />
+              v1.0 Public Beta
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.1, ease: "easeOut" }}
-              className="text-3xl md:text-4xl lg:text-6xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
+              className="text-4xl md:text-5xl lg:text-6.5xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
             >
               Engineering <br />
               <span className="text-white font-bold tracking-tight">Life. Digitally.</span>
