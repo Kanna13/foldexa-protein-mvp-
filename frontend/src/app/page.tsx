@@ -174,7 +174,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="border-t border-gray-200 pt-16"
           >
-            <h3 className="text-sm font-mono uppercase tracking-widest text-gray-400 mb-8 text-center">Our Partners</h3>
+            <h3 className="text-3xl font-bold tracking-tight text-black mb-12 text-center">Our Partners</h3>
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {[
                 {
@@ -237,7 +237,7 @@ export default function Home() {
                   </p>
 
                   <Link href="#contact">
-                    <Button variant="primary" size="lg" className="min-w-[200px] shadow-lg hover:shadow-emerald-500/20">
+                    <Button className="min-w-[200px] shadow-lg bg-black text-white hover:bg-neutral-800 border-0 h-12 px-8 text-lg">
                       Partner With Us <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                   </Link>
@@ -258,7 +258,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-5xl font-bold mb-4 text-black">Simple. Powerful. Fast.</h2>
+            <h2 className="text-6xl font-medium tracking-tighter mb-4 text-black">Simple. Powerful. Fast.</h2>
             <p className="text-xl text-gray-500">Four steps to breakthrough protein designs</p>
           </motion.div>
 
@@ -288,53 +288,33 @@ export default function Home() {
                 desc: "Interactive 3D viewer with quality metrics",
                 detail: "Download PDB, sequences, and reports"
               },
-            ].map((item, idx) => (
-              <motion.div
+            ].map((item) => (
+              <div
                 key={item.step}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.15 }}
-                viewport={{ once: true }}
                 className="group"
               >
-                <motion.div
-                  whileHover={{ x: 10 }}
-                  className="flex items-start gap-6 p-8 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all duration-300 border-l-4 border-transparent hover:border-emerald-500"
+                <div
+                  className="flex items-start gap-6 p-8 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 transition-all duration-300"
                 >
                   <div className="flex-shrink-0">
-                    <motion.div
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.6 }}
-                      className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                    <div
+                      className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white font-bold text-xl"
                     >
                       {item.step}
-                    </motion.div>
+                    </div>
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold mb-2 group-hover:text-emerald-600 transition-colors">{item.title}</h3>
+                    <h3 className="text-2xl font-bold mb-2 text-black">{item.title}</h3>
                     <p className="text-lg text-gray-700 mb-1">{item.desc}</p>
                     <p className="text-sm text-gray-500">{item.detail}</p>
                   </div>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    whileHover={{ opacity: 1 }}
-                    className="flex-shrink-0"
+                  <div
+                    className="flex-shrink-0 opacity-100"
                   >
-                    <ArrowRight className="w-6 h-6 text-emerald-500" />
-                  </motion.div>
-                </motion.div>
-                {idx < 3 && (
-                  <div className="flex justify-center my-2">
-                    <motion.div
-                      initial={{ scaleY: 0 }}
-                      whileInView={{ scaleY: 1 }}
-                      transition={{ duration: 0.3, delay: idx * 0.15 + 0.3 }}
-                      viewport={{ once: true }}
-                      className="w-0.5 h-8 bg-gradient-to-b from-gray-300 to-transparent origin-top"
-                    />
+                    <ArrowRight className="w-6 h-6 text-black" />
                   </div>
-                )}
-              </motion.div>
+                </div>
+              </div>
             ))}
           </div>
 
