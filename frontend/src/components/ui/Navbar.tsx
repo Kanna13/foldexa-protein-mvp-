@@ -67,8 +67,8 @@ export function Navbar({ variant = "default" }: NavbarProps) {
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative w-14 h-14 flex items-center justify-center">
+                <Link href="/" className="flex items-center gap-1 group">
+                    <div className="relative w-16 h-16 flex items-center justify-center">
                         <img src={logoSrc} alt="Foldexa Logo" className="w-full h-full object-contain" />
                     </div>
                     <span className={cn("text-xl font-bold tracking-tight", textColor)}>Foldexa</span>
