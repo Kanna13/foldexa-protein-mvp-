@@ -288,7 +288,7 @@ export default function Home() {
                 className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-emerald-500/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] transition-all duration-300"
               >
                 <div className="relative z-10">
-                  <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center mb-6 text-black shadow-sm shadow-emerald-500/20 border-2 border-black">
+                  <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 text-emerald-700 shadow-sm shadow-emerald-500/10 border border-emerald-500/20">
                     <span className="font-mono text-sm font-bold">{item.step}</span>
                   </div>
 
