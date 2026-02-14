@@ -221,7 +221,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
-              className="mt-20 text-center"
+              className="mt-8 mx-auto max-w-2xl bg-white p-10 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center"
             >
               <h3 className="text-3xl font-bold text-neutral-900 mb-3 tracking-tight">Become a Partner</h3>
               <p className="text-lg text-neutral-500 mb-8 max-w-md mx-auto leading-relaxed">
