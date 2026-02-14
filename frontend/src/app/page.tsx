@@ -248,8 +248,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SECTION 3: HOW IT WORKS (Minimalist) --- */}
-      <section id="platform" className="bg-white py-32">
+      {/* --- SECTION 3: HOW IT WORKS (Premium Grid) --- */}
+      <section id="platform" className="bg-neutral-50/50 py-32 border-t border-neutral-100">
         <div className="max-w-5xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -258,8 +258,8 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-6xl font-medium tracking-tighter mb-4 text-black">Simple. Powerful. Fast.</h2>
-            <p className="text-xl text-gray-500">Four steps to breakthrough protein designs</p>
+            <h2 className="text-6xl font-medium tracking-tighter mb-4 text-neutral-900">Simple. Powerful. Fast.</h2>
+            <p className="text-xl text-neutral-500">Four steps to breakthrough protein designs</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -295,7 +295,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
                 viewport={{ once: true }}
-                className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-neutral-200 hover:shadow-xl transition-all duration-300"
+                className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-neutral-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300"
               >
                 <div className="absolute top-8 right-8 text-4xl font-bold text-neutral-100 group-hover:text-emerald-500/10 transition-colors select-none">
                   {item.step}

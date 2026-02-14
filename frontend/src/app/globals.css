@@ -1,21 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  /* Deep Space Black */
-  --background: #050505;
-  /* Off-white text */
-  --foreground: #E2E2E2;
+  /* Premium Light Theme */
+  --background: #ffffff;
+  --foreground: #09090b;
 
-  /* Brand Colors */
-  --primary: #00D97E;
-  /* Rich Vibrant Green */
-  --primary-dark: #00B368;
-  --secondary: #0A0F0D;
-  /* Subtle Green-Black */
+  /* Brand Colors - Emerald */
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --secondary: #f4f4f5;
 
-  /* Glass UI */
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(10, 15, 13, 0.6);
+  /* UI Elements */
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --border: #e4e4e7;
+
+  /* Glass UI (Adapted for Light Mode) */
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.7);
 }
 
 @theme inline {
