@@ -149,14 +149,10 @@ export default function Home() {
                     desc: "Structure Validation",
                     color: "bg-amber-500",
                   },
-                ].map((model, idx) => (
-                  <motion.div
+                ].map((model) => (
+                  <div
                     key={model.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: idx * 0.1 }}
-                    viewport={{ once: true }}
-                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-300 transition-colors"
+                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-300 transition-all duration-200"
                   >
                     <span className={`w-3 h-3 rounded-full ${model.color}`} />
 
@@ -164,7 +160,7 @@ export default function Home() {
                       <p className="font-semibold">{model.name}</p>
                       <p className="text-sm text-gray-500">{model.desc}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </motion.div>
