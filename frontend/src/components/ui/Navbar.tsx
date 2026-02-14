@@ -84,10 +84,10 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                 </div>
 
                 {/* CTA */}
-                <div className="hidden md:flex items-center gap-4">
-                    <Button variant="ghost" size="sm" className={cn(textColor, "hover:bg-white/10")}>Log In</Button>
+                <div className="hidden md:flex items-center gap-3">
+                    <Button variant="ghost" size="sm" className={cn(textColor, "hover:bg-white/10 h-7 px-3 text-xs")}>Log In</Button>
                     <Link href="/app/new">
-                        <Button variant="primary" size="sm" className="gap-1">Start Folding</Button>
+                        <Button variant="primary" size="sm" className="gap-1 h-7 px-3 text-xs">Start Folding</Button>
                     </Link>
                 </div>
 
