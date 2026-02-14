@@ -10,6 +10,7 @@ import { useRef } from "react";
 import { PricingSection } from "@/components/marketing/PricingSection";
 import Image from "next/image";
 import { BenchmarksSection } from "@/components/marketing/BenchmarksSection";
+import { StorySection } from "@/components/marketing/StorySection";
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -326,45 +327,7 @@ export default function Home() {
       <BenchmarksSection />
 
       {/* --- SECTION 4: OUR STORY --- */}
-      <section className="bg-white py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-5xl font-bold text-center mb-16">Our Story</h2>
-          <div className="space-y-12">
-            {[
-              {
-                name: "Azamat",
-                age: "",
-                role: "Bioengineer",
-                education: "Studied Bioengineering at KAIST, one of South Korea's top universities",
-                color: "bg-blue-500"
-              },
-              {
-                name: "Kanat Tilekov",
-                age: "22 years old",
-                role: "Software Developer & Data Analyst",
-                education: "Studied at Solbridge International School of Business (South Korea) and gained knowledge in Spain",
-                color: "bg-purple-500"
-              },
-              {
-                name: "Sarzmuza Issabek",
-                age: "21 years old",
-                role: "Sales Person & Business Developer",
-                education: "Studied at Solbridge University in Korea, later moved to Seoul and worked in car export business",
-                color: "bg-orange-500"
-              }
-            ].map((member) => (
-              <div key={member.name} className="flex items-start gap-6 p-8 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
-                <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-300 flex-shrink-0" />
-                <div>
-                  <h3 className="text-2xl font-bold">{member.name} {member.age && <span className="text-gray-400 text-lg">({member.age})</span>}</h3>
-                  <p className="text-lg text-gray-600 font-medium mb-2">{member.role}</p>
-                  <p className="text-gray-500">{member.education}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <StorySection />
 
       {/* --- SECTION 5: OUR VISION --- */}
       <section className="bg-gradient-to-br from-neutral-900 to-neutral-800 text-white py-32">

@@ -20,7 +20,7 @@
   --glass-bg: rgba(255, 255, 255, 0.7);
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
