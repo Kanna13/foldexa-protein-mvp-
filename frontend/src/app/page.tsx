@@ -59,7 +59,7 @@ export default function Home() {
             >
               Engineering <br />
               <span className="text-[#FFFFF0] font-bold tracking-tight">Life. </span>
-              <span className="text-neutral-400 font-bold tracking-tight">Digitally.</span>
+              <span className="text-neutral-300 font-bold tracking-tight">Digitally.</span>
             </motion.h1>
 
             <motion.p
