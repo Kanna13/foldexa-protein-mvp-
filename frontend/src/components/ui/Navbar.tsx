@@ -65,8 +65,8 @@ export function Navbar({ variant = "default" }: NavbarProps) {
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-1 group">
-                    <img src="/icon.png" alt="Foldexa Icon" className="w-5 h-5 md:w-6 md:h-6 object-contain" />
+                <Link href="/" className="flex items-center gap-3 group">
+                    <img src="/icon.png" alt="Foldexa Icon" className="w-4 h-4 md:w-5 md:h-5 object-contain" />
                     <span className={cn("text-base font-medium tracking-tight leading-none", textColor === "text-white" ? "text-[#FFFFF0]" : textColor)}>Foldexa</span>
                 </Link>
 
@@ -85,18 +85,12 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                 </div>
 
                 {/* CTA */}
-                <div className="hidden md:flex items-center gap-3">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className={cn("h-7 px-3 text-xs font-medium hover:bg-white/5", isContrast ? "text-white" : "text-emerald-400 hover:text-emerald-300")}
+                <div className="hidden md:flex items-center gap-6">
+                    <Link
+                        href="/login"
+                        className={cn("text-sm font-medium transition-colors font-mono hover:text-primary", subTextColor)}
                     >
-                        Watch Demo
-                    </Button>
-                    <Link href="/app/new">
-                        <Button variant="primary" size="sm" className="gap-1 h-7 px-3 text-xs font-medium bg-emerald-500 hover:bg-emerald-400 text-black border-0">
-                            Start Folding
-                        </Button>
+                        Log In
                     </Link>
                 </div>
 
