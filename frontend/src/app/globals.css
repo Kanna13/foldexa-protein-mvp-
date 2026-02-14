@@ -20,34 +20,6 @@
   --glass-bg: rgba(255, 255, 255, 0.7);
 }
 
-@theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-dark: var(--primary-dark);
-  --color-secondary: var(--secondary);
-  --color-glass-border: var(--glass-border);
-  --color-glass-bg: var(--glass-bg);
-
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-space-grotesk);
-
-  --animate-float: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-20px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
-}
 
 body {
   background: var(--background);
