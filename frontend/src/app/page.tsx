@@ -55,10 +55,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.1, ease: "easeOut" }}
-              className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
             >
               Engineering <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 to-neutral-400 font-bold">Life. Digitally.</span>
+              <span className="text-white font-bold tracking-tight">Life. Digitally.</span>
             </motion.h1>
 
             <motion.p

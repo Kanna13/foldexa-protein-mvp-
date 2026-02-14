@@ -65,18 +65,19 @@ export function Navbar({ variant = "default" }: NavbarProps) {
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-1 group">
+                <Link href="/" className="flex items-center gap-0.5 group">
                     <img src="/icon.png" alt="Foldexa Icon" className="w-10 h-10 md:w-11 md:h-11 object-contain" />
                     <span className={cn("text-lg font-medium tracking-tight", textColor)}>Foldexa</span>
                 </Link>
 
                 {/* Desktop Links */}
-                <div className="hidden md:flex items-center gap-8">
+                {/* Desktop Links */}
+                <div className="hidden md:flex items-center gap-6">
                     {navLinks.map((link) => (
                         <Link
                             key={link.name}
                             href={link.href}
-                            className={cn("text-sm font-medium transition-colors font-mono", subTextColor)}
+                            className={cn("text-sm font-medium transition-colors font-mono hover:text-primary", subTextColor)}
                         >
                             {link.name}
                         </Link>
@@ -85,9 +86,17 @@ export function Navbar({ variant = "default" }: NavbarProps) {
 
                 {/* CTA */}
                 <div className="hidden md:flex items-center gap-3">
-                    <Button variant="ghost" size="sm" className={cn(textColor, "hover:bg-white/10 h-7 px-3 text-xs")}>Log In</Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn("h-7 px-3 text-xs font-medium hover:bg-white/5", isContrast ? "text-white" : "text-emerald-400 hover:text-emerald-300")}
+                    >
+                        Watch Demo
+                    </Button>
                     <Link href="/app/new">
-                        <Button variant="primary" size="sm" className="gap-1 h-7 px-3 text-xs">Start Folding</Button>
+                        <Button variant="primary" size="sm" className="gap-1 h-7 px-3 text-xs font-medium bg-emerald-500 hover:bg-emerald-400 text-black border-0">
+                            Start Folding
+                        </Button>
                     </Link>
                 </div>
 
