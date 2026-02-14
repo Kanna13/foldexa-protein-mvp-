@@ -76,14 +76,14 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
-              className="flex flex-col sm:flex-row items-center gap-4"
+              className="flex flex-col sm:flex-row items-center gap-4 mt-8"
             >
               <Link href="/app/new">
-                <Button variant="primary" size="lg" className="min-w-[160px] shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:shadow-[0_0_30px_rgba(16,185,129,0.25)] transition-all duration-500 h-10 px-6 text-sm bg-emerald-500 hover:bg-emerald-400 text-black font-semibold border-0">
+                <Button variant="primary" size="lg" className="min-w-[140px] shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:shadow-[0_0_30px_rgba(16,185,129,0.25)] transition-all duration-500 h-11 px-5 text-sm bg-emerald-500 hover:bg-emerald-400 text-black font-semibold border-0">
                   Start Folding <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
-              <Button variant="glass" size="lg" className="min-w-[160px] h-10 px-6 text-sm bg-black/20 hover:bg-emerald-950/20 border-white/10 hover:border-emerald-500/20 text-emerald-100/80 hover:text-emerald-400 transition-all duration-300 backdrop-blur-sm">
+              <Button variant="glass" size="lg" className="min-w-[140px] h-11 px-5 text-sm bg-black/20 hover:bg-emerald-950/20 border-white/10 hover:border-emerald-500/20 text-emerald-100/80 hover:text-emerald-400 transition-all duration-300 backdrop-blur-sm">
                 <Play className="mr-2 w-3.5 h-3.5 fill-current opacity-80" /> Watch Demo
               </Button>
             </motion.div>
