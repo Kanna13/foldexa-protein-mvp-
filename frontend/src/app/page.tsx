@@ -37,6 +37,12 @@ export default function Home() {
             className="absolute inset-0 z-0 pointer-events-none"
           >
             <HeroVisual />
+
+            {/* DESKTOP GRADIENT */}
+            <div className="absolute inset-0 hidden md:block bg-gradient-to-b from-black/40 via-black/30 to-black/70" />
+
+            {/* MOBILE STRONG OVERLAY */}
+            <div className="absolute inset-0 md:hidden bg-black/70" />
           </motion.div>
 
           {/* Content (Centered on top) */}
@@ -55,11 +61,11 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, delay: 0.1, ease: "easeOut" }}
-              className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
+              className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[1.1] text-white/90 drop-shadow-2xl"
             >
               Engineering <br />
               <span className="text-white font-bold tracking-tight">Life. </span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 font-bold tracking-tight">Digitally.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-white/30 font-bold tracking-tight">Digitally.</span>
             </motion.h1>
 
             <motion.p
