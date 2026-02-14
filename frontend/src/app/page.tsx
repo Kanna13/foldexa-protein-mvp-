@@ -79,12 +79,12 @@ export default function Home() {
               className="flex flex-col sm:flex-row items-center gap-4"
             >
               <Link href="/app/new">
-                <Button variant="primary" size="lg" className="min-w-[200px] shadow-[0_0_20px_rgba(0,217,126,0.15)] hover:shadow-[0_0_30px_rgba(0,217,126,0.3)] transition-shadow duration-500 h-12 px-7.5 text-lg">
-                  Start Folding <ArrowRight className="ml-2 w-5 h-5" />
+                <Button variant="primary" size="lg" className="min-w-[160px] shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:shadow-[0_0_30px_rgba(16,185,129,0.25)] transition-all duration-500 h-10 px-6 text-sm bg-emerald-500 hover:bg-emerald-400 text-black font-semibold border-0">
+                  Start Folding <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
-              <Button variant="glass" size="lg" className="min-w-[200px] h-12 px-7.5 text-lg bg-black/40 hover:bg-black/60 border-white/20">
-                <Play className="mr-2 w-4.5 h-4.5 fill-current" /> Watch Demo
+              <Button variant="glass" size="lg" className="min-w-[160px] h-10 px-6 text-sm bg-black/20 hover:bg-emerald-950/20 border-white/10 hover:border-emerald-500/20 text-emerald-100/80 hover:text-emerald-400 transition-all duration-300 backdrop-blur-sm">
+                <Play className="mr-2 w-3.5 h-3.5 fill-current opacity-80" /> Watch Demo
               </Button>
             </motion.div>
           </div>
