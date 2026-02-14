@@ -17,6 +17,10 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Foldexa | Engineering Life, Digitally",
   description: "Accurate and intelligent protein structure prediction platform.",
+  metadataBase: new URL("https://foldexa.bio"),
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({
