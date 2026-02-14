@@ -240,7 +240,7 @@ export default function Home() {
       </section>
 
       {/* --- SECTION 3: HOW IT WORKS (Premium Grid) --- */}
-      <section id="platform" className="bg-neutral-50/50 py-32 border-t border-neutral-100">
+      <section id="platform" className="bg-neutral-50/50 pt-20 pb-32 border-t border-neutral-100">
         <div className="max-w-5xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
