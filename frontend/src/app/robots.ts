@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-    const baseUrl = 'https://foldexa.com' // TODO: Replace with your actual domain
+    const baseUrl = 'https://foldexa.bio' // TODO: Replace with your actual domain
 
     return {
         rules: {
