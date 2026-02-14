@@ -53,6 +53,8 @@ export function Navbar({ variant = "default" }: NavbarProps) {
         borderClass = isLight ? "border-black/5" : "border-white/5";
     }
 
+    const logoSrc = "/logos/foldexa-logo.png";
+
     return (
         <motion.nav
             initial={{ y: -100 }}
@@ -67,11 +69,9 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group">
                     <div className="relative w-8 h-8 flex items-center justify-center">
-                        <Dna className={cn("w-8 h-8 transition-transform group-hover:animate-spin-slow", (isLight && !isContrast) ? "text-emerald-600" : "text-emerald-400")} />
+                        <img src={logoSrc} alt="Foldexa Logo" className="w-full h-full object-contain" />
                     </div>
                     <span className={cn("text-xl font-bold tracking-tight", textColor)}>Foldexa</span>
-
-
                 </Link>
 
                 {/* Desktop Links */}
