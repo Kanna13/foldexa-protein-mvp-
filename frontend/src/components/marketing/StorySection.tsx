@@ -219,7 +219,7 @@ export function StorySection() {
                                                         initial={{ opacity: 0 }}
                                                         animate={{ opacity: 1 }}
                                                         transition={{ duration: 0.5, delay: 0.2 }}
-                                                        className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/40 to-transparent"
+                                                        className="absolute bottom-0 left-0 right-0 h-2/3 z-10 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
                                                     />
 
                                                     <div className="relative z-20 h-full flex flex-col justify-end p-8 md:p-10">
