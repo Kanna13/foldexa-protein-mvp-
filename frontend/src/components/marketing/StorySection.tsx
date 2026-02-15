@@ -72,7 +72,7 @@ export function StorySection() {
     }, []);
 
     return (
-        <section className="bg-[#0A0A0A] text-white py-32 relative overflow-hidden font-sans border-t border-white/10">
+        <section id="team" className="bg-[#0A0A0A] text-white py-32 relative overflow-hidden font-sans border-t border-white/10">
             {/* Background Ambience */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.05),transparent_50%)] pointer-events-none" />
 

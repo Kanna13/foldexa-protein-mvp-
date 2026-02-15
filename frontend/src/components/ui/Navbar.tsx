@@ -9,10 +9,10 @@ import { Button } from "./Button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-    { name: "Platform", href: "#platform" },
+    { name: "Platform", href: "/#platform" },
     { name: "History", href: "/app/history" },
-    { name: "About", href: "#about" },
-    { name: "Team", href: "/team" },
+    { name: "About", href: "/#about" },
+    { name: "Team", href: "/#team" },
 ];
 
 interface NavbarProps {

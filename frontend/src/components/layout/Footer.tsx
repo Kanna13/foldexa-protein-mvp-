@@ -12,7 +12,7 @@ const FOOTER_LINKS = {
     ],
     company: [
         { name: "About", href: "/#about" },
-        { name: "Team", href: "/team" },
+        { name: "Team", href: "/#team" },
         { name: "Contact", href: "/#contact" },
         { name: "Careers", href: "#", disabled: true }, // Placeholder
     ],

@@ -445,15 +445,15 @@ export default function Home() {
       <PricingSection />
 
       {/* --- SECTION 7: CONTACT --- */}
-      <section id="contact" className="bg-[#FBFBFD] py-32 border-t border-neutral-200">
+      <section id="contact" className="bg-black py-32 border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <span className="text-xs font-semibold tracking-widest text-neutral-500 uppercase mb-4 block">
             Get in Touch
           </span>
-          <h2 className="text-4xl font-semibold tracking-tight text-neutral-900 mb-6">
+          <h2 className="text-4xl font-semibold tracking-tight text-white mb-6">
             Interested in partnering with us?
           </h2>
-          <p className="text-lg text-neutral-500 max-w-xl mx-auto mb-10 font-light">
+          <p className="text-lg text-neutral-400 max-w-xl mx-auto mb-10 font-light">
             Whether you want to learn more or explore collaboration opportunities, we'd love to connect.
           </p>
 
@@ -468,7 +468,7 @@ export default function Home() {
             </a>
             <a
               href="mailto:contact@foldexa.com"
-              className="inline-flex items-center justify-center px-8 py-3 bg-neutral-900 text-white text-sm font-medium rounded-full hover:bg-black transition-colors min-w-[160px]"
+              className="inline-flex items-center justify-center px-8 py-3 bg-white text-black text-sm font-medium rounded-full hover:bg-neutral-200 transition-colors min-w-[160px]"
             >
               Email Us
             </a>
