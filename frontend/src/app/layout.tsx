@@ -15,14 +15,13 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Foldexa | Engineering Life, Digitally",
-  description: "Accurate and intelligent protein structure prediction platform.",
-  metadataBase: new URL("https://foldexa.bio"),
-  alternates: {
-    canonical: "/",
-  },
+  title: "Foldexa",
+  description: "Protein engineering platform",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
     shortcut: "/favicon.ico",
     apple: "/icon.png",
   },
