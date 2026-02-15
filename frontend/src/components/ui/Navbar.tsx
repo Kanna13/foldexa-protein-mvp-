@@ -74,6 +74,16 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                         <Link
                             key={link.name}
                             href={link.href}
+                            onClick={(e) => {
+                                if (pathname === "/" && link.href.startsWith("/#")) {
+                                    e.preventDefault();
+                                    const id = link.href.replace("/#", "");
+                                    const element = document.getElementById(id);
+                                    if (element) {
+                                        element.scrollIntoView({ behavior: "smooth" });
+                                    }
+                                }
+                            }}
                             className={cn("text-sm font-medium tracking-wide transition-all duration-300", linkColor)}
                         >
                             {link.name}
@@ -123,7 +133,17 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                             key={link.name}
                             href={link.href}
                             className="text-2xl font-medium tracking-tight text-white/90 py-3 border-b border-white/5"
-                            onClick={() => setMobileMenuOpen(false)}
+                            onClick={(e) => {
+                                setMobileMenuOpen(false);
+                                if (pathname === "/" && link.href.startsWith("/#")) {
+                                    e.preventDefault();
+                                    const id = link.href.replace("/#", "");
+                                    const element = document.getElementById(id);
+                                    if (element) {
+                                        element.scrollIntoView({ behavior: "smooth" });
+                                    }
+                                }
+                            }}
                         >
                             {link.name}
                         </Link>
