@@ -39,12 +39,28 @@ export function BetaAccessForm() {
 
         setStatus("loading");
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        try {
+            const response = await fetch("http://localhost:8000/api/v1/beta/request-access", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
 
-        setStatus("success");
-        // Ideally, send data to backend here
-        console.log("Form Submitted:", formData);
+            if (response.ok) {
+                setStatus("success");
+                console.log("Form Submitted:", formData);
+            } else {
+                console.error("Submission failed");
+                setStatus("idle"); // reset or show error
+                alert("Something went wrong. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            setStatus("idle");
+            alert("Failed to connect to server.");
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
