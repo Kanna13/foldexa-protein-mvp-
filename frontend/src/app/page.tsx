@@ -4,13 +4,103 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Navbar } from "@/components/ui/Navbar";
 import { Button } from "@/components/ui/Button";
 import { HeroVisual } from "@/components/ui/HeroVisual";
-import { ArrowRight, Play, ChevronsDown } from "lucide-react";
+import { ArrowRight, Play, ChevronsDown, Linkedin, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 import { PricingSection } from "@/components/marketing/PricingSection";
 import Image from "next/image";
 import { BenchmarksSection } from "@/components/marketing/BenchmarksSection";
 import { StorySection } from "@/components/marketing/StorySection";
+
+// ... (skipping to Vision Section)
+
+{/* --- SECTION 5: OUR VISION --- */ }
+<section className="bg-white py-32 border-t border-neutral-100/50">
+  <div className="max-w-4xl mx-auto px-6 text-center">
+    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100/50 border border-neutral-200 mb-8">
+      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+      <span className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">Our Vision</span>
+    </div>
+
+    <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-neutral-900 leading-tight mb-8">
+      To democratize protein engineering and make cutting-edge AI tools accessible to researchers worldwide.
+    </h2>
+
+    <div className="w-24 h-px bg-neutral-200 mx-auto mb-8" />
+
+    <p className="text-lg text-neutral-500 max-w-2xl mx-auto font-light leading-relaxed">
+      We believe that breakthrough discoveries shouldn't be limited by computational barriers. we built Foldexa to bridge the gap between biology and software.
+    </p>
+  </div>
+</section>
+
+{/* --- SECTION 6: PRICING --- */ }
+<PricingSection />
+
+{/* --- SECTION 7: CONTACT (Premium) --- */ }
+<section id="contact" className="bg-gradient-to-b from-white to-neutral-50 py-32 border-t border-neutral-200 relative overflow-hidden">
+  {/* Subtle DNA/Particle effect placeholder - minimal and static for performance */}
+  <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] pointer-events-none" />
+
+  <div className="max-w-5xl mx-auto px-6 relative z-10">
+    <div className="text-center mb-16">
+      <span className="text-xs font-bold tracking-widest text-neutral-500 uppercase mb-4 block">
+        Contact
+      </span>
+      <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 mb-6 leading-tight">
+        Let’s build the future of <br /> protein engineering together.
+      </h2>
+      <p className="text-lg md:text-xl text-neutral-500 max-w-2xl mx-auto font-light leading-relaxed">
+        Interested in partnering with Foldexa or learning more about our platform?
+        We’re always open to research collaborations, partnerships, and early adopters.
+      </p>
+    </div>
+
+    <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-16">
+      {/* Card 1: LinkedIn */}
+      <a
+        href="https://www.linkedin.com/company/foldexa"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group p-8 rounded-3xl bg-white border border-neutral-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center"
+      >
+        <div className="w-12 h-12 bg-[#0077b5]/10 rounded-xl flex items-center justify-center text-[#0077b5] mb-6 group-hover:scale-110 transition-transform">
+          <Linkedin className="w-6 h-6" />
+        </div>
+        <h3 className="text-xl font-bold text-neutral-900 mb-2">Connect on LinkedIn</h3>
+        <p className="text-neutral-500 mb-8 flex-grow">
+          Follow Foldexa and message us for partnerships and updates.
+        </p>
+        <span className="text-[#0077b5] font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+          Open LinkedIn <ArrowRight className="w-4 h-4" />
+        </span>
+      </a>
+
+      {/* Card 2: Email */}
+      <a
+        href="mailto:contact@foldexa.com"
+        className="group p-8 rounded-3xl bg-white border border-neutral-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center"
+      >
+        <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
+          <Mail className="w-6 h-6" />
+        </div>
+        <h3 className="text-xl font-bold text-neutral-900 mb-2">Email Us</h3>
+        <p className="text-neutral-500 mb-8 flex-grow">
+          Reach out directly for collaboration, research access, or questions.
+        </p>
+        <span className="text-emerald-600 font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+          Send Email <ArrowRight className="w-4 h-4" />
+        </span>
+      </a>
+    </div>
+
+    <div className="text-center">
+      <p className="text-sm text-neutral-400 font-medium bg-white/50 inline-block px-4 py-2 rounded-full border border-neutral-100 backdrop-blur-sm">
+        Typically respond within 24–48 hours.
+      </p>
+    </div>
+  </div>
+</section>
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -330,7 +420,7 @@ export default function Home() {
       <StorySection />
 
       {/* --- SECTION 5: OUR VISION --- */}
-      <section className="bg-[#FFFFF0] py-32 border-t border-neutral-100 relative overflow-hidden">
+      <section className="bg-white py-32 border-t border-neutral-100 relative overflow-hidden">
         {/* Static CSS-only ambient glow - lightweight */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-emerald-500/5 to-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
 
