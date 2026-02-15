@@ -37,9 +37,9 @@ export function BenchmarksSection() {
                 <div className="grid lg:grid-cols-3 gap-5 mb-24 w-full">
 
                     {/* Chart 1: i_PAE */}
-                    <div className="bg-[#111] border border-[#1C1C1C] rounded-[20px] p-10 pb-7 flex flex-col">
-                        <h4 className="text-2xl font-bold mb-1 text-white">Interface PAE (i_PAE)</h4>
-                        <p className="text-[#404040] mb-9 text-base">Lower = higher confidence in binding pose</p>
+                    <div className="bg-[#111] border border-[#1C1C1C] rounded-[20px] p-5 md:p-10 pb-7 flex flex-col">
+                        <h4 className="text-xl md:text-2xl font-bold mb-1 text-white">Interface PAE (i_PAE)</h4>
+                        <p className="text-[#404040] mb-9 text-xs md:text-base">Lower = higher confidence in binding pose</p>
 
                         <div className="flex-1 flex items-end h-[280px] border-b-2 border-[#1C1C1C] relative">
                             {/* Grid Lines */}
@@ -49,36 +49,36 @@ export function BenchmarksSection() {
 
                             {/* Bars */}
                             <div className="flex-1 flex flex-col items-center justify-end h-full z-10 w-full group">
-                                <span className="text-[#10B981] text-lg mb-1">★</span>
-                                <span className="text-xl font-bold mb-1.5 text-white">4.54</span>
-                                <div className="w-[64px] bg-[#10B981] rounded-t-md h-[105px]" />
-                                <p className="text-base text-center text-[#525252] mt-3.5 font-medium leading-[1.4]">Foldexa.bio<br />Best (#1)</p>
+                                <span className="text-[#10B981] text-sm md:text-lg mb-1">★</span>
+                                <span className="text-sm md:text-xl font-bold mb-1.5 text-white">4.54</span>
+                                <div className="w-9 md:w-16 bg-[#10B981] rounded-t-md h-[105px]" />
+                                <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-3.5 font-medium leading-[1.4]">Foldexa.bio<br />Best (#1)</p>
                             </div>
                             <div className="flex-1 flex flex-col items-center justify-end h-full z-10 w-full group">
-                                <span className="text-xl font-bold mb-1.5 text-white">4.62</span>
-                                <div className="w-[64px] bg-[rgba(16,185,129,0.35)] rounded-t-md h-[110px]" />
-                                <p className="text-base text-center text-[#525252] mt-3.5 font-medium leading-[1.4]">Foldexa.bio<br />Top-10 avg</p>
+                                <span className="text-sm md:text-xl font-bold mb-1.5 text-white">4.62</span>
+                                <div className="w-9 md:w-16 bg-[rgba(16,185,129,0.35)] rounded-t-md h-[110px]" />
+                                <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-3.5 font-medium leading-[1.4]">Foldexa.bio<br />Top-10 avg</p>
                             </div>
                             <div className="flex-1 flex flex-col items-center justify-end h-full z-10 w-full group">
-                                <span className="text-xl font-bold mb-1.5 text-white">5.75</span>
-                                <div className="w-[64px] bg-[#2A2A2A] rounded-t-md h-[138px]" />
-                                <p className="text-base text-center text-[#525252] mt-3.5 font-medium leading-[1.4]">Reference<br />hTAAB-hTie2</p>
+                                <span className="text-sm md:text-xl font-bold mb-1.5 text-white">5.75</span>
+                                <div className="w-9 md:w-16 bg-[#2A2A2A] rounded-t-md h-[138px]" />
+                                <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-3.5 font-medium leading-[1.4]">Reference<br />hTAAB-hTie2</p>
                             </div>
                             <div className="flex-1 flex flex-col items-center justify-end h-full z-10 w-full group">
-                                <span className="text-xl font-bold mb-1.5 text-[#EF4444]">8.2</span>
-                                <div className="w-[64px] bg-[#EF4444] rounded-t-md h-[200px]" />
-                                <p className="text-base text-center text-[#525252] mt-3.5 font-medium leading-[1.4]">Chai-2<br />(median)</p>
+                                <span className="text-sm md:text-xl font-bold mb-1.5 text-[#EF4444]">8.2</span>
+                                <div className="w-9 md:w-16 bg-[#EF4444] rounded-t-md h-[200px]" />
+                                <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-3.5 font-medium leading-[1.4]">Chai-2<br />(median)</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Chart 2: RMSD */}
-                    <div className="bg-[#111] border border-[#1C1C1C] rounded-[20px] p-10 pb-7 flex flex-col">
-                        <h4 className="text-2xl font-bold mb-1 text-white">CDR-L1 Backbone RMSD</h4>
-                        <p className="text-[#404040] mb-4 text-base">Angstroms (Å) — lower is better</p>
+                    <div className="bg-[#111] border border-[#1C1C1C] rounded-[20px] p-5 md:p-10 pb-7 flex flex-col">
+                        <h4 className="text-xl md:text-2xl font-bold mb-1 text-white">CDR-L1 Backbone RMSD</h4>
+                        <p className="text-[#404040] mb-4 text-xs md:text-base">Angstroms (Å) — lower is better</p>
                         <div className="flex items-center justify-end gap-3 mb-2.5">
-                            <span className="text-[rgba(239,68,68,0.5)] text-[15px] font-semibold">2 Å filtering threshold</span>
-                            <div className="w-[60px] border-t-2 border-dashed border-[rgba(239,68,68,0.35)]" />
+                            <span className="text-[rgba(239,68,68,0.5)] text-xs md:text-[15px] font-semibold">2 Å filtering threshold</span>
+                            <div className="w-[40px] md:w-[60px] border-t-2 border-dashed border-[rgba(239,68,68,0.35)]" />
                         </div>
 
                         <div className="flex-1 flex items-end h-[280px] border-b-2 border-[#1C1C1C] relative">
@@ -90,66 +90,66 @@ export function BenchmarksSection() {
 
                             {/* Bars */}
                             <div className="flex-1 flex flex-col items-center justify-end h-full z-10 w-full group">
-                                <span className="text-[#10B981] text-lg mb-1">★</span>
-                                <span className="text-xl font-bold mb-1.5 text-white">0.179</span>
-                                <div className="w-[64px] bg-[#10B981] rounded-t-md h-[16px]" />
-                                <p className="text-base text-center text-[#525252] mt-3.5 font-medium leading-[1.4]">Foldexa.bio<br />Best (#1)</p>
+                                <span className="text-[#10B981] text-sm md:text-lg mb-1">★</span>
+                                <span className="text-sm md:text-xl font-bold mb-1.5 text-white">0.179</span>
+                                <div className="w-9 md:w-16 bg-[#10B981] rounded-t-md h-[16px]" />
+                                <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-3.5 font-medium leading-[1.4]">Foldexa.bio<br />Best (#1)</p>
                             </div>
                             <div className="flex-1 flex flex-col items-center justify-end h-full z-10 w-full group">
-                                <span className="text-xl font-bold mb-1.5 text-white">0.37</span>
-                                <div className="w-[64px] bg-[rgba(16,185,129,0.35)] rounded-t-md h-[34px]" />
-                                <p className="text-base text-center text-[#525252] mt-3.5 font-medium leading-[1.4]">Foldexa.bio<br />Top-10 avg</p>
+                                <span className="text-sm md:text-xl font-bold mb-1.5 text-white">0.37</span>
+                                <div className="w-9 md:w-16 bg-[rgba(16,185,129,0.35)] rounded-t-md h-[34px]" />
+                                <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-3.5 font-medium leading-[1.4]">Foldexa.bio<br />Top-10 avg</p>
                             </div>
                             <div className="flex-1 flex flex-col items-center justify-end h-full z-10 w-full group">
-                                <span className="text-xl font-bold mb-1.5 text-white">0.81</span>
-                                <div className="w-[64px] bg-[#2A2A2A] rounded-t-md h-[76px]" />
-                                <p className="text-base text-center text-[#525252] mt-3.5 font-medium leading-[1.4]">Reference<br />hTAAB-hTie2</p>
+                                <span className="text-sm md:text-xl font-bold mb-1.5 text-white">0.81</span>
+                                <div className="w-9 md:w-16 bg-[#2A2A2A] rounded-t-md h-[76px]" />
+                                <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-3.5 font-medium leading-[1.4]">Reference<br />hTAAB-hTie2</p>
                             </div>
                             <div className="flex-1 flex flex-col items-center justify-end h-full z-10 w-full group">
-                                <span className="text-xl font-bold mb-1.5 text-[#8B5CF6]">~1.5</span>
-                                <div className="w-[64px] bg-[#8B5CF6] rounded-t-md h-[140px]" />
-                                <p className="text-base text-center text-[#525252] mt-3.5 font-medium leading-[1.4]">DiffAb<br />(scRMSD)</p>
+                                <span className="text-sm md:text-xl font-bold mb-1.5 text-[#8B5CF6]">~1.5</span>
+                                <div className="w-9 md:w-16 bg-[#8B5CF6] rounded-t-md h-[140px]" />
+                                <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-3.5 font-medium leading-[1.4]">DiffAb<br />(scRMSD)</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Chart 3: ddG (Negative Values) */}
-                    <div className="bg-[#111] border border-[#1C1C1C] rounded-[20px] p-10 pb-7 flex flex-col">
-                        <h4 className="text-2xl font-bold mb-1 text-white">Binding Free Energy (Rosetta ddG)</h4>
-                        <p className="text-[#404040] mb-9 text-base">kcal/mol — more negative = stronger binding</p>
+                    <div className="bg-[#111] border border-[#1C1C1C] rounded-[20px] p-5 md:p-10 pb-7 flex flex-col">
+                        <h4 className="text-xl md:text-2xl font-bold mb-1 text-white">Binding Free Energy (Rosetta ddG)</h4>
+                        <p className="text-[#404040] mb-9 text-xs md:text-base">kcal/mol — more negative = stronger binding</p>
 
                         <div className="border-t-2 border-[#1C1C1C] relative mt-2">
-                            <span className="absolute left-2 -top-6 text-[15px] font-medium text-[#333]">0 kcal/mol</span>
+                            <span className="absolute left-2 -top-6 text-xs md:text-[15px] font-medium text-[#333]">0 kcal/mol</span>
 
                             <div className="flex h-[220px]">
 
                                 {/* Bar 1 */}
                                 <div className="flex-1 flex flex-col items-center w-full group">
-                                    <div className="w-[64px] bg-[#10B981] rounded-b-md h-[176px]" />
-                                    <span className="text-xl font-bold mt-2 text-white">−25.75</span>
-                                    <span className="text-[#10B981] text-base mt-0.5">★</span>
-                                    <p className="text-base text-center text-[#525252] mt-2.5 font-medium leading-[1.4]">Foldexa.bio<br />Best (#4)</p>
+                                    <div className="w-9 md:w-16 bg-[#10B981] rounded-b-md h-[176px]" />
+                                    <span className="text-sm md:text-xl font-bold mt-2 text-white">−25.75</span>
+                                    <span className="text-[#10B981] text-sm md:text-base mt-0.5">★</span>
+                                    <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-2.5 font-medium leading-[1.4]">Foldexa.bio<br />Best (#4)</p>
                                 </div>
 
                                 {/* Bar 2 */}
                                 <div className="flex-1 flex flex-col items-center w-full group">
-                                    <div className="w-[64px] bg-[rgba(16,185,129,0.35)] rounded-b-md h-[160px]" />
-                                    <span className="text-xl font-bold mt-2 text-white">−23.52</span>
-                                    <p className="text-base text-center text-[#525252] mt-2.5 font-medium leading-[1.4]">Foldexa.bio<br />Top-10 avg</p>
+                                    <div className="w-9 md:w-16 bg-[rgba(16,185,129,0.35)] rounded-b-md h-[160px]" />
+                                    <span className="text-sm md:text-xl font-bold mt-2 text-white">−23.52</span>
+                                    <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-2.5 font-medium leading-[1.4]">Foldexa.bio<br />Top-10 avg</p>
                                 </div>
 
                                 {/* Bar 3 */}
                                 <div className="flex-1 flex flex-col items-center w-full group">
-                                    <div className="w-[64px] bg-[#2A2A2A] rounded-b-md h-[104px]" />
-                                    <span className="text-xl font-bold mt-2 text-white">−15.00</span>
-                                    <p className="text-base text-center text-[#525252] mt-2.5 font-medium leading-[1.4]">RFdiffusion<br />(Bennett)</p>
+                                    <div className="w-9 md:w-16 bg-[#2A2A2A] rounded-b-md h-[104px]" />
+                                    <span className="text-sm md:text-xl font-bold mt-2 text-white">−15.00</span>
+                                    <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-2.5 font-medium leading-[1.4]">RFdiffusion<br />(Bennett)</p>
                                 </div>
 
                                 {/* Bar 4 */}
                                 <div className="flex-1 flex flex-col items-center w-full group">
-                                    <div className="w-[64px] bg-[#F59E0B] rounded-b-md h-[4px]" />
-                                    <span className="text-xl font-bold mt-2 text-[#F59E0B]">0.00</span>
-                                    <p className="text-base text-center text-[#525252] mt-2.5 font-medium leading-[1.4]">Reference<br />hTAAB-hTie2</p>
+                                    <div className="w-9 md:w-16 bg-[#F59E0B] rounded-b-md h-[4px]" />
+                                    <span className="text-sm md:text-xl font-bold mt-2 text-[#F59E0B]">0.00</span>
+                                    <p className="text-[10px] md:text-sm text-center text-[#525252] mt-2 md:mt-2.5 font-medium leading-[1.4]">Reference<br />hTAAB-hTie2</p>
                                 </div>
 
                             </div>

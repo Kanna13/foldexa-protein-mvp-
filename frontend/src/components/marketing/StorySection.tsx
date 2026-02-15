@@ -78,10 +78,9 @@ export function StorySection() {
             <div className="max-w-7xl mx-auto px-6 relative z-10">
 
                 {/* Section Label */}
-                <div className="flex items-center gap-4 mb-16 justify-center">
-                    <div className="w-3.5 h-3.5 bg-emerald-500 rounded-full shadow-[0_0_16px_rgba(16,185,129,0.45)]" />
-                    <h3 className="text-xl font-bold tracking-[0.12em] uppercase text-neutral-500">Our Story</h3>
-                </div>
+                <h3 className="text-xl font-bold tracking-[0.12em] uppercase text-emerald-500 text-center mb-16">
+                    WE ARE FOLDEXA
+                </h3>
 
                 {/* 1. INTRO BLOCK */}
                 <div className="mb-24 text-center max-w-4xl mx-auto">
