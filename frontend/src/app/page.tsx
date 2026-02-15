@@ -445,7 +445,7 @@ export default function Home() {
       <PricingSection />
 
       {/* --- SECTION 7: CONTACT --- */}
-      <section id="contact" className="bg-black py-32 border-t border-white/10">
+      <section id="contact" className="bg-[#0A0A0A] py-32 border-t border-white/10">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <span className="text-xs font-semibold tracking-widest text-neutral-500 uppercase mb-4 block">
             Get in Touch
