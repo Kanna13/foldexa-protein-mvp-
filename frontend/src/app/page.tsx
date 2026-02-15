@@ -118,7 +118,7 @@ export default function Home() {
             >
               <h2 className="text-5xl font-bold tracking-tight leading-tight">From the Lab<br />to the Clone.</h2>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Foldexa was created by three students: <strong className="text-black">Azamat, Kanat, and Issabek</strong> — with a vision to democratize protein science.
+                Foldexa was created by three enthusiasts: <strong className="text-black">Azamat, Kanat, and Issabek</strong> — with a vision to democratize protein science.
               </p>
               <p className="text-lg text-gray-500 leading-relaxed">
                 We combine state-of-the-art diffusion models (DiffAb, RFdiffusion) with AlphaFold2 to create a seamless pipeline for de novo protein design.
@@ -330,11 +330,16 @@ export default function Home() {
       <StorySection />
 
       {/* --- SECTION 5: OUR VISION --- */}
-      <section className="bg-gradient-to-br from-neutral-900 to-neutral-800 text-white py-32">
+      {/* --- SECTION 5: OUR VISION --- */}
+      <section className="bg-white text-black py-40 border-t border-gray-100 relative overflow-hidden">
+        {/* Subtle decoration */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gray-50 rounded-full blur-3xl -z-10 opacity-60" />
+
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-5xl font-bold mb-8">Our Vision</h2>
-          <p className="text-2xl text-gray-300 leading-relaxed">
+          <h2 className="text-4xl md:text-5xl font-bold mb-10 tracking-tight text-neutral-900">Our Vision</h2>
+          <p className="text-xl md:text-2xl text-neutral-600 leading-relaxed font-light max-w-3xl mx-auto">
             To democratize protein engineering and make cutting-edge AI tools accessible to researchers worldwide.
+            <br /><br />
             We believe that breakthrough discoveries shouldn't be limited by computational barriers.
           </p>
         </div>
