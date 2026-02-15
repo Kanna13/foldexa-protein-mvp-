@@ -28,17 +28,7 @@ export function Footer() {
     return (
         <footer className="bg-[#0A0A0A] border-t border-white/10">
 
-            {/* 1. TOP CTA STRIP (Inverted: White Background) */}
-            <div className="bg-white text-black py-16 px-6 text-center relative overflow-hidden border-b border-neutral-100">
-                <div className="relative z-10 max-w-2xl mx-auto">
-                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 text-neutral-900">
-                        Accelerating the future of protein engineering.
-                    </h2>
-                    <p className="text-neutral-500 text-lg font-light">
-                        Start designing proteins with next-generation AI.
-                    </p>
-                </div>
-            </div>
+
 
             {/* 2. MAIN FOOTER GRID (Dark Theme) */}
             <div className="max-w-7xl mx-auto px-6 py-16 text-neutral-400">

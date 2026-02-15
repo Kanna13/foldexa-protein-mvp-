@@ -94,16 +94,11 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                         Log in
                     </Link>
 
-                    {/* Premium Get Access CTA */}
+                    {/* Premium Get Access CTA (Static) */}
                     <Link href="/beta-access">
-                        <motion.button
-                            whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)" }}
-                            whileTap={{ scale: 0.98 }}
-                            className="relative group overflow-hidden rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-black shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all"
-                        >
+                        <div className="relative group overflow-hidden rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-black hover:bg-emerald-400 transition-colors">
                             <span className="relative z-10">Get Access</span>
-                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                        </motion.button>
+                        </div>
                     </Link>
                 </div>
 
