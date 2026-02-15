@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Navbar } from "@/components/ui/Navbar";
 import { ArrowLeft, CreditCard, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
 const PLANS: Record<string, { price: string; name: string; features: string[] }> = {
     free: {
@@ -25,7 +25,7 @@ const PLANS: Record<string, { price: string; name: string; features: string[] }>
     },
 };
 
-export default function CheckoutPage() {
+function CheckoutContent() {
     const searchParams = useSearchParams();
     const planKey = searchParams.get("plan")?.toLowerCase() || "free";
     const plan = PLANS[planKey] || PLANS.free;
@@ -139,5 +139,13 @@ export default function CheckoutPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white">Loading...</div>}>
+            <CheckoutContent />
+        </Suspense>
     );
 }
