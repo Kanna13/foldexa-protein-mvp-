@@ -50,6 +50,10 @@ export const metadata: Metadata = {
   },
 };
 
+import { Footer } from "@/components/layout/Footer";
+
+// ... (previous imports)
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,8 +61,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
-      <body className="font-sans antialiased text-foreground bg-background">
-        {children}
+      <body className="font-sans antialiased text-foreground bg-background min-h-screen flex flex-col">
+        <div className="flex-grow">
+          {children}
+        </div>
+        <Footer />
       </body>
     </html>
   );

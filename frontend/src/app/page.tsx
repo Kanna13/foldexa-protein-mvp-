@@ -330,16 +330,22 @@ export default function Home() {
       <StorySection />
 
       {/* --- SECTION 5: OUR VISION --- */}
-      {/* --- SECTION 5: OUR VISION --- */}
-      <section className="bg-white text-black py-40 border-t border-gray-100 relative overflow-hidden">
-        {/* Subtle decoration */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gray-50 rounded-full blur-3xl -z-10 opacity-60" />
+      <section className="bg-[#FFFFF0] py-32 border-t border-neutral-100 relative overflow-hidden">
+        {/* Static CSS-only ambient glow - lightweight */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-emerald-500/5 to-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-10 tracking-tight text-neutral-900">Our Vision</h2>
-          <p className="text-xl md:text-2xl text-neutral-600 leading-relaxed font-light max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <span className="inline-block py-1 px-3 rounded-full border border-neutral-200 bg-white/50 backdrop-blur-sm text-xs font-semibold tracking-widest text-neutral-500 uppercase mb-8">
+            Our Vision
+          </span>
+
+          <h2 className="text-3xl md:text-5xl font-medium leading-tight tracking-tight text-neutral-900 mb-8 font-sans">
             To democratize protein engineering and make cutting-edge AI tools accessible to researchers worldwide.
-            <br /><br />
+          </h2>
+
+          <div className="w-16 h-px bg-neutral-200 mx-auto mb-8" />
+
+          <p className="text-lg md:text-xl text-neutral-500 font-light max-w-2xl mx-auto">
             We believe that breakthrough discoveries shouldn't be limited by computational barriers.
           </p>
         </div>
@@ -349,24 +355,30 @@ export default function Home() {
       <PricingSection />
 
       {/* --- SECTION 7: CONTACT --- */}
-      <section id="contact" className="bg-white py-32">
+      <section id="contact" className="bg-[#FBFBFD] py-32 border-t border-neutral-200">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-5xl font-bold mb-8">Get in Touch</h2>
-          <p className="text-xl text-gray-600 mb-12">
-            Interested in partnering with us or want to learn more? Let's connect!
+          <span className="text-xs font-semibold tracking-widest text-neutral-500 uppercase mb-4 block">
+            Get in Touch
+          </span>
+          <h2 className="text-4xl font-semibold tracking-tight text-neutral-900 mb-6">
+            Interested in partnering with us?
+          </h2>
+          <p className="text-lg text-neutral-500 max-w-xl mx-auto mb-10 font-light">
+            Whether you want to learn more or explore collaboration opportunities, we'd love to connect.
           </p>
-          <div className="flex justify-center gap-6">
+
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a
               href="https://www.linkedin.com/company/foldexa"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-3 bg-[#0077b5] text-white text-sm font-medium rounded-full hover:bg-[#006396] transition-colors min-w-[160px]"
             >
               LinkedIn
             </a>
             <a
               href="mailto:contact@foldexa.com"
-              className="px-8 py-4 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-3 bg-neutral-900 text-white text-sm font-medium rounded-full hover:bg-black transition-colors min-w-[160px]"
             >
               Email Us
             </a>

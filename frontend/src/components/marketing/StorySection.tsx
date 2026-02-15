@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 // Founder Data
 const FOUNDERS = [
@@ -277,16 +278,11 @@ export function StorySection() {
                         Foldexa brings biology, software, and vision together to accelerate the future of protein engineering.
                     </motion.p>
 
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
-                        viewport={{ once: true }}
-                    >
-                        <a href="#demo" className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-lg rounded-full transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+                    <div className="mt-10">
+                        <Link href="/app/new" className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-lg rounded-full transition-colors">
                             See what we built <ArrowRight className="w-5 h-5" />
-                        </a>
-                    </motion.div>
+                        </Link>
+                    </div>
                 </div>
 
             </div>
