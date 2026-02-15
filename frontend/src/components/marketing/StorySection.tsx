@@ -79,8 +79,7 @@ export function StorySection() {
             <div className="max-w-7xl mx-auto px-6 relative z-10">
 
                 {/* Section Label */}
-                {/* Section Label */}
-                <h3 className="text-5xl md:text-7xl font-bold tracking-tight text-emerald-500 text-center mb-16">
+                <h3 className="text-5xl md:text-7xl font-bold tracking-tight text-emerald-500 text-center mb-8">
                     We are Foldexa
                 </h3>
 
