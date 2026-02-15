@@ -30,26 +30,20 @@ export function Navbar({ variant = "default" }: NavbarProps) {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // "contrast" = Always black background, white text (High visibility on white pages)
-    // "light" = Transparent then white on scroll (Standard clean)
-    // "default" = Transparent then black on scroll (Dark mode)
-
     const isContrast = variant === "contrast";
     const isLight = variant === "light";
 
-    // If contrast, always white text. If light, dark text.
     const textColor = isContrast ? "text-white" : (isLight ? "text-neutral-900" : "text-white");
-    const subTextColor = isContrast ? "text-white hover:text-white" : (isLight ? "text-neutral-500 hover:text-neutral-900" : "text-white hover:text-white");
+    // Premium typography: heavier weight, tighter tracking
+    const linkColor = isContrast ? "text-white/80 hover:text-white" : (isLight ? "text-neutral-600 hover:text-black" : "text-neutral-300 hover:text-white");
 
-    // Background logic
     let navBg = "bg-transparent";
     let borderClass = "";
 
     if (isContrast) {
-        // Always black padding, minimal transparency
         navBg = "bg-[#0A0A0A] border-b border-white/5 shadow-sm";
     } else if (isScrolled) {
-        navBg = isLight ? "bg-white/80 backdrop-blur-md" : "bg-black/80 backdrop-blur-md";
+        navBg = isLight ? "bg-white/80 backdrop-blur-xl" : "bg-black/60 backdrop-blur-xl supports-[backdrop-filter]:bg-black/60";
         borderClass = isLight ? "border-black/5" : "border-white/5";
     }
 
@@ -58,75 +52,99 @@ export function Navbar({ variant = "default" }: NavbarProps) {
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-2",
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-3",
                 navBg,
                 borderClass
             )}
         >
-            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
+            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-12">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-3 group">
-                    <img src="/icon.png" alt="Foldexa Icon" className="w-4 h-4 md:w-5 md:h-5 object-contain" />
-                    <span className={cn("text-base font-medium tracking-tight leading-none", textColor === "text-white" ? "text-[#FFFFF0]" : textColor)}>Foldexa</span>
+                <Link href="/" className="flex items-center gap-2 group">
+                    <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/10 group-hover:border-emerald-500/30 transition-colors">
+                        <img src="/icon.png" alt="Foldexa Icon" className="w-5 h-5 object-contain" />
+                    </div>
+                    <span className={cn("text-lg font-semibold tracking-tight leading-none", textColor === "text-white" ? "text-white" : textColor)}>
+                        Foldexa
+                    </span>
                 </Link>
 
-                {/* Desktop Links */}
-                {/* Desktop Links */}
-                <div className="hidden md:flex items-center gap-6">
+                {/* Desktop Links - Premium Typography */}
+                <div className="hidden md:flex items-center gap-8">
                     {navLinks.map((link) => (
                         <Link
                             key={link.name}
                             href={link.href}
-                            className={cn("text-sm font-medium transition-colors font-mono hover:text-primary", subTextColor)}
+                            className={cn("text-sm font-medium tracking-wide transition-all duration-300", linkColor)}
                         >
                             {link.name}
                         </Link>
                     ))}
                 </div>
 
-                {/* CTA */}
-                <div className="hidden md:flex items-center gap-6">
+                {/* Right Side Actions */}
+                <div className="hidden md:flex items-center gap-4">
+                    {/* Ghost Login Button */}
                     <Link
                         href="/login"
-                        className={cn("text-sm font-medium transition-colors font-mono hover:text-primary", subTextColor)}
+                        className={cn(
+                            "text-sm font-medium tracking-tight transition-colors px-4 py-2 rounded-full hover:bg-white/5",
+                            textColor
+                        )}
                     >
-                        Log In
+                        Log in
+                    </Link>
+
+                    {/* Premium Get Access CTA */}
+                    <Link href="/beta-access">
+                        <motion.button
+                            whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)" }}
+                            whileTap={{ scale: 0.98 }}
+                            className="relative group overflow-hidden rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-black shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all"
+                        >
+                            <span className="relative z-10">Get Access</span>
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                        </motion.button>
                     </Link>
                 </div>
 
                 {/* Mobile Toggle */}
                 <button
-                    className={cn("md:hidden", textColor)}
+                    className={cn("md:hidden p-2 rounded-md hover:bg-white/5 transition-colors", textColor)}
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 >
-                    {mobileMenuOpen ? <X /> : <Menu />}
+                    {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
             </div>
 
-            {/* Mobile Menu */}
-            {mobileMenuOpen && (
-                <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="md:hidden bg-[#0A0A0A] border-b border-white/10"
-                >
-                    <div className="flex flex-col p-6 gap-4">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                className="text-lg text-white font-mono"
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
-                        <Link href="/app/new" onClick={() => setMobileMenuOpen(false)}>
-                            <Button className="w-full">Start Folding</Button>
+            {/* Mobile Menu - Premium Feel */}
+            <motion.div
+                initial={false}
+                animate={mobileMenuOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+                className="md:hidden overflow-hidden bg-[#0A0A0A] border-b border-white/10"
+            >
+                <div className="flex flex-col p-6 gap-2">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.name}
+                            href={link.href}
+                            className="text-2xl font-medium tracking-tight text-white/90 py-3 border-b border-white/5"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            {link.name}
+                        </Link>
+                    ))}
+                    <div className="flex flex-col gap-3 mt-6">
+                        <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-center text-neutral-400 py-3">
+                            Log in
+                        </Link>
+                        <Link href="/beta-access" onClick={() => setMobileMenuOpen(false)}>
+                            <Button className="w-full bg-emerald-500 text-black font-semibold rounded-full py-6">
+                                Get Early Access
+                            </Button>
                         </Link>
                     </div>
-                </motion.div>
-            )}
+                </div>
+            </motion.div>
         </motion.nav>
     );
 }
