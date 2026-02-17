@@ -336,16 +336,10 @@ export default function Home() {
       {/* --- SECTION 3: HOW IT WORKS (Premium Grid) --- */}
       <section id="platform" className="bg-neutral-50/50 pt-20 pb-32 border-t border-neutral-100">
         <div className="max-w-5xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
+          <div className="text-center mb-20">
             <h2 className="text-6xl font-mono font-bold tracking-tighter mb-4 text-neutral-900">Simple. Powerful. Fast.</h2>
-            <p className="text-xl text-neutral-600 font-medium">Four steps to breakthrough protein designs</p>
-          </motion.div>
+            <p className="text-xl text-neutral-500/80 font-medium">Four steps to breakthrough protein designs</p>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             {[
