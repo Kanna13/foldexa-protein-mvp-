@@ -172,7 +172,7 @@ export default function Home() {
               className="flex flex-col sm:flex-row items-center gap-4"
             >
               <Link href="/app/new">
-                <Button variant="primary" size="lg" className="min-w-[200px] transition-all duration-500 h-12 px-8 text-lg bg-emerald-500 hover:bg-emerald-600 text-black font-semibold border-0">
+                <Button variant="primary" size="lg" className="min-w-[200px] transition-all duration-500 h-12 px-8 text-lg bg-emerald-500 hover:bg-emerald-400 text-black font-semibold border-0 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_35px_rgba(16,185,129,0.6)]">
                   Start Folding <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
@@ -368,12 +368,8 @@ export default function Home() {
                 detail: "Download PDB, sequences, and reports"
               },
             ].map((item, idx) => (
-              <motion.div
+              <div
                 key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
-                viewport={{ once: true }}
                 className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-emerald-500/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] transition-all duration-300"
               >
                 <div className="relative z-10">
@@ -388,25 +384,19 @@ export default function Home() {
                     {item.detail}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mt-16"
-          >
+          <div className="text-center mt-16">
             <Link href="/app/new">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <div className="inline-block transition-transform duration-200 hover:scale-105 active:scale-95">
                 <Button variant="primary" size="lg" className="shadow-xl">
                   Try It Now <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-              </motion.div>
+              </div>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
