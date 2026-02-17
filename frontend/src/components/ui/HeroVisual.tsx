@@ -1,16 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export function HeroVisual() {
     return (
         <div className="relative w-full min-h-screen overflow-hidden bg-black">
 
             <div className="absolute inset-0">
-                <img
+                <Image
                     src="/hero-bg.png"
                     alt="Protein background"
-                    className="w-full h-full object-cover opacity-70"
+                    fill
+                    priority
+                    quality={80}
+                    sizes="100vw"
+                    className="object-cover opacity-70"
                 />
             </div>
 

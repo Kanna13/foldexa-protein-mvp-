@@ -95,7 +95,7 @@ import { StorySection } from "@/components/marketing/StorySection";
     </div>
 
     <div className="text-center">
-      <p className="text-sm text-neutral-400 font-medium bg-white/50 inline-block px-4 py-2 rounded-full border border-neutral-100 backdrop-blur-sm">
+      <p className="text-sm text-neutral-400 font-medium bg-white/50 inline-block px-4 py-2 rounded-full border border-neutral-100 md:backdrop-blur-sm">
         Typically respond within 24–48 hours.
       </p>
     </div>
@@ -111,8 +111,9 @@ export default function Home() {
 
   // Natural Scroll - No forced sticky overlap for the white section
   // The hero just fades out slightly as we scroll past it
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
+  // Optimized: Use simpler transforms and avoid heavy calculations
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
 
   return (
     <div ref={containerRef} className="relative bg-background">
@@ -175,7 +176,7 @@ export default function Home() {
                   Start Folding <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
-              <Button variant="glass" size="lg" className="min-w-[200px] h-12 px-8 text-lg bg-black/20 hover:bg-emerald-950/20 border-white/10 hover:border-emerald-500/20 text-emerald-100/80 hover:text-emerald-400 transition-all duration-300 backdrop-blur-sm">
+              <Button variant="glass" size="lg" className="min-w-[200px] h-12 px-8 text-lg bg-black/20 hover:bg-emerald-950/20 border-white/10 hover:border-emerald-500/20 text-emerald-100/80 hover:text-emerald-400 transition-all duration-300 md:backdrop-blur-sm">
                 <Play className="mr-2 w-4.5 h-4.5 fill-current opacity-80" /> Watch Demo
               </Button>
             </motion.div>
@@ -298,6 +299,8 @@ export default function Home() {
                         width={200}
                         height={100}
                         className="object-contain max-h-full w-auto"
+                        loading="lazy"
+                        sizes="(max-width: 768px) 150px, 200px"
                       />
                     </div>
                   </div>
@@ -425,7 +428,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-emerald-500/5 to-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <span className="inline-block py-1 px-3 rounded-full border border-neutral-200 bg-white/50 backdrop-blur-sm text-xs font-semibold tracking-widest text-neutral-500 uppercase mb-8">
+          <span className="inline-block py-1 px-3 rounded-full border border-neutral-200 bg-white/50 md:backdrop-blur-sm text-xs font-semibold tracking-widest text-neutral-500 uppercase mb-8">
             Our Vision
           </span>
 

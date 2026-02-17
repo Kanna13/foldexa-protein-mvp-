@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Github, Linkedin, Mail, Twitter } from "lucide-react";
 
 const FOOTER_LINKS = {
@@ -38,7 +39,7 @@ export function Footer() {
                     <div className="flex flex-col items-center md:items-start space-y-6">
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 border border-white/10">
-                                <img src="/icon.png" alt="Foldexa Icon" className="w-5 h-5 object-contain" />
+                                <Image src="/icon.png" alt="Foldexa Icon" width={20} height={20} className="object-contain" />
                             </div>
                             <span className="text-lg font-semibold tracking-tight text-white">
                                 Foldexa

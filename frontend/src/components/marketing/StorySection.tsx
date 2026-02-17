@@ -146,6 +146,7 @@ export function StorySection() {
                                                 src={founder.image}
                                                 alt={founder.name}
                                                 fill
+                                                sizes="(max-width: 768px) 56px, 56px"
                                                 className="object-cover"
                                             />
                                         </motion.div>
@@ -211,6 +212,8 @@ export function StorySection() {
                                                             src={founder.image}
                                                             alt={founder.name}
                                                             fill
+                                                            sizes="(max-width: 768px) 100vw, 40vw"
+                                                            quality={90}
                                                             className="object-cover brightness-90"
                                                         />
                                                     </motion.div>

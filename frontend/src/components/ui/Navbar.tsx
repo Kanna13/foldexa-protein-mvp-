@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Dna, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "./Button";
@@ -61,7 +62,7 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
                     <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/10">
-                        <img src="/icon.png" alt="Foldexa Icon" className="w-5 h-5 object-contain" />
+                        <Image src="/icon.png" alt="Foldexa Icon" width={20} height={20} className="object-contain" />
                     </div>
                     <span className={cn("text-lg font-semibold tracking-tight leading-none", textColor === "text-white" ? "text-white" : textColor)}>
                         Foldexa
