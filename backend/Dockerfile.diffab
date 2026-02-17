@@ -1,0 +1,48 @@
+
+FROM continuumio/miniconda3
+
+WORKDIR /app
+
+# Create environment with python 3.8 and dependencies
+RUN conda create -n diffab python=3.8 -y
+
+# Make RUN commands use the new environment
+SHELL ["conda", "run", "-n", "diffab", "/bin/bash", "-c"]
+
+# Install System/Bio Dependencies via Conda (Robust channel priority)
+RUN conda install -c conda-forge -c bioconda -c pytorch \
+    hmmer \
+    pdbfixer \
+    openmm \
+    pytorch \
+    torchvision \
+    cpuonly \
+    biopython \
+    anarci \
+    -y
+
+# Install Pip dependencies
+RUN pip install \
+    joblib \
+    lmdb \
+    tqdm \
+    easydict \
+    pyyaml \
+    tensorboard \
+    abnumber
+
+# Copy the REAL diffab code
+COPY diffab-real/diffab-main /app
+
+# Copy the wrapper script
+COPY backend/diffab_real_wrapper.py /app/wrapper.py
+
+# AUTO-PATCH: Fix Biopython compatibility (remove SCOPData dependency)
+COPY backend/patch_diffab.py /app/patch_diffab.py
+RUN python /app/patch_diffab.py
+
+# Set PYTHONPATH
+ENV PYTHONPATH=/app
+
+# Default Entrypoint using conda run
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "diffab", "python", "/app/wrapper.py"]

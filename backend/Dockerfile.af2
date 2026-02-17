@@ -1,0 +1,8 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY stubs/af2_stub.py /app/af2_stub.py
+
+# Map entrypoint to stub
+ENTRYPOINT ["python", "/app/af2_stub.py"]
