@@ -138,9 +138,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: "easeOut" }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 text-primary-dark text-xs font-mono uppercase tracking-[0.2em] opacity-90"
+              className="inline-flex items-center gap-2 px-4 py-1.5 text-emerald-400 text-xs font-mono uppercase tracking-[0.2em] opacity-90"
             >
-              <span className="w-3.5 h-3.5 rounded-full bg-primary animate-pulse" />
+              <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse" />
               v1.0 Public Beta
             </motion.div>
 

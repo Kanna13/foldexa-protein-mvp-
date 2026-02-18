@@ -50,8 +50,7 @@ def main():
             
         print_log(f"Trajectory {i} finished. Saving PDB...")
         
-        # Save dummy output
-        # Save dummy output
+        #ls
         out_file = f"{output_prefix}_{i}.pdb"
         if input_path and os.path.exists(input_path):
             shutil.copy(input_path, out_file)
