@@ -131,6 +131,7 @@ export function StorySection() {
                   ${selectedId === founder.id ? 'opacity-0 pointer-events-none' : 'opacity-100'}
                 `}
                                 whileHover={{ scale: 1.02 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
                             >
                                 {/* Glow Effect */}
                                 <div className={`absolute inset-0 bg-gradient-to-b ${founder.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
@@ -140,7 +141,8 @@ export function StorySection() {
                                     <div className="flex items-center gap-4 mb-6">
                                         <motion.div
                                             layoutId={`founder-img-${founder.id}`}
-                                            className="relative w-14 h-14 rounded-full overflow-hidden border border-neutral-700 group-hover:border-white/20 transition-colors"
+                                            className="relative w-14 h-14 overflow-hidden border border-neutral-700 group-hover:border-white/20 transition-colors"
+                                            style={{ borderRadius: "50%" }}
                                         >
                                             <Image
                                                 src={founder.image}
@@ -151,8 +153,8 @@ export function StorySection() {
                                             />
                                         </motion.div>
                                         <div>
-                                            <h3 className="text-xl font-bold text-white leading-tight">{founder.name}</h3>
-                                            <p className="text-sm text-neutral-500 font-medium">{founder.role}</p>
+                                            <motion.h3 layoutId={`founder-name-${founder.id}`} className="text-xl font-bold text-white leading-tight">{founder.name}</motion.h3>
+                                            <motion.p layoutId={`founder-role-${founder.id}`} className="text-sm text-neutral-500 font-medium">{founder.role}</motion.p>
                                         </div>
                                     </div>
 
@@ -189,65 +191,83 @@ export function StorySection() {
                                         <motion.div
                                             layoutId={`card-${founder.id}`}
                                             key={founder.id}
-                                            onClick={() => setSelectedId(null)}
-                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative cursor-zoom-out"
+                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative cursor-zoom-out flex flex-col md:flex-row h-full max-h-[85vh]"
                                         >
                                             {/* Close Button */}
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); setSelectedId(null); }}
-                                                className="absolute top-6 right-6 z-20 w-10 h-10 bg-black/20 hover:bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors border border-white/10"
+                                                className="absolute top-6 right-6 z-50 w-10 h-10 bg-black/20 hover:bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors border border-white/10"
                                             >
                                                 <X className="w-5 h-5" />
                                             </button>
 
-                                            <div className="grid md:grid-cols-5 h-full max-h-[85vh] overflow-y-auto">
-                                                {/* Sidebar (Visual with Background Image) */}
-                                                <div className="md:col-span-2 relative min-h-[300px] md:min-h-full">
-                                                    {/* Expanded Image Background */}
-                                                    <motion.div
-                                                        layoutId={`founder-img-${founder.id}`}
-                                                        className="absolute inset-0 z-0"
-                                                    >
-                                                        <Image
-                                                            src={founder.image}
-                                                            alt={founder.name}
-                                                            fill
-                                                            sizes="(max-width: 768px) 100vw, 40vw"
-                                                            quality={90}
-                                                            className="object-cover brightness-90"
-                                                        />
-                                                    </motion.div>
-
-                                                    {/* Gradient Overlay for Text Readability */}
-                                                    <motion.div
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        transition={{ duration: 0.5, delay: 0.2 }}
-                                                        className="absolute bottom-0 left-0 right-0 h-2/3 z-10 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+                                            {/* Sidebar (Visual with Background Image) */}
+                                            <div className="relative w-full md:w-2/5 min-h-[300px] md:min-h-full">
+                                                {/* Expanded Image Background */}
+                                                <motion.div
+                                                    layoutId={`founder-img-${founder.id}`}
+                                                    className="absolute inset-0 z-0 overflow-hidden"
+                                                    style={{ borderRadius: "0%" }}
+                                                >
+                                                    <Image
+                                                        src={founder.image}
+                                                        alt={founder.name}
+                                                        fill
+                                                        sizes="(max-width: 768px) 100vw, 40vw"
+                                                        quality={90}
+                                                        className="object-cover brightness-90"
                                                     />
+                                                </motion.div>
 
-                                                    <div className="relative z-20 h-full flex flex-col justify-end p-8 md:p-10">
-                                                        <h3 className="text-3xl md:text-3xl font-bold text-white mb-2">{founder.name}</h3>
-                                                        <p className="text-lg text-emerald-400 font-medium">{founder.role}</p>
-                                                    </div>
+                                                {/* Gradient Overlay for Text Readability */}
+                                                <motion.div
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                                    className="absolute bottom-0 left-0 right-0 h-2/3 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent"
+                                                />
+
+                                                <div className="relative z-20 h-full flex flex-col justify-end p-8 md:p-10 pointer-events-none">
+                                                    <motion.h3 layoutId={`founder-name-${founder.id}`} className="text-3xl md:text-4xl font-bold text-white mb-2">{founder.name}</motion.h3>
+                                                    <motion.p layoutId={`founder-role-${founder.id}`} className="text-lg text-emerald-400 font-medium">{founder.role}</motion.p>
+                                                </div>
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="relative w-full md:w-3/5 p-10 md:p-12 bg-[#111] overflow-y-auto">
+                                                <motion.h4
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 0.1 }}
+                                                    className={`text-sm font-bold ${founder.textAccent} uppercase tracking-widest mb-8`}
+                                                >
+                                                    The Story
+                                                </motion.h4>
+
+                                                <div className="space-y-6 text-lg text-neutral-300 leading-relaxed">
+                                                    {founder.bio.map((paragraph, i) => (
+                                                        <motion.p
+                                                            initial={{ opacity: 0, y: 10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ delay: 0.2 + (i * 0.1) }}
+                                                            key={i}
+                                                        >
+                                                            {paragraph}
+                                                        </motion.p>
+                                                    ))}
                                                 </div>
 
-                                                {/* Content */}
-                                                <div className="md:col-span-3 p-10 md:p-12 bg-[#111]">
-                                                    <h4 className={`text-sm font-bold ${founder.textAccent} uppercase tracking-widest mb-8`}>The Story</h4>
-
-                                                    <div className="space-y-6 text-lg text-neutral-300 leading-relaxed">
-                                                        {founder.bio.map((paragraph, i) => (
-                                                            <p key={i}>{paragraph}</p>
-                                                        ))}
-                                                    </div>
-
-                                                    <div className="mt-12 pt-8 border-t border-neutral-800">
-                                                        <p className="text-neutral-500 italic text-xl">
-                                                            "{founder.quote}"
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                                <motion.div
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ delay: 0.5 }}
+                                                    className="mt-12 pt-8 border-t border-neutral-800"
+                                                >
+                                                    <p className="text-neutral-500 italic text-xl">
+                                                        "{founder.quote}"
+                                                    </p>
+                                                </motion.div>
                                             </div>
                                         </motion.div>
                                     ))}
