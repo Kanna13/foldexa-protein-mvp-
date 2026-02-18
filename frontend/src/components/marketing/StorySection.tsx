@@ -131,7 +131,7 @@ export function StorySection() {
                   ${selectedId === founder.id ? 'opacity-0 pointer-events-none' : 'opacity-100'}
                 `}
                                 whileHover={{ scale: 1.02 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                transition={{ type: "spring", stiffness: 180, damping: 25 }}
                             >
                                 {/* Glow Effect */}
                                 <div className={`absolute inset-0 bg-gradient-to-b ${founder.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
@@ -191,8 +191,9 @@ export function StorySection() {
                                         <motion.div
                                             layoutId={`card-${founder.id}`}
                                             key={founder.id}
-                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative flex flex-col md:flex-row h-full max-h-[85vh] cursor-default"
+                                            transition={{ type: "spring", stiffness: 180, damping: 25 }}
+                                            onClick={() => setSelectedId(null)}
+                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative flex flex-col md:flex-row h-full max-h-[85vh] cursor-zoom-out"
                                         >
                                             {/* Close Button */}
                                             <button
@@ -204,8 +205,7 @@ export function StorySection() {
 
                                             {/* Sidebar (Visual with Background Image) */}
                                             <div
-                                                className="relative w-full md:w-2/5 min-h-[300px] md:min-h-full cursor-zoom-out"
-                                                onClick={() => setSelectedId(null)}
+                                                className="relative w-full md:w-2/5 min-h-[300px] md:min-h-full"
                                             >
                                                 {/* Expanded Image Background */}
                                                 <motion.div
