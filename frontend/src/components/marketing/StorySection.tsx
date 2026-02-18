@@ -192,7 +192,7 @@ export function StorySection() {
                                             layoutId={`card-${founder.id}`}
                                             key={founder.id}
                                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative cursor-zoom-out flex flex-col md:flex-row h-full max-h-[85vh]"
+                                            className="w-full max-w-5xl bg-[#0A0A0A] border border-neutral-800 rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative flex flex-col md:flex-row h-full max-h-[85vh] cursor-default"
                                         >
                                             {/* Close Button */}
                                             <button
@@ -203,7 +203,10 @@ export function StorySection() {
                                             </button>
 
                                             {/* Sidebar (Visual with Background Image) */}
-                                            <div className="relative w-full md:w-2/5 min-h-[300px] md:min-h-full">
+                                            <div
+                                                className="relative w-full md:w-2/5 min-h-[300px] md:min-h-full cursor-zoom-out"
+                                                onClick={() => setSelectedId(null)}
+                                            >
                                                 {/* Expanded Image Background */}
                                                 <motion.div
                                                     layoutId={`founder-img-${founder.id}`}
