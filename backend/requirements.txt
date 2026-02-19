@@ -39,5 +39,4 @@ locust==2.20.0
 # Payments
 stripe==8.1.0
 
-pydantic[email]
-
+email-validator
