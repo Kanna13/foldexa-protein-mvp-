@@ -2,6 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# 👉 VERY IMPORTANT — fix Python imports on Railway
+ENV PYTHONPATH=/app
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
@@ -23,7 +26,7 @@ COPY . .
 RUN mkdir -p /app/storage/uploads /app/storage/results
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8080
 
-# Default command (can be overridden in docker-compose)
+# Run API
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
