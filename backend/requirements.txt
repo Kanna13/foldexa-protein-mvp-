@@ -31,4 +31,4 @@ stripe==8.1.0
 
 pytest==7.4.4
 pytest-cov==4.1.0
-locust
+
