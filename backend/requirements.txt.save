@@ -1,0 +1,153 @@
+Total 4 (delta 3), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To https://github.com/Kanna13/foldexa-protein-mvp-.git
+   bab31e0..e776951  main -> main
+kanna@Kannas-MacBook-Air backend % ды
+zsh: command not found: ды
+kanna@Kannas-MacBook-Air backend % ls
+Dockerfile		alembic			docs			stubs
+Dockerfile.af2		alembic.ini		patch_diffab.py		tests
+Dockerfile.diffab	app			pytest.ini
+Dockerfile.rfdiffusion	data			requirements.txt
+README.md		diffab_real_wrapper.py	storage
+kanna@Kannas-MacBook-Air backend % ls requirements.txt 
+requirements.txt
+kanna@Kannas-MacBook-Air backend % ls
+Dockerfile		alembic			docs			stubs
+Dockerfile.af2		alembic.ini		patch_diffab.py		tests
+Dockerfile.diffab	app			pytest.ini
+Dockerfile.rfdiffusion	data			requirements.txt
+README.md		diffab_real_wrapper.py	storage
+kanna@Kannas-MacBook-Air backend % nano requirements.txt
+
+  UW PICO 5.09                                File: requirements.txt                                  
+
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy==2.0.25
+asyncpg==0.29.0
+alembic==1.13.1
+
+# Task Queue
+celery==5.3.6
+redis==5.0.1
+
+# Object Storage
+boto3==1.34.34
+minio==7.2.3
+
+# HTTP Client
+httpx==0.26.0
+requests==2.31.0
+
+# Utilities
+python-multipart==0.0.6
+python-dotenv==1.0.0
+
+# Authentication
+pyjwt==2.8.0
+
+# Rate Limiting
+redis[hiredis]==5.0.1
+
+# Observability
+prometheus-client==0.19.0
+structlog==24.1.0
+
+# Testing
+pytest==7.4.4
+pytest-cov==4.1.0
+locust==2.20.0
+
+# Payments
+stripe==8.1.0
+
+pydantic[email]
+
+
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy==2.0.25
+asyncpg==0.29.0
+alembic==1.13.1
+
+# Task Queue
+celery==5.3.6
+redis==5.0.1
+
+# Object Storage
+boto3==1.34.34
+minio==7.2.3
+
+# HTTP Client
+httpx==0.26.0
+requests==2.31.0
+
+# Utilities
+python-multipart==0.0.6
+python-dotenv==1.0.0
+
+# Authentication
+pyjwt==2.8.0
+
+# Rate Limiting
+redis[hiredis]==5.0.1
+
+# Observability
+prometheus-client==0.19.0
+structlog==24.1.0
+
+# Testing
+pytest==7.4.4
+pytest-cov==4.1.0
+locust==2.20.0
+
+# Payments
+stripe==8.1.0
+
+pydantic[email]
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy==2.0.25
+asyncpg==0.29.0
+alembic==1.13.1
+
+# Task Queue
+celery==5.3.6
+redis==5.0.1
+
+# Object Storage
+boto3==1.34.34
+minio==7.2.3
+
+# HTTP Client
+httpx==0.26.0
+requests==2.31.0
+
+# Utilities
+python-multipart==0.0.6
+python-dotenv==1.0.0
+
+# Authentication
+pyjwt==2.8.0
+
+# Rate Limiting
+redis[hiredis]==5.0.1
+
+# Observability
+prometheus-client==0.19.0
+structlog==24.1.0
+
+# Testing
+pytest==7.4.4
+pytest-cov==4.1.0
+locust==2.20.0
+
+# Payments
+stripe==8.1.0
+
+pydantic[email]
+
