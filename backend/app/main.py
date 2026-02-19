@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
+import os
 
 from app.api.routes import jobs, files, payments, beta
 from app.core.config import settings
@@ -16,7 +17,21 @@ from app.infrastructure.db.models import Base
 
 # ... (logging setup)
 
-# ... (lifespan)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    setup_logging()
+    logger = logging.getLogger("uvicorn.error")
+    logger.info("Starting up Foldexa API...")
+    
+    # Ensure storage directories exist
+    os.makedirs(settings.upload_dir, exist_ok=True)
+    os.makedirs(settings.result_dir, exist_ok=True)
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down Foldexa API...")
 
 app = FastAPI(
     title=settings.app_name,

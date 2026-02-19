@@ -32,9 +32,10 @@ class StorageService:
             if not self.client.bucket_exists(self.bucket_name):
                 self.client.make_bucket(self.bucket_name)
                 logger.info(f"Created bucket: {self.bucket_name}")
-        except S3Error as e:
-            logger.error(f"Error ensuring bucket exists: {e}")
-            raise
+        except Exception as e:
+            # Allow startup even if S3 is not available (e.g. during build or incorrect config)
+            logger.warning(f"Could not connect to S3/MinIO: {e}. File uploads will fail until fixed.")
+            # Do not raise exception here
     
     def upload_file(self, file_path: str, s3_key: str) -> str:
         """Upload a file to S3."""
