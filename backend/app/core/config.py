@@ -64,7 +64,13 @@ class Settings(BaseSettings):
     
     # Security
     secret_key: str = "CHANGE_ME_IN_PRODUCTION"
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://foldexa.bio",
+        "https://www.foldexa.bio",
+        "https://foldexa-protein-mvp-production.up.railway.app"
+    ]
     
     # Observability
     log_level: str = "INFO"
