@@ -3,6 +3,7 @@ Core application configuration using pydantic-settings.
 Supports environment-based config for dev/staging/prod.
 """
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, AliasChoices
 from typing import Optional
 
 
@@ -39,10 +40,10 @@ class Settings(BaseSettings):
     celery_result_backend: str = "redis://localhost:6379/2"
     
     # Object Storage (MinIO/S3)
-    s3_endpoint: str = "http://localhost:9000"
-    s3_access_key: str = "minioadmin"
-    s3_secret_key: str = "minioadmin"
-    s3_bucket_name: str = "foldexa-artifacts"
+    s3_endpoint: str = Field(default="http://localhost:9000", validation_alias=AliasChoices("S3_ENDPOINT", "MINIO_ENDPOINT"))
+    s3_access_key: str = Field(default="minioadmin", validation_alias=AliasChoices("S3_ACCESS_KEY", "MINIO_ACCESS_KEY"))
+    s3_secret_key: str = Field(default="minioadmin", validation_alias=AliasChoices("S3_SECRET_KEY", "MINIO_SECRET_KEY"))
+    s3_bucket_name: str = Field(default="foldexa-artifacts", validation_alias=AliasChoices("S3_BUCKET_NAME", "MINIO_BUCKET"))
     s3_region: str = "us-east-1"
     s3_use_ssl: bool = False
     
