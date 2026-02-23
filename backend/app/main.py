@@ -51,8 +51,8 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(jobs.router) # Assuming jobs handles its own prefix or is root
-app.include_router(files.router)
+app.include_router(jobs.router, prefix="/api/v1") # Assuming jobs handles its own prefix (/jobs)
+app.include_router(files.router, prefix="/api/v1")
 app.include_router(payments.router, prefix="/api/v1/payments", tags=["payments"])
 app.include_router(beta.router, prefix="/api/v1/beta", tags=["beta"])
 
