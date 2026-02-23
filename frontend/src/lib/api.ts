@@ -42,7 +42,7 @@ export const api = {
             formData.append("selected_models", selectedModels);
         }
 
-        const response = await axios.post(`${API_BASE}/jobs/`, formData, {
+        const response = await axios.post(`${API_BASE}/api/v1/jobs/`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
         return response.data;
@@ -50,24 +50,24 @@ export const api = {
 
     /** Get job status */
     getJob: async (jobId: string): Promise<Job> => {
-        const response = await axios.get(`${API_BASE}/jobs/${jobId}`);
+        const response = await axios.get(`${API_BASE}/api/v1/jobs/${jobId}`);
         return response.data;
     },
 
     /** Get job results (artifacts & metrics) */
     getJobResults: async (jobId: string): Promise<JobResult> => {
-        const response = await axios.get(`${API_BASE}/jobs/${jobId}/results`);
+        const response = await axios.get(`${API_BASE}/api/v1/jobs/${jobId}/results`);
         return response.data;
     },
 
     /** List all jobs (History) */
     listJobs: async (limit: number = 20): Promise<Job[]> => {
-        const response = await axios.get(`${API_BASE}/jobs/`, { params: { limit } });
+        const response = await axios.get(`${API_BASE}/api/v1/jobs/`, { params: { limit } });
         return response.data;
     },
 
     /** Cancel a job */
     cancelJob: async (jobId: string): Promise<void> => {
-        await axios.delete(`${API_BASE}/jobs/${jobId}`);
+        await axios.delete(`${API_BASE}/api/v1/jobs/${jobId}`);
     }
 };
