@@ -1,5 +1,9 @@
 """
 Storage service for managing artifacts in S3/MinIO.
+
+Supports both local docker-compose (minio:9000, HTTP) and
+Railway production (minio:9000 internal hostname, HTTP).
+SSL is controlled explicitly via MINIO_USE_SSL env var.
 """
 from minio import Minio
 from minio.error import S3Error
@@ -7,39 +11,80 @@ from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO, Optional
 import logging
+from urllib.parse import urlparse
 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 
+def _parse_endpoint(raw_endpoint: str) -> str:
+    """Strip http:// or https:// from endpoint, return bare host:port."""
+    parsed = urlparse(raw_endpoint)
+    if parsed.netloc:
+        return parsed.netloc  # e.g. "minio:9000" from "http://minio:9000"
+    return raw_endpoint       # e.g. "minio:9000" if no scheme given
+
+
 class StorageService:
     """Abstraction for object storage operations."""
     
     def __init__(self):
-        # Determine secure flag automatically from endpoint URL
-        is_secure = settings.s3_endpoint.startswith("https://") or settings.s3_use_ssl
+        endpoint_clean = _parse_endpoint(settings.s3_endpoint)
         
+        # SSL is ONLY enabled if explicitly set via MINIO_USE_SSL=true.
+        # Internal Railway networking uses HTTP — never auto-detect from scheme.
+        is_secure = settings.s3_use_ssl
+
+        logger.info(
+            f"Initializing MinIO client: endpoint={endpoint_clean}, "
+            f"secure={is_secure}, bucket={settings.s3_bucket_name}"
+        )
+
         self.client = Minio(
-            endpoint=settings.s3_endpoint.replace("http://", "").replace("https://", ""),
+            endpoint=endpoint_clean,
             access_key=settings.s3_access_key,
             secret_key=settings.s3_secret_key,
             secure=is_secure,
         )
         self.bucket_name = settings.s3_bucket_name
-        # Validation moved to explicit call during app startup
     
-    def validate_connection(self):
-        """Strictly validate connection to MinIO/S3 on startup."""
+    def validate_connection(self, timeout_seconds: int = 10):
+        """
+        Validate MinIO connection on startup.
+        Logs clear error if unreachable but does NOT block indefinitely.
+        """
+        import signal
+
+        def _timeout_handler(signum, frame):
+            raise TimeoutError(f"MinIO connection timed out after {timeout_seconds}s")
+
+        # Set alarm to prevent infinite hang
+        old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(timeout_seconds)
+
         try:
             if not self.client.bucket_exists(self.bucket_name):
                 self.client.make_bucket(self.bucket_name)
                 logger.info(f"Created bucket: {self.bucket_name}")
             else:
-                logger.info(f"Bucket {self.bucket_name} already exists.")
-        except Exception as e:
-            logger.error(f"CRITICAL: Failed to connect to MinIO at {settings.s3_endpoint}. Error: {e}")
+                logger.info(f"Bucket '{self.bucket_name}' verified and accessible.")
+        except TimeoutError as e:
+            logger.error(f"CRITICAL: {e}")
+            raise RuntimeError(str(e))
+        except S3Error as e:
+            logger.error(
+                f"CRITICAL: MinIO S3 error at {settings.s3_endpoint} — {e}"
+            )
             raise RuntimeError(f"MinIO connection failed: {e}")
+        except Exception as e:
+            logger.error(
+                f"CRITICAL: Cannot reach MinIO at {settings.s3_endpoint} — {e}"
+            )
+            raise RuntimeError(f"MinIO connection failed: {e}")
+        finally:
+            signal.alarm(0)  # Cancel the alarm
+            signal.signal(signal.SIGALRM, old_handler)
     
     def upload_file(self, file_path: str, s3_key: str) -> str:
         """Upload a file to S3."""
@@ -120,10 +165,10 @@ class StorageService:
                 object_name=s3_key,
                 expires=timedelta(seconds=expires_seconds),
             )
-            # Support local docker vs public URLs automatically
-            # If the application is connecting to the internal docker 'minio:9000' endpoint,
-            # browsers need this to be 'localhost:9000' to download it.
-            # If it's a Railway public URL (e.g. minio-production.up.railway.app), do not replace.
+            # In local docker-compose, browsers can't reach 'minio:9000',
+            # so rewrite to localhost. In Railway, the internal hostname
+            # is used only server-side; presigned URLs go through the
+            # public domain which MinIO handles natively.
             if settings.s3_endpoint in ["http://minio:9000", "minio:9000"]:
                 url = url.replace("minio:9000", "localhost:9000")
                 
@@ -133,5 +178,6 @@ class StorageService:
             raise
 
 
-# Global instance
+# Global instance — created at import time, but validate_connection()
+# is called explicitly from app lifespan (main.py).
 storage_service = StorageService()

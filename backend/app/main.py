@@ -28,11 +28,17 @@ async def lifespan(app: FastAPI):
     os.makedirs(settings.upload_dir, exist_ok=True)
     os.makedirs(settings.result_dir, exist_ok=True)
     
-    # Validate MinIO connection strictly on startup
+    # Validate MinIO connection on startup (non-blocking)
     from app.infrastructure.storage.s3_service import storage_service
     logger.info("Validating MinIO connection...")
-    storage_service.validate_connection()
-    logger.info("Successfully connected to MinIO/S3 object storage.")
+    try:
+        storage_service.validate_connection(timeout_seconds=10)
+        logger.info("Successfully connected to MinIO/S3 object storage.")
+    except RuntimeError as e:
+        logger.warning(
+            f"MinIO validation failed: {e}. "
+            "Server will start, but file operations will fail until MinIO is reachable."
+        )
     
     yield
     

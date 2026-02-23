@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     s3_secret_key: str = Field(default="minioadmin", validation_alias=AliasChoices("S3_SECRET_KEY", "MINIO_SECRET_KEY"))
     s3_bucket_name: str = Field(default="foldexa-artifacts", validation_alias=AliasChoices("S3_BUCKET_NAME", "MINIO_BUCKET"))
     s3_region: str = "us-east-1"
-    s3_use_ssl: bool = False
+    s3_use_ssl: bool = Field(default=False, validation_alias=AliasChoices("S3_USE_SSL", "MINIO_USE_SSL"))
     
     # Storage Paths (Local fallback for development)
     storage_base_path: str = "./storage"
