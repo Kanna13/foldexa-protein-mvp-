@@ -182,7 +182,7 @@ async def create_job(
         # Cleanup S3 if uploaded
         if s3_key:
             try:
-                storage_service.delete_file(s3_key)
+                storage_service.delete_object(s3_key)
                 logger.info(f"Cleaned up S3 file: {s3_key}")
             except Exception as cleanup_error:
                 logger.error(f"Failed to cleanup S3 file {s3_key}: {cleanup_error}")
@@ -218,9 +218,15 @@ async def list_jobs(
     db: AsyncSession = Depends(get_db)
 ):
     """List jobs with optional status filter."""
-    status_filter = JobStatus(status) if status else None
-    jobs = await JobService.list_jobs(db, status=status_filter, limit=limit)
-    return [JobStatusResponse.model_validate(job) for job in jobs]
+    try:
+        status_filter = JobStatus(status) if status else None
+        jobs = await JobService.list_jobs(db, status=status_filter, limit=limit)
+        return [JobStatusResponse.model_validate(job) for job in jobs]
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid status filter: {status}")
+    except Exception as e:
+        logger.error(f"Error listing jobs: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to list jobs: {str(e)}")
 
 
 @router.get("/{job_id}/results", response_model=JobResultResponse)

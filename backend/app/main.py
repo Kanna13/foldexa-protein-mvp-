@@ -28,6 +28,16 @@ async def lifespan(app: FastAPI):
     os.makedirs(settings.upload_dir, exist_ok=True)
     os.makedirs(settings.result_dir, exist_ok=True)
     
+    # Create database tables if they don't exist
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables verified/created.")
+    except Exception as e:
+        logger.error(f"CRITICAL: Database connection failed: {e}")
+        # Don't block startup — the DB might come online shortly
+        logger.warning("Server will start, but database operations will fail until DB is reachable.")
+    
     # Validate MinIO connection on startup (non-blocking)
     from app.infrastructure.storage.s3_service import storage_service
     logger.info("Validating MinIO connection...")
