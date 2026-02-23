@@ -132,39 +132,37 @@ async def create_job(
         else:
             recommended_pipeline = pipeline_type.value
         
-        # Use transaction for atomicity
-        async with db.begin():
-            # Parse selected_models
-            model_list = selected_models.split(",") if selected_models else []
-            
-            # Create job with analysis metadata
-            job = await JobService.create_job(
-                db=db,
-                pipeline_type=recommended_pipeline,
-                config={
-                    "atom_count": file_info.get("atom_count", 0),
-                    "pdb_analysis": pdb_analysis,
-                    "selected_models": model_list
-                }
-            )
-            
-            # Upload to S3
-            s3_key = await JobService.upload_input(
-                db=db,
-                job_id=job.id,
-                file_content=file_content,
-                filename=file.filename
-            )
-            
-            # Update status to QUEUED
-            await JobService.update_job_status(db, job.id, JobStatus.QUEUED)
+        # Parse selected_models
+        model_list = selected_models.split(",") if selected_models else []
+        
+        # Create job with analysis metadata
+        job = await JobService.create_job(
+            db=db,
+            pipeline_type=recommended_pipeline,
+            config={
+                "atom_count": file_info.get("atom_count", 0),
+                "pdb_analysis": pdb_analysis,
+                "selected_models": model_list
+            }
+        )
+        
+        # Upload to S3
+        s3_key = await JobService.upload_input(
+            db=db,
+            job_id=job.id,
+            file_content=file_content,
+            filename=file.filename
+        )
+        
+        # Update status to QUEUED
+        await JobService.update_job_status(db, job.id, JobStatus.QUEUED)
         
         # Dispatch to Celery (outside transaction)
         task = execute_pipeline.delay(job.id, pipeline_type.value)
         
         # Store Celery task ID
         job.celery_task_id = task.id
-        await db.commit()
+
         
         logger.info(f"Created and queued job {job.id} with {file_info.get('atom_count', 0)} atoms")
         

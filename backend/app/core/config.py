@@ -47,9 +47,9 @@ class Settings(BaseSettings):
     s3_use_ssl: bool = False
     
     # Storage Paths (Local fallback for development)
-    storage_base_path: str = "app/storage"
-    upload_dir: str = "app/storage/uploads"
-    result_dir: str = "app/storage/results"
+    storage_base_path: str = "./storage"
+    upload_dir: str = "./storage/uploads"
+    result_dir: str = "./storage/results"
     
     # Job Configuration
     job_timeout_seconds: int = 10800  # 3 hours
