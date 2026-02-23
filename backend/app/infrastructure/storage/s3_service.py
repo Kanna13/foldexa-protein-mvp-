@@ -17,25 +17,29 @@ class StorageService:
     """Abstraction for object storage operations."""
     
     def __init__(self):
+        # Determine secure flag automatically from endpoint URL
+        is_secure = settings.s3_endpoint.startswith("https://") or settings.s3_use_ssl
+        
         self.client = Minio(
             endpoint=settings.s3_endpoint.replace("http://", "").replace("https://", ""),
             access_key=settings.s3_access_key,
             secret_key=settings.s3_secret_key,
-            secure=settings.s3_use_ssl,
+            secure=is_secure,
         )
         self.bucket_name = settings.s3_bucket_name
-        self._ensure_bucket_exists()
+        # Validation moved to explicit call during app startup
     
-    def _ensure_bucket_exists(self):
-        """Create bucket if it doesn't exist."""
+    def validate_connection(self):
+        """Strictly validate connection to MinIO/S3 on startup."""
         try:
             if not self.client.bucket_exists(self.bucket_name):
                 self.client.make_bucket(self.bucket_name)
                 logger.info(f"Created bucket: {self.bucket_name}")
+            else:
+                logger.info(f"Bucket {self.bucket_name} already exists.")
         except Exception as e:
-            # Allow startup even if S3 is not available (e.g. during build or incorrect config)
-            logger.warning(f"Could not connect to S3/MinIO: {e}. File uploads will fail until fixed.")
-            # Do not raise exception here
+            logger.error(f"CRITICAL: Failed to connect to MinIO at {settings.s3_endpoint}. Error: {e}")
+            raise RuntimeError(f"MinIO connection failed: {e}")
     
     def upload_file(self, file_path: str, s3_key: str) -> str:
         """Upload a file to S3."""
@@ -116,13 +120,12 @@ class StorageService:
                 object_name=s3_key,
                 expires=timedelta(seconds=expires_seconds),
             )
-            # Fix host for browser access (docker internal network vs localhost)
-            # If the url contains 'minio', replace it with 'localhost'
-            if "minio:9000" in url:
+            # Support local docker vs public URLs automatically
+            # If the application is connecting to the internal docker 'minio:9000' endpoint,
+            # browsers need this to be 'localhost:9000' to download it.
+            # If it's a Railway public URL (e.g. minio-production.up.railway.app), do not replace.
+            if settings.s3_endpoint in ["http://minio:9000", "minio:9000"]:
                 url = url.replace("minio:9000", "localhost:9000")
-            elif "minio" in url: 
-                 # Fallback if port is missing or different, though usually it's minio:9000
-                url = url.replace("minio", "localhost")
                 
             return url
         except S3Error as e:
