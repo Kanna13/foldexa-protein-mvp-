@@ -40,7 +40,8 @@ export function BetaAccessForm() {
         setStatus("loading");
 
         try {
-            const response = await fetch("http://localhost:8000/api/v1/beta/request-access", {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://foldexa-protein-mvp-production.up.railway.app";
+            const response = await fetch(`${API_BASE}/api/v1/beta/request-access`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

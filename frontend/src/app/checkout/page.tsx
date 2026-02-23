@@ -35,7 +35,8 @@ function CheckoutContent() {
         setLoading(true);
         try {
             // Create Checkout Session
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/payments/create-checkout-session`, {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://foldexa-protein-mvp-production.up.railway.app";
+            const response = await fetch(`${API_BASE}/api/v1/payments/create-checkout-session`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ plan: planKey }),
