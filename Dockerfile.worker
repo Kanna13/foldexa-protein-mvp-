@@ -2,24 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# system deps
-RUN apt-get update && apt-get install -y \
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONPATH=/app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# copy ONLY backend first (so requirements exists)
-COPY backend /app
-
-# install dependencies
+COPY backend/requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ensure imports work
-ENV PYTHONPATH=/app
+COPY backend /app
 
-# create runtime dirs
 RUN mkdir -p /app/storage/uploads /app/storage/results
 
-# start celery worker
-CMD ["celery", "-A", "app.core.celery_app", "worker", "--loglevel=info", "--concurrency=1"]
+CMD ["celery","-A","app.core.celery_app","worker","--loglevel=info","--concurrency=1"]
