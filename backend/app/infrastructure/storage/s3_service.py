@@ -52,39 +52,32 @@ class StorageService:
     def validate_connection(self, timeout_seconds: int = 10):
         """
         Validate MinIO connection on startup.
-        Logs clear error if unreachable but does NOT block indefinitely.
+        Logs clear error if unreachable. Uses thread-based timeout
+        (portable — works on Linux, macOS, Docker Alpine, Windows).
         """
-        import signal
+        from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
 
-        def _timeout_handler(signum, frame):
-            raise TimeoutError(f"MinIO connection timed out after {timeout_seconds}s")
-
-        # Set alarm to prevent infinite hang
-        old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
-        signal.alarm(timeout_seconds)
-
-        try:
+        def _check():
             if not self.client.bucket_exists(self.bucket_name):
                 self.client.make_bucket(self.bucket_name)
                 logger.info(f"Created bucket: {self.bucket_name}")
             else:
                 logger.info(f"Bucket '{self.bucket_name}' verified and accessible.")
-        except TimeoutError as e:
-            logger.error(f"CRITICAL: {e}")
-            raise RuntimeError(str(e))
+
+        try:
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(_check)
+                future.result(timeout=timeout_seconds)
+        except FuturesTimeout:
+            msg = f"MinIO connection timed out after {timeout_seconds}s at {settings.s3_endpoint}"
+            logger.error(f"CRITICAL: {msg}")
+            raise RuntimeError(msg)
         except S3Error as e:
-            logger.error(
-                f"CRITICAL: MinIO S3 error at {settings.s3_endpoint} — {e}"
-            )
+            logger.error(f"CRITICAL: MinIO S3 error at {settings.s3_endpoint} — {e}")
             raise RuntimeError(f"MinIO connection failed: {e}")
         except Exception as e:
-            logger.error(
-                f"CRITICAL: Cannot reach MinIO at {settings.s3_endpoint} — {e}"
-            )
+            logger.error(f"CRITICAL: Cannot reach MinIO at {settings.s3_endpoint} — {e}")
             raise RuntimeError(f"MinIO connection failed: {e}")
-        finally:
-            signal.alarm(0)  # Cancel the alarm
-            signal.signal(signal.SIGALRM, old_handler)
     
     def upload_file(self, file_path: str, s3_key: str) -> str:
         """Upload a file to S3."""

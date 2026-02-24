@@ -70,7 +70,10 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "https://foldexa.bio",
         "https://www.foldexa.bio",
-        "https://foldexa-protein-mvp-production.up.railway.app"
+        "https://foldexa-protein-mvp-production.up.railway.app",
+        # Vercel preview/production domains
+        "https://foldexa-protein-mvp.vercel.app",
+        "https://foldexa.vercel.app",
     ]
     
     # Observability
