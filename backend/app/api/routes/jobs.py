@@ -158,10 +158,17 @@ async def create_job(
         await JobService.update_job_status(db, job.id, JobStatus.QUEUED)
         
         # Dispatch to Celery (outside transaction)
-        task = execute_pipeline.delay(job.id, pipeline_type.value)
-        
-        # Store Celery task ID
-        job.celery_task_id = task.id
+        try:
+            task = execute_pipeline.delay(job.id, pipeline_type.value)
+            job.celery_task_id = task.id
+            logger.info(f"Dispatched job {job.id} to Celery task {task.id}")
+        except Exception as celery_err:
+            # Redis/Celery unavailable — job is saved in DB as QUEUED
+            # but won't be processed until a worker picks it up
+            logger.warning(
+                f"Celery dispatch failed for job {job.id}: {celery_err}. "
+                "Job is saved as QUEUED but won't execute until Celery/Redis is available."
+            )
 
         
         logger.info(f"Created and queued job {job.id} with {file_info.get('atom_count', 0)} atoms")
