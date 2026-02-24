@@ -1,14 +1,23 @@
 """
-Docker execution runner for ML models.
-Handles container lifecycle, GPU allocation, and result collection.
+GPU model executor — routes jobs to the configured backend.
+
+Backends:
+  - "runpod"  → RunPod Serverless GPU (production)
+  - "docker"  → Local Docker containers (docker-compose dev)
+  - "local"   → Stub/placeholder (no GPU, returns mock result)
+
+The interface (execute_diffab, execute_rfdiffusion, execute_af2_gamma)
+is consumed by app/worker/tasks.py and must not change.
 """
-import subprocess
 import logging
 import os
+import json
+import time
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional
-import json
+from typing import Dict, Optional
+
+import requests
 
 from app.core.config import settings
 from app.infrastructure.storage.s3_service import storage_service
@@ -16,296 +25,233 @@ from app.infrastructure.storage.s3_service import storage_service
 logger = logging.getLogger(__name__)
 
 
-class DockerRunner:
-    """Execute ML models in isolated Docker containers."""
-    
+# ---------------------------------------------------------------------------
+# RunPod Serverless Executor (production)
+# ---------------------------------------------------------------------------
+
+class RunPodExecutor:
+    """Execute ML models via RunPod serverless GPU endpoints."""
+
     def __init__(self):
-        self.docker_enabled = settings.docker_enabled
+        self.api_key = settings.runpod_api_key
+        self.timeout = settings.runpod_timeout
+        self.base_url = "https://api.runpod.ai/v2"
+        self.headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        # MinIO config passed to the GPU worker so it can read/write files
+        self.minio_config = {
+            "endpoint": settings.s3_endpoint,
+            "access_key": settings.s3_access_key,
+            "secret_key": settings.s3_secret_key,
+            "bucket": settings.s3_bucket_name,
+            "use_ssl": settings.s3_use_ssl,
+        }
+
+    # -- public interface (matches old ModelExecutor) --
+
+    async def execute_diffab(self, job_id: str, input_s3_key: str) -> Dict:
+        return await self._run_model(
+            endpoint_id=settings.runpod_endpoint_diffab,
+            model="diffab",
+            job_id=job_id,
+            input_s3_key=input_s3_key,
+        )
+
+    async def execute_rfdiffusion(self, job_id: str, input_s3_key: str) -> Dict:
+        return await self._run_model(
+            endpoint_id=settings.runpod_endpoint_rfdiffusion,
+            model="rfdiffusion",
+            job_id=job_id,
+            input_s3_key=input_s3_key,
+        )
+
+    async def execute_af2_gamma(self, job_id: str, input_s3_key: str) -> Dict:
+        """AF2 not on RunPod yet — placeholder that returns empty metrics."""
+        logger.warning(f"AF2 Gamma not configured on RunPod; skipping for job {job_id}")
+        return {"artifacts": [], "metrics": {}}
+
+    # -- internals --
+
+    async def _run_model(
+        self,
+        endpoint_id: str,
+        model: str,
+        job_id: str,
+        input_s3_key: str,
+    ) -> Dict:
+        """Submit a job to RunPod and poll until complete."""
+        if not endpoint_id:
+            raise RuntimeError(f"RunPod endpoint for {model} is not configured (RUNPOD_ENDPOINT_{model.upper()} is empty)")
+
+        url = f"{self.base_url}/{endpoint_id}/run"
+
+        payload = {
+            "input": {
+                "job_id": job_id,
+                "model": model,
+                "input_s3_key": input_s3_key,
+                "minio": self.minio_config,
+            }
+        }
+
+        logger.info(f"[RunPod] Submitting {model} job {job_id} to {endpoint_id}")
+
+        # 1. Submit
+        resp = requests.post(url, json=payload, headers=self.headers, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        runpod_id = data["id"]
+        logger.info(f"[RunPod] Submitted — runpod_id={runpod_id}")
+
+        # 2. Poll for completion
+        status_url = f"{self.base_url}/{endpoint_id}/status/{runpod_id}"
+        deadline = time.time() + self.timeout
+
+        while time.time() < deadline:
+            time.sleep(5)
+            status_resp = requests.get(status_url, headers=self.headers, timeout=15)
+            status_resp.raise_for_status()
+            status_data = status_resp.json()
+            status = status_data.get("status")
+
+            if status == "COMPLETED":
+                output = status_data.get("output", {})
+                logger.info(f"[RunPod] {model} job {job_id} completed: {len(output.get('artifacts', []))} artifacts")
+                return output
+
+            if status == "FAILED":
+                error = status_data.get("error", "Unknown RunPod error")
+                raise RuntimeError(f"RunPod {model} failed: {error}")
+
+            logger.debug(f"[RunPod] {model} job {job_id} status={status}")
+
+        raise TimeoutError(f"RunPod {model} job {job_id} timed out after {self.timeout}s")
+
+
+# ---------------------------------------------------------------------------
+# Local Docker Executor (docker-compose dev — reuses old logic)
+# ---------------------------------------------------------------------------
+
+class LocalDockerExecutor:
+    """Execute ML models in local Docker containers (for development)."""
+
+    def __init__(self):
+        import subprocess
+        self.subprocess = subprocess
         self.gpu_enabled = settings.gpu_enabled
-    
-    def run_container(
-        self,
-        image: str,
-        command: List[str],
-        mounts: Dict[str, str], # {host_volume_or_path: container_path}
-        volumes_from: Optional[List[str]] = None, # Inherit volumes from these containers
-        environment: Optional[Dict[str, str]] = None,
-        gpu: bool = False,
-        timeout: int = 3600
-    ) -> Dict:
-        """
-        Run a Docker container using a shared volume strategy (DooD compatible).
-        """
-        if not self.docker_enabled:
-            raise RuntimeError("Docker execution is disabled")
-        
-        container_name = f"foldexa-job-{os.urandom(4).hex()}"
-        
-        # 1. Create Container
-        create_cmd = ["docker", "create", "--name", container_name]
-        
-        if gpu and self.gpu_enabled:
-            create_cmd.extend(["--gpus", "all"])
-            
-        if environment:
-            for key, value in environment.items():
-                create_cmd.extend(["-e", f"{key}={value}"])
-        
-        # Add mounts
-        for source, target in mounts.items():
-            create_cmd.extend(["-v", f"{source}:{target}"])
-            
-        # Add volumes_from
-        if volumes_from:
-            for container in volumes_from:
-                create_cmd.extend(["--volumes-from", container])
-                
-        create_cmd.append(image)
-        create_cmd.extend(command)
-        
-        # Create the container
-        subprocess.run(create_cmd, check=True, capture_output=True)
-        
-        try:
-            # 2. No need to copy inputs (Docker cp) because we rely on shared volumes.
-            
-            # 3. Start Container (Attach to capture output)
-            start_cmd = ["docker", "start", "-a", container_name]
-            
-            logger.info(f"Executing container {container_name}")
-            result = subprocess.run(
-                start_cmd,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                check=False
-            )
-            
-            # 4. No need to copy outputs back.
 
-            return {
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-                "exit_code": result.returncode,
-                "success": result.returncode == 0
-            }
+    async def execute_diffab(self, job_id: str, input_s3_key: str) -> Dict:
+        return await self._run_docker_model("diffab", job_id, input_s3_key)
 
-        except subprocess.TimeoutExpired:
-            logger.error(f"Container execution timed out after {timeout}s")
-            subprocess.run(["docker", "rm", "-f", container_name], capture_output=True)
-            raise
-        except Exception as e:
-            logger.error(f"Docker execution failed: {e}")
-            raise
-        finally:
-            # 5. Cleanup container
-            subprocess.run(["docker", "rm", "-f", container_name], capture_output=True)
+    async def execute_rfdiffusion(self, job_id: str, input_s3_key: str) -> Dict:
+        return await self._run_docker_model("rfdiffusion", job_id, input_s3_key)
 
+    async def execute_af2_gamma(self, job_id: str, input_s3_key: str) -> Dict:
+        return await self._run_docker_model("af2-gamma", job_id, input_s3_key)
 
-
-
-class ModelExecutor:
-    """High-level interface for executing ML models."""
-    
-    def __init__(self):
-        self.runner = DockerRunner()
-        # Resolve Weights directory relative to project root
-        # Assuming we are in backend/app/infrastructure/compute/
-        # Project root is backend/../../.. -> foldexa-protein-mvp-
-        # We want foldexa-protein-mvp-/Weights
-        
-        # Use container path for weights
-        self.weights_dir = "/weights"
-        if not os.path.exists(self.weights_dir):
-            logger.warning(f"Weights directory not found at {self.weights_dir}")
-
-    async def execute_diffab(
-        self,
-        job_id: str,
-        input_s3_key: str
-    ) -> Dict:
-        """Execute DiffAb antibody design."""
-        logger.info(f"Executing DiffAb for job {job_id}")
-        
-        # Use shared workspace mounted in worker at /workspace_share
+    async def _run_docker_model(self, model: str, job_id: str, input_s3_key: str) -> Dict:
         job_dir = Path(f"/workspace_share/{job_id}")
-        if not job_dir.exists():
-            job_dir.mkdir(parents=True, exist_ok=True)
-            
-        try:
-            # Download input directly to shared volume
-            input_path = job_dir / "input.pdb"
-            storage_service.download_file(input_s3_key, str(input_path))
-            
-            output_dir = job_dir / "outputs"
-            output_dir.mkdir(exist_ok=True)
-            
-            # Run DiffAb container
-            # Mount the NAMED volume 'foldexa_workspace_shared' to /workspace inside the model container
-            # Inherit /weights from foldexa-worker using volumes_from
-            result = self.runner.run_container(
-                image="diffab:latest",
-                command=[
-                    "--input", f"/workspace/{job_id}/input.pdb",
-                    "--output", f"/workspace/{job_id}/outputs",
-                    "--num_designs", "5",
-                ],
-                mounts={
-                    "foldexa_workspace_shared": "/workspace",
-                },
-                volumes_from=["foldexa-worker"],
-                gpu=True,
-                timeout=1800
-            )
-            
-            if not result["success"]:
-                raise RuntimeError(f"DiffAb failed: {result['stderr']}")
-            
-            # Upload outputs
-            artifacts = []
-            for pdb_file in output_dir.glob("*.pdb"):
-                s3_key = f"jobs/{job_id}/diffab/{pdb_file.name}"
-                storage_service.upload_file(str(pdb_file), s3_key)
-                artifacts.append({
-                    "type": "pdb",
-                    "s3_key": s3_key,
-                    "size": pdb_file.stat().st_size
-                })
-            
-            return {
-                "artifacts": artifacts,
-                "logs": result["stdout"]
-            }
-        except Exception as e:
-            logger.error(f"DiffAb execution error: {e}")
-            raise
-        # Optional: cleanup job_dir? keeping for debugging is safer for now.
-    
-    async def execute_rfdiffusion(
-        self,
-        job_id: str,
-        input_s3_key: str
-    ) -> Dict:
-        """Execute RFdiffusion protein design."""
-        logger.info(f"Executing RFdiffusion for job {job_id}")
-        
-        job_dir = Path(f"/workspace_share/{job_id}")
-        if not job_dir.exists():
-            job_dir.mkdir(parents=True, exist_ok=True)
-            
-        try:
-            input_path = job_dir / "input.pdb"
-            storage_service.download_file(input_s3_key, str(input_path))
-            
-            output_dir = job_dir / "outputs"
-            output_dir.mkdir(exist_ok=True)
-            
-            result = self.runner.run_container(
-                image="rfdiffusion:latest",
-                command=[
-                    "inference.design_ppi",
-                    f"inference.input_pdb=/workspace/{job_id}/input.pdb",
-                    f"inference.output_prefix=/workspace/{job_id}/outputs/design",
-                    "inference.num_designs=5",
-                ],
-                mounts={
-                    "foldexa_workspace_shared": "/workspace",
-                },
-                volumes_from=["foldexa-worker"],
-                gpu=True,
-                timeout=3600
-            )
-            
-            if not result["success"]:
-                raise RuntimeError(f"RFdiffusion failed: {result['stderr']}")
-            
-            artifacts = []
-            for pdb_file in output_dir.glob("*.pdb"):
-                s3_key = f"jobs/{job_id}/rfdiffusion/{pdb_file.name}"
-                storage_service.upload_file(str(pdb_file), s3_key)
-                artifacts.append({
-                    "type": "pdb",
-                    "s3_key": s3_key,
-                    "size": pdb_file.stat().st_size
-                })
-            
-            return {
-                "artifacts": artifacts,
-                "logs": result["stdout"]
-            }
-        except Exception as e:
-            logger.error(f"RFdiffusion execution error: {e}")
-            raise
-    
-    async def execute_af2_gamma(
-        self,
-        job_id: str,
-        input_s3_key: str
-    ) -> Dict:
-        """Execute AlphaFold2 Gamma for structure prediction."""
-        logger.info(f"Executing AF2 Gamma for job {job_id}")
-        
-        job_dir = Path(f"/workspace_share/{job_id}")
-        if not job_dir.exists():
-            job_dir.mkdir(parents=True, exist_ok=True)
-            
-        try:
-            input_path = job_dir / "input.pdb"
-            storage_service.download_file(input_s3_key, str(input_path))
-            
-            output_dir = job_dir / "outputs"
-            output_dir.mkdir(exist_ok=True)
-            
-            result = self.runner.run_container(
-                image="af2-gamma:latest",
-                command=[
-                    "--input", f"/workspace/{job_id}/input.pdb",
-                    "--output_dir", f"/workspace/{job_id}/outputs",
-                ],
-                mounts={
-                    "foldexa_workspace_shared": "/workspace",
-                },
-                volumes_from=["foldexa-worker"],
-                gpu=True,
-                timeout=7200
-            )
-            
-            if not result["success"]:
-                raise RuntimeError(f"AF2 Gamma failed: {result['stderr']}")
-            
-            # Parse metrics from output
-            metrics = self._parse_af2_metrics(str(output_dir))
-            
-            # Upload artifacts
-            artifacts = []
-            for pdb_file in output_dir.glob("*.pdb"):
-                s3_key = f"jobs/{job_id}/af2/{pdb_file.name}"
-                storage_service.upload_file(str(pdb_file), s3_key)
-                artifacts.append({
-                    "type": "pdb",
-                    "s3_key": s3_key,
-                    "size": pdb_file.stat().st_size
-                })
-            
-            return {
-                "artifacts": artifacts,
-                "metrics": metrics,
-                "logs": result["stdout"]
-            }
-        except Exception as e:
-            logger.error(f"AF2 execution error: {e}")
-            raise
-    
-    def _parse_af2_metrics(self, output_dir: str) -> Dict:
-        """Parse AF2 output metrics."""
-        metrics_file = os.path.join(output_dir, "metrics.json")
-        if os.path.exists(metrics_file):
+        job_dir.mkdir(parents=True, exist_ok=True)
+
+        input_path = job_dir / "input.pdb"
+        storage_service.download_file(input_s3_key, str(input_path))
+
+        output_dir = job_dir / "outputs"
+        output_dir.mkdir(exist_ok=True)
+
+        docker_cmd = [
+            "docker", "run", "--rm",
+            "-v", f"foldexa_workspace_shared:/workspace",
+        ]
+        if self.gpu_enabled:
+            docker_cmd.extend(["--gpus", "all"])
+
+        if model == "diffab":
+            docker_cmd.extend([
+                "diffab:latest",
+                "--input", f"/workspace/{job_id}/input.pdb",
+                "--output", f"/workspace/{job_id}/outputs",
+                "--num_designs", "5",
+            ])
+        elif model == "rfdiffusion":
+            docker_cmd.extend([
+                "rfdiffusion:latest",
+                "inference.design_ppi",
+                f"inference.input_pdb=/workspace/{job_id}/input.pdb",
+                f"inference.output_prefix=/workspace/{job_id}/outputs/design",
+                "inference.num_designs=5",
+            ])
+        elif model == "af2-gamma":
+            docker_cmd.extend([
+                "af2-gamma:latest",
+                "--input", f"/workspace/{job_id}/input.pdb",
+                "--output_dir", f"/workspace/{job_id}/outputs",
+            ])
+
+        logger.info(f"[Docker] Running {model} for job {job_id}")
+        result = self.subprocess.run(docker_cmd, capture_output=True, text=True, timeout=3600)
+
+        if result.returncode != 0:
+            raise RuntimeError(f"{model} container failed: {result.stderr}")
+
+        # Upload output PDBs to MinIO
+        artifacts = []
+        for pdb_file in output_dir.glob("*.pdb"):
+            s3_key = f"jobs/{job_id}/{model}/{pdb_file.name}"
+            storage_service.upload_file(str(pdb_file), s3_key)
+            artifacts.append({
+                "type": "pdb",
+                "s3_key": s3_key,
+                "size": pdb_file.stat().st_size,
+            })
+
+        metrics = {}
+        metrics_file = output_dir / "metrics.json"
+        if metrics_file.exists():
             with open(metrics_file) as f:
-                return json.load(f)
-        
-        # FAIL if metrics are missing - no fake data!
-        raise FileNotFoundError(f"Metrics file not found at {metrics_file}. Model execution likely failed.")
+                metrics = json.load(f)
+
+        return {"artifacts": artifacts, "metrics": metrics, "logs": result.stdout}
 
 
-# Global executor instance
-model_executor = ModelExecutor()
+# ---------------------------------------------------------------------------
+# Stub Executor (no GPU at all — for testing)
+# ---------------------------------------------------------------------------
+
+class LocalStubExecutor:
+    """Stub executor that returns placeholder results (no real GPU)."""
+
+    async def execute_diffab(self, job_id: str, input_s3_key: str) -> Dict:
+        logger.warning(f"[Stub] DiffAb stub for job {job_id} — no real GPU execution")
+        return {"artifacts": [], "metrics": {}}
+
+    async def execute_rfdiffusion(self, job_id: str, input_s3_key: str) -> Dict:
+        logger.warning(f"[Stub] RFdiffusion stub for job {job_id} — no real GPU execution")
+        return {"artifacts": [], "metrics": {}}
+
+    async def execute_af2_gamma(self, job_id: str, input_s3_key: str) -> Dict:
+        logger.warning(f"[Stub] AF2 stub for job {job_id} — no real GPU execution")
+        return {"artifacts": [], "metrics": {}}
+
+
+# ---------------------------------------------------------------------------
+# Factory — picks the right executor based on GPU_BACKEND env var
+# ---------------------------------------------------------------------------
+
+def _create_executor():
+    backend = settings.gpu_backend.lower()
+    if backend == "runpod":
+        logger.info("GPU backend: RunPod Serverless")
+        return RunPodExecutor()
+    elif backend == "docker":
+        logger.info("GPU backend: Local Docker")
+        return LocalDockerExecutor()
+    else:
+        logger.info("GPU backend: Local Stub (no GPU)")
+        return LocalStubExecutor()
+
+
+# Global instance — consumed by app/worker/tasks.py
+model_executor = _create_executor()

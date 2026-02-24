@@ -47,6 +47,13 @@ class Settings(BaseSettings):
     s3_region: str = "us-east-1"
     s3_use_ssl: bool = Field(default=False, validation_alias=AliasChoices("S3_USE_SSL", "MINIO_USE_SSL"))
     
+    # GPU / RunPod Configuration
+    gpu_backend: str = "local"  # "runpod" | "docker" | "local"
+    runpod_api_key: str = ""
+    runpod_endpoint_diffab: str = ""
+    runpod_endpoint_rfdiffusion: str = ""
+    runpod_timeout: int = 600  # seconds to wait for RunPod response
+    
     # Storage Paths (Local fallback for development)
     storage_base_path: str = "./storage"
     upload_dir: str = "./storage/uploads"
