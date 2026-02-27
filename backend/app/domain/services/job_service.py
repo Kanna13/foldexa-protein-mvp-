@@ -130,15 +130,18 @@ class JobService:
     ) -> Optional[str]:
         """Upload input file to S3 and update job."""
         from io import BytesIO
+        from fastapi.concurrency import run_in_threadpool
         
         job = await JobService.get_job(db, job_id)
         if not job:
             return None
         
-        # Upload to S3
+        # Upload to S3 using a thread pool because minio client is synchronous
+        # and blocking the event loop leads to 30s timeouts on Railway.
         s3_key = f"jobs/{job_id}/inputs/{filename}"
-        storage_service.upload_fileobj(
-            file_obj=BytesIO(file_content),  # Wrap bytes in BytesIO
+        await run_in_threadpool(
+            storage_service.upload_fileobj,
+            file_obj=BytesIO(file_content),
             s3_key=s3_key,
             length=len(file_content)
         )

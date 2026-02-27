@@ -1,11 +1,12 @@
 from fastapi import APIRouter, BackgroundTasks, UploadFile, File, Depends, HTTPException, Form
+from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Annotated, Optional
 from enum import Enum
 import logging
 
 from app.domain.services.job_service import JobService
-from app.infrastructure.db.session import get_db
+from app.infrastructure.db.session import get_db, AsyncSessionLocal
 from app.infrastructure.db.models import JobStatus
 from app.schemas.job import (
     JobCreateRequest,
@@ -32,8 +33,87 @@ class PipelineType(str, Enum):
     FULL_PIPELINE = "diffab_rfdiffusion_af2"
 
 
+async def _process_job_background(
+    job_id: str,
+    file_content: bytes,
+    filename: str,
+    pipeline_type: PipelineType,
+    selected_models: str,
+):
+    """Background task to analyze, upload, and dispatch the job without blocking HTTP response."""
+    async with AsyncSessionLocal() as db:
+        try:
+            # 1. Extract file metadata
+            file_info = await run_in_threadpool(get_file_info, file_content)
+            
+            # 2. Analyze PDB structure
+            pdb_analysis = await run_in_threadpool(
+                PDBAnalyzer.analyze, 
+                file_content.decode('utf-8', errors='ignore'), 
+                filename
+            )
+            logger.info(f"PDB Analysis for {job_id}: {pdb_analysis['recommended_mode']}")
+            
+            if pipeline_type == PipelineType.FULL_PIPELINE:
+                mode_to_pipeline = {
+                    'codesign_single': 'diffab_only',
+                    'codesign_multicdrs': 'diffab_rfdiffusion_af2',
+                    'fixbb': 'diffab_only',
+                    'strpred': 'af2_only'
+                }
+                recommended_pipeline = mode_to_pipeline.get(pdb_analysis['recommended_mode'], 'diffab_rfdiffusion_af2')
+            else:
+                recommended_pipeline = pipeline_type.value
+            
+            model_list = selected_models.split(",") if selected_models else []
+            
+            # 3. Update the job configuration in DB
+            job = await JobService.get_job(db, job_id)
+            if job:
+                job.config = {
+                    "atom_count": file_info.get("atom_count", 0),
+                    "pdb_analysis": pdb_analysis,
+                    "selected_models": model_list
+                }
+                job.pipeline_type = recommended_pipeline
+                await db.commit()
+            
+            # 4. Upload to S3 (Network bound, minio is synchronous so run_in_threadpool is used inside)
+            s3_key = await JobService.upload_input(db=db, job_id=job_id, file_content=file_content, filename=filename)
+            await JobService.update_job_status(db, job_id, JobStatus.QUEUED)
+            await db.commit()
+            
+            # 5. Dispatch to RunPod via HTTP 
+            try:
+                runpod_job_id = await RunPodRunner.submit_job(
+                    job_id=job_id,
+                    model_name=recommended_pipeline,
+                    input_s3_key=s3_key,
+                    params={
+                        "atom_count": file_info.get("atom_count", 0),
+                        "pipeline": recommended_pipeline
+                    }
+                )
+                logger.info(f"Dispatched job {job_id} to RunPod via BackgroundTask. RunPod ID: {runpod_job_id}")
+            except Exception as runpod_err:
+                logger.warning(
+                    f"RunPod dispatch failed for job {job_id}: {runpod_err}. "
+                    "Job is saved as QUEUED but won't execute until RunPod is available."
+                )
+
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Background processing failed for job {job_id}: {e}", exc_info=True)
+            try:
+                await JobService.update_job_status(db, job_id, JobStatus.FAILED, str(e))
+                await db.commit()
+            except Exception as cleanup_error:
+                logger.error(f"Failed to mark background job {job_id} as FAILED: {cleanup_error}")
+
+
 @router.post("/", response_model=JobCreateResponse)
 async def create_job(
+    background_tasks: BackgroundTasks,
     file: Annotated[
         UploadFile,
         File(
@@ -56,127 +136,48 @@ async def create_job(
     
     ⚠️ **ONLY .pdb files are accepted!**
     
-    **Accepted file format:**
-    - `.pdb` - Protein Data Bank format (ONLY)
-    
-    **File requirements:**
-    - Maximum size: 50 MB
-    - Must contain valid protein structure data (ATOM/HETATM records)
-    - Minimum 10 atoms required
-    - File extension MUST be .pdb
-    
-    **Process:**
-    1. Validates file extension is .pdb
-    2. Validates file content and structure
-    3. Creates a job in the database
-    4. Uploads the input file to S3
-    5. Queues the job for execution
-    
     **Returns:**
     - `job_id`: Unique identifier for tracking
     - `status`: Current job status (initially "queued")
     - `created_at`: Timestamp of job creation
-    
-    **Error Responses:**
-    - `400 Bad Request`: Invalid file format or content
-    - `500 Internal Server Error`: Server-side processing error
     """
-    job = None
-    s3_key = None
-    
     try:
-        # Validate filename
         if not file.filename:
             raise HTTPException(status_code=400, detail="No filename provided")
         
-        # Read file content ONCE
         file_content = await file.read()
         
-        # Validate extension
         is_valid, error = validate_file_extension(file.filename)
         if not is_valid:
             raise HTTPException(status_code=400, detail=error)
         
-        # Validate content
         is_valid, error = validate_file_content(file_content)
         if not is_valid:
             raise HTTPException(status_code=400, detail=error)
         
-        # Validate PDB structure
+        # PDB parsing is fast enough for HTTP req, but full analysis is moved to BG
         is_valid, error = validate_pdb_structure(file_content)
         if not is_valid:
             raise HTTPException(status_code=400, detail=error)
         
-        # Extract file metadata
-        file_info = get_file_info(file_content)
-        logger.info(f"File validation passed: {file.filename} ({len(file_content)} bytes, {file_info.get('atom_count', 0)} atoms)")
-        
-        # Analyze PDB structure for intelligent mode selection
-        pdb_analysis = PDBAnalyzer.analyze(file_content.decode('utf-8'), filename=file.filename)
-        logger.info(f"PDB Analysis: {pdb_analysis['chain_count']} chains, antibody={pdb_analysis['is_antibody']}, recommended={pdb_analysis['recommended_mode']}")
-        
-        # Auto-select pipeline if not specified (intelligent selection)
-        if pipeline_type == PipelineType.FULL_PIPELINE:
-            # Map recommended mode to pipeline type
-            mode_to_pipeline = {
-                'codesign_single': 'diffab_only',
-                'codesign_multicdrs': 'diffab_rfdiffusion_af2',  # Full pipeline
-                'fixbb': 'diffab_only',
-                'strpred': 'af2_only'
-            }
-            recommended_pipeline = mode_to_pipeline.get(
-                pdb_analysis['recommended_mode'],
-                'diffab_rfdiffusion_af2'
-            )
-            logger.info(f"Auto-selected pipeline: {recommended_pipeline} based on structure analysis")
-        else:
-            recommended_pipeline = pipeline_type.value
-        
-        # Parse selected_models
-        model_list = selected_models.split(",") if selected_models else []
-        
-        # Create job with analysis metadata
+        # Create lightweight job in CREATED state instantly
         job = await JobService.create_job(
             db=db,
-            pipeline_type=recommended_pipeline,
-            config={
-                "atom_count": file_info.get("atom_count", 0),
-                "pdb_analysis": pdb_analysis,
-                "selected_models": model_list
-            }
+            pipeline_type=pipeline_type.value,
         )
+        await db.commit()
         
-        # Upload to S3
-        s3_key = await JobService.upload_input(
-            db=db,
+        # Offload heavy text splitting, S3 networking, and HTTP dispatch to BackgroundTasks
+        background_tasks.add_task(
+            _process_job_background,
             job_id=job.id,
             file_content=file_content,
-            filename=file.filename
+            filename=file.filename,
+            pipeline_type=pipeline_type,
+            selected_models=selected_models
         )
         
-        # Update status to QUEUED
-        await JobService.update_job_status(db, job.id, JobStatus.QUEUED)
-        
-        # Dispatch to RunPod via HTTP (outside transaction)
-        try:
-            # Note: We send the raw DB job_id here to link back in the webhook payload
-            runpod_job_id = await RunPodRunner.submit_job(
-                job_id=job.id,
-                model_name=recommended_pipeline,
-                input_s3_key=s3_key,
-                params={
-                    "atom_count": file_info.get("atom_count", 0),
-                    "pipeline": recommended_pipeline
-                }
-            )
-            logger.info(f"Dispatched job {job.id} to RunPod. Assigned ID: {runpod_job_id}")
-        except Exception as runpod_err:
-            logger.warning(
-                f"RunPod dispatch failed for job {job.id}: {runpod_err}. "
-                "Job is saved as QUEUED but won't execute until RunPod is available."
-            )
-        
-        logger.info(f"Created and queued job {job.id} with {file_info.get('atom_count', 0)} atoms")
+        logger.info(f"Received and delegated job {job.id} to background tasks.")
         
         return JobCreateResponse(
             job_id=job.id,
@@ -185,28 +186,10 @@ async def create_job(
         )
     
     except HTTPException:
-        # Re-raise validation errors (already have proper status codes)
         raise
     except Exception as e:
-        # Rollback transaction
         await db.rollback()
-        
-        # Cleanup S3 if uploaded
-        if s3_key:
-            try:
-                storage_service.delete_object(s3_key)
-                logger.info(f"Cleaned up S3 file: {s3_key}")
-            except Exception as cleanup_error:
-                logger.error(f"Failed to cleanup S3 file {s3_key}: {cleanup_error}")
-        
-        # Cleanup job if created
-        if job:
-            try:
-                await JobService.update_job_status(db, job.id, JobStatus.FAILED, str(e))
-            except Exception as cleanup_error:
-                logger.error(f"Failed to mark job as failed: {cleanup_error}")
-        
-        logger.error(f"Error creating job: {e}", exc_info=True)
+        logger.error(f"Error initializing job: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
@@ -299,14 +282,11 @@ async def cancel_job(
             detail=f"Cannot cancel job in {job.status} status"
         )
     
-    # Revoke Celery task if exists
-    if job.celery_task_id:
-        try:
-            from app.core.celery_app import celery_app
-            celery_app.control.revoke(job.celery_task_id, terminate=True, signal='SIGKILL')
-            logger.info(f"Revoked Celery task {job.celery_task_id} for job {job_id}")
-        except Exception as e:
-            logger.error(f"Failed to revoke Celery task: {e}")
+    # Revoke RunPod HTTP Job if it was still active
+    # (Optional: Implement a cancel endpoint on the RunPod HTTP server if desired)
+    if job.status in [JobStatus.QUEUED, JobStatus.PROVISIONING, JobStatus.RUNNING]:
+        logger.info(f"Marking job {job_id} as CARCELLED locally. RunPod may still compute it, but result will be ignored.")
+
     
     # Update job status
     await JobService.update_job_status(db, job_id, JobStatus.CANCELLED)
