@@ -55,6 +55,22 @@ const FOUNDERS = [
         border: "group-hover:border-purple-500/50",
         textAccent: "text-purple-500",
         initials: "SI"
+    },
+    {
+        id: "rauan",
+        name: "Rauan Bolat",
+        role: "Project Manager & Product Developer",
+        quote: "Architecting systems from concept to execution",
+        bio: [
+            "I am a Systems Analysis and Project Management expert with a Master’s degree in Project Management.",
+            "My expertise lies in architecting complex financial IT systems and building technology startups from concept to execution.",
+            "At Foldexa, I ensure that our ambitious scientific and technical goals translate into perfectly executed, scalable impact."
+        ],
+        image: "/images/team/Rauan.jpeg",
+        color: "from-orange-500/20 to-orange-900/5",
+        border: "group-hover:border-orange-500/50",
+        textAccent: "text-orange-500",
+        initials: "RB"
     }
 ];
 
@@ -92,7 +108,7 @@ export function StorySection() {
                         viewport={{ once: true }}
                         className="text-4xl md:text-6xl font-bold tracking-tight mb-8 leading-tight"
                     >
-                        Three different paths.<br />
+                        Four different paths.<br />
                         <span className="text-neutral-500">One shared obsession.</span>
                     </motion.h2>
 
@@ -103,7 +119,7 @@ export function StorySection() {
                         viewport={{ once: true }}
                         className="text-xl text-neutral-400 leading-relaxed max-w-2xl mx-auto"
                     >
-                        We came from different worlds — bioengineering, software, and business.
+                        We came from different worlds — bioengineering, software, business, and complex systems architecture.
                         But we shared one belief: <span className="text-white font-medium">protein engineering should be accessible to everyone.</span>
                         That belief became Foldexa.
                     </motion.p>
@@ -114,7 +130,7 @@ export function StorySection() {
                     {/* Scroll Area */}
                     <div
                         ref={scrollContainerRef}
-                        className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                        className="flex flex-nowrap md:flex-wrap md:justify-center gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                         style={{ WebkitOverflowScrolling: 'touch' }}
                     >
                         {FOUNDERS.map((founder) => (
@@ -123,7 +139,7 @@ export function StorySection() {
                                 key={founder.id}
                                 onClick={() => setSelectedId(founder.id)}
                                 className={`
-                  relative min-w-[85vw] md:min-w-0 snap-center cursor-pointer group
+                  relative shrink-0 w-[85vw] md:w-[calc(33.333%-1rem)] max-w-[400px] snap-center cursor-pointer group
                   bg-[#111] border border-neutral-800 rounded-3xl p-8
                   hover:bg-[#161616] transition-colors duration-300
                   flex flex-col h-[400px] justify-between
@@ -289,7 +305,7 @@ export function StorySection() {
                         viewport={{ once: true }}
                         className="text-3xl md:text-5xl font-bold tracking-tight mb-6"
                     >
-                        Three disciplines. Three founders.<br />
+                        Four disciplines. Four founders.<br />
                         <span className="text-emerald-500">One platform.</span>
                     </motion.h3>
 
