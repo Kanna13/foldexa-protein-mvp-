@@ -24,15 +24,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY handler.py .
 
 # --- Model Installation ---
-# Uncomment and customize for your specific model:
-#
 # DiffAb:
-# RUN git clone https://github.com/YOUR_FORK/diffab.git /app/diffab
-# COPY weights/diffab/ /app/weights/diffab/
-#
+RUN git clone https://github.com/luost26/diffab.git /app/diffab
+# DiffAb typically downloads its own weights during the first run or via a specific script.
+# We will create an empty directory for weights, and users can mount them or the script will download.
+RUN mkdir -p /app/weights/diffab
+
 # RFdiffusion:
-# RUN git clone https://github.com/RosettaCommons/RFdiffusion.git /app/rfdiffusion
-# COPY weights/rfdiffusion/ /app/weights/rfdiffusion/
+RUN git clone https://github.com/RosettaCommons/RFdiffusion.git /app/rfdiffusion
+RUN mkdir -p /app/weights/rfdiffusion
+# Optionally, download RFDiffusion base weights directly to image if required:
+# RUN wget -qO /app/weights/rfdiffusion/Base_ckpt.pt http://files.ipd.uw.edu/pub/RFdiffusion/6f5902ac237024bdd0c176cb93063dc4/Base_ckpt.pt
 
 # RunPod entrypoint
 CMD ["python", "handler.py"]
