@@ -15,7 +15,7 @@ from app.schemas.job import (
     ArtifactResponse,
     MetricResponse,
 )
-from app.worker.tasks import execute_pipeline
+from app.infrastructure.compute.runpod_runner import RunPodRunner
 from app.infrastructure.storage.s3_service import storage_service
 from app.core.validation import validate_file_extension, validate_file_content, validate_pdb_structure, get_file_info
 from app.core.pdb_analyzer import PDBAnalyzer
@@ -157,19 +157,24 @@ async def create_job(
         # Update status to QUEUED
         await JobService.update_job_status(db, job.id, JobStatus.QUEUED)
         
-        # Dispatch to Celery (outside transaction)
+        # Dispatch to RunPod via HTTP (outside transaction)
         try:
-            task = execute_pipeline.delay(job.id, pipeline_type.value)
-            job.celery_task_id = task.id
-            logger.info(f"Dispatched job {job.id} to Celery task {task.id}")
-        except Exception as celery_err:
-            # Redis/Celery unavailable — job is saved in DB as QUEUED
-            # but won't be processed until a worker picks it up
-            logger.warning(
-                f"Celery dispatch failed for job {job.id}: {celery_err}. "
-                "Job is saved as QUEUED but won't execute until Celery/Redis is available."
+            # Note: We send the raw DB job_id here to link back in the webhook payload
+            runpod_job_id = await RunPodRunner.submit_job(
+                job_id=job.id,
+                model_name=recommended_pipeline,
+                input_s3_key=s3_key,
+                params={
+                    "atom_count": file_info.get("atom_count", 0),
+                    "pipeline": recommended_pipeline
+                }
             )
-
+            logger.info(f"Dispatched job {job.id} to RunPod. Assigned ID: {runpod_job_id}")
+        except Exception as runpod_err:
+            logger.warning(
+                f"RunPod dispatch failed for job {job.id}: {runpod_err}. "
+                "Job is saved as QUEUED but won't execute until RunPod is available."
+            )
         
         logger.info(f"Created and queued job {job.id} with {file_info.get('atom_count', 0)} atoms")
         

@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 import logging
 import os
 
-from app.api.routes import jobs, files, payments, beta
+from app.api.routes import jobs, files, payments, beta, webhook
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.rate_limit import RateLimitMiddleware
@@ -78,6 +78,7 @@ app.include_router(jobs.router, prefix="/api/v1") # Assuming jobs handles its ow
 app.include_router(files.router, prefix="/api/v1")
 app.include_router(payments.router, prefix="/api/v1/payments", tags=["payments"])
 app.include_router(beta.router, prefix="/api/v1/beta", tags=["beta"])
+app.include_router(webhook.router, prefix="/api/v1", tags=["webhooks"])
 
 
 
