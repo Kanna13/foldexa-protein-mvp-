@@ -32,4 +32,4 @@ RUN mkdir -p /app/storage/uploads /app/storage/results
 EXPOSE 8080
 
 # Run API
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["python", "-m", "app.main"]
