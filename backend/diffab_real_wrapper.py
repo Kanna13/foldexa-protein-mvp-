@@ -41,7 +41,7 @@ def main():
     # python diffab/tools/runner/design_for_pdb.py INPUT --config TEMP_CONFIG --out_root OUTPUT --device cpu
     cmd = [
         "python",
-        "diffab/tools/runner/design_for_pdb.py",
+        "/workspace/code/diffab/diffab/tools/runner/design_for_pdb.py",
         args.input,
         "--config", temp_config_path,
         "--out_root", args.output,
