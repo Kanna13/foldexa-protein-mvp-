@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir runpod minio httpx brotli brotlicffi aiohttp[speedups]
+RUN pip install --no-cache-dir runpod minio httpx brotli brotlicffi aiohttp
 
 # COPY model source
 COPY app/infrastructure/pipeline/af2_gamma_eval /workspace/code/af2
