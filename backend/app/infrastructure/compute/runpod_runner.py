@@ -15,10 +15,12 @@ class RunPodRunner:
         Submit a GPU inference job via HTTP to RunPod Serverless API.
         """
         runpod_api_key = settings.runpod_api_key
-        if model_name == "rfdiffusion":
+        if model_name.startswith("rfdiffusion"):
             endpoint_id = settings.runpod_endpoint_rfdiffusion
-        elif model_name == "diffab":
+        elif model_name.startswith("diffab"):
             endpoint_id = settings.runpod_endpoint_diffab
+        elif model_name.startswith("af2"):
+            endpoint_id = getattr(settings, "runpod_endpoint_af2", "")
         else:
             logger.error(f"Unknown model_name for RunPod dispatch: {model_name}")
             raise ValueError(f"Unknown model_name: {model_name}")

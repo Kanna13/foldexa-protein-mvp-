@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     runpod_api_key: str = ""
     runpod_endpoint_diffab: str = ""
     runpod_endpoint_rfdiffusion: str = ""
+    runpod_endpoint_af2: str = ""
     runpod_timeout: int = 600  # seconds to wait for RunPod response
     
     # Storage Paths (Local fallback for development)
