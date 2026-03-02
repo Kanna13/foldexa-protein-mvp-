@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir runpod minio httpx brotli brotlicffi joblib lmdb tqdm easydict pyyaml tensorboard abnumber
+RUN pip install --no-cache-dir runpod minio httpx brotli brotlicffi aiohttp[speedups] joblib lmdb tqdm easydict pyyaml tensorboard abnumber
 
 # COPY model source
 COPY app/infrastructure/pipeline/diffab-main /workspace/code/diffab
