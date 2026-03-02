@@ -10,7 +10,7 @@ protein_letters_3to1 = {
     'THR': 'T', 'VAL': 'V', 'TRP': 'W', 'TYR': 'Y',
 }
 
-target_file = "/app/diffab/tools/renumber/run.py"
+target_file = "/workspace/code/diffab/tools/renumber/run.py"
 
 with open(target_file, 'r') as f:
     lines = f.readlines()

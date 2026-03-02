@@ -34,10 +34,8 @@ class Settings(BaseSettings):
     db_pool_size: int = 20
     db_max_overflow: int = 10
     
-    # Redis (Celery Broker + Cache)
+    # Redis (Rate Limiting + Cache)
     redis_url: str = "redis://localhost:6379/0"
-    celery_broker_url: str = "redis://localhost:6379/1"
-    celery_result_backend: str = "redis://localhost:6379/2"
     
     # Object Storage (MinIO/S3)
     s3_endpoint: str = Field(default="http://localhost:9000", validation_alias=AliasChoices("S3_ENDPOINT", "MINIO_ENDPOINT"))

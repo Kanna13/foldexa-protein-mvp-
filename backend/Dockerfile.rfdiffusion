@@ -1,8 +1,27 @@
-FROM python:3.9-slim
+FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
 
-WORKDIR /app
+WORKDIR /workspace
 
-COPY stubs/rfdiffusion_stub.py /app/rfdiffusion_stub.py
+RUN apt-get update && apt-get install -y \
+    wget \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Map entrypoint to stub
-ENTRYPOINT ["python", "/app/rfdiffusion_stub.py"]
+RUN pip install --no-cache-dir runpod minio httpx
+
+# COPY model source
+COPY app/infrastructure/pipeline/RFdiffusion-main /workspace/code/rfdiffusion
+
+# install model requirements if exists
+RUN if [ -f /workspace/code/rfdiffusion/requirements.txt ]; then \
+    pip install --no-cache-dir -r /workspace/code/rfdiffusion/requirements.txt; \
+    fi
+
+RUN pip install -e /workspace/code/rfdiffusion
+
+# COPY ONLY rfdiffusion weights (не всю папку!)
+COPY Weights/rfdiffusion/ /workspace/weights/rfdiffusion/
+
+COPY runpod_worker/handler.py /workspace/handler.py
+
+ENTRYPOINT ["python", "/workspace/handler.py"]

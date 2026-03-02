@@ -32,12 +32,6 @@ jobs_by_status = Gauge(
     ["status"]
 )
 
-celery_tasks_total = Counter(
-    "celery_tasks_total",
-    "Total Celery tasks",
-    ["task_name", "status"]
-)
-
 model_execution_duration_seconds = Histogram(
     "model_execution_duration_seconds",
     "Model execution duration",

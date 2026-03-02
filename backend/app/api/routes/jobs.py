@@ -80,7 +80,7 @@ async def _process_job_background(
             
             # 4. Upload to S3 (Network bound, minio is synchronous so run_in_threadpool is used inside)
             s3_key = await JobService.upload_input(db=db, job_id=job_id, file_content=file_content, filename=filename)
-            await JobService.update_job_status(db, job_id, JobStatus.QUEUED)
+            await JobService.update_job_status(db, job_id, JobStatus.UPLOADED)
             await db.commit()
             
             # 5. Dispatch to RunPod via HTTP 
@@ -94,12 +94,17 @@ async def _process_job_background(
                         "pipeline": recommended_pipeline
                     }
                 )
+                await JobService.update_job_status(db, job_id, JobStatus.QUEUED)
+                await db.commit()
                 logger.info(f"Dispatched job {job_id} to RunPod via BackgroundTask. RunPod ID: {runpod_job_id}")
             except Exception as runpod_err:
-                logger.warning(
+                logger.error(
                     f"RunPod dispatch failed for job {job_id}: {runpod_err}. "
-                    "Job is saved as QUEUED but won't execute until RunPod is available."
+                    "Job is marked as FAILED to prevent a silent QUEUED state."
                 )
+                await JobService.update_job_status(db, job_id, JobStatus.FAILED, str(runpod_err))
+                await db.commit()
+                return # Stop processing, already failed
 
         except Exception as e:
             await db.rollback()

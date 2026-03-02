@@ -1,48 +1,26 @@
+FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
 
-FROM continuumio/miniconda3
+WORKDIR /workspace
 
-WORKDIR /app
+RUN apt-get update && apt-get install -y \
+    wget \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create environment with python 3.8 and dependencies
-RUN conda create -n diffab python=3.8 -y
+RUN pip install --no-cache-dir runpod minio httpx joblib lmdb tqdm easydict pyyaml tensorboard abnumber
 
-# Make RUN commands use the new environment
-SHELL ["conda", "run", "-n", "diffab", "/bin/bash", "-c"]
+# COPY model source
+COPY app/infrastructure/pipeline/diffab-main /workspace/code/diffab
 
-# Install System/Bio Dependencies via Conda (Robust channel priority)
-RUN conda install -c conda-forge -c bioconda -c pytorch \
-    hmmer \
-    pdbfixer \
-    openmm \
-    pytorch \
-    torchvision \
-    cpuonly \
-    biopython \
-    anarci \
-    -y
+COPY diffab_real_wrapper.py /workspace/code/diffab/wrapper.py
+COPY patch_diffab.py /workspace/patch_diffab.py
+RUN python /workspace/patch_diffab.py
 
-# Install Pip dependencies
-RUN pip install \
-    joblib \
-    lmdb \
-    tqdm \
-    easydict \
-    pyyaml \
-    tensorboard \
-    abnumber
+# COPY ONLY diffab weights
+COPY Weights/diffab/ /workspace/weights/diffab/
 
-# Copy the REAL diffab code
-COPY diffab-real/diffab-main /app
+ENV PYTHONPATH=/workspace/code/diffab
 
-# Copy the wrapper script
-COPY backend/diffab_real_wrapper.py /app/wrapper.py
+COPY runpod_worker/handler.py /workspace/handler.py
 
-# AUTO-PATCH: Fix Biopython compatibility (remove SCOPData dependency)
-COPY backend/patch_diffab.py /app/patch_diffab.py
-RUN python /app/patch_diffab.py
-
-# Set PYTHONPATH
-ENV PYTHONPATH=/app
-
-# Default Entrypoint using conda run
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "diffab", "python", "/app/wrapper.py"]
+ENTRYPOINT ["python", "/workspace/handler.py"]

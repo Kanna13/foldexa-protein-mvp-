@@ -1,60 +1,77 @@
-import os
-import hmac
-import hashlib
 import json
 import logging
 import httpx
 
+from app.core.config import settings
+
 logger = logging.getLogger(__name__)
 
-# Try to get from app config, fallback to environment for flexibility
-RUNPOD_URL = os.environ.get("RUNPOD_URL", "").rstrip("/")
-RUNPOD_SHARED_SECRET = os.environ.get("RUNPOD_SHARED_SECRET", "")
-
 class RunPodRunner:
-    """Runner for dispatching GPU jobs over HTTP to dedicated RunPod inference server."""
+    """Runner for dispatching GPU jobs over HTTP to dedicated RunPod Serverless."""
 
     @staticmethod
     async def submit_job(job_id: str, model_name: str, input_s3_key: str, params: dict = None) -> str:
         """
-        Submit a GPU inference job via HTTP to RunPod.
+        Submit a GPU inference job via HTTP to RunPod Serverless API.
         """
-        if not RUNPOD_URL or not RUNPOD_SHARED_SECRET:
-            logger.error("RUNPOD_URL or RUNPOD_SHARED_SECRET not configured")
-            raise RuntimeError("RunPod credentials not configured. Job cannot be dispatched.")
+        runpod_api_key = settings.runpod_api_key
+        if model_name == "rfdiffusion":
+            endpoint_id = settings.runpod_endpoint_rfdiffusion
+        elif model_name == "diffab":
+            endpoint_id = settings.runpod_endpoint_diffab
+        else:
+            logger.error(f"Unknown model_name for RunPod dispatch: {model_name}")
+            raise ValueError(f"Unknown model_name: {model_name}")
 
-        payload = json.dumps({
-            "model_name": model_name,
-            "input_s3_key": input_s3_key,
-            "params": params or {}
-        }).encode("utf-8")
+        if not runpod_api_key or not endpoint_id:
+            logger.error(f"RunPod settings missing for {model_name}. API_KEY and ENDPOINT_ID are required.")
+            raise RuntimeError(f"RunPod credentials/endpoint not configured for {model_name}. Job cannot be dispatched.")
 
-        # Create HMAC SHA256 signature
-        signature = f"sha256={hmac.new(RUNPOD_SHARED_SECRET.encode(), payload, hashlib.sha256).hexdigest()}"
+        payload = {
+            "input": {
+                "job_id": job_id,
+                "model_name": model_name,
+                "input_s3_key": input_s3_key,
+                "params": params or {}
+            }
+        }
 
-        logger.info(f"Dispatching job {job_id} ({model_name}) to RunPod at {RUNPOD_URL}...")
+        url = f"https://api.runpod.ai/v2/{endpoint_id}/run"
+        logger.info(f"Dispatching job {job_id} ({model_name}) to RunPod Serverless endpoint: {endpoint_id}...")
 
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    f"{RUNPOD_URL}/v1/predict",
-                    content=payload,
+                    url,
+                    json=payload,
                     headers={
-                        "X-Signature": signature,
+                        "Authorization": f"Bearer {runpod_api_key}",
                         "Content-Type": "application/json"
                     },
-                    timeout=10.0  # Fast timeout since server should reply 'ACCEPTED' immediately 
+                    timeout=15.0  # Fast timeout since server should reply 'IN_QUEUE' immediately 
                 )
                 response.raise_for_status()
                 data = response.json()
-                logger.info(f"RunPod successfully accepted job {job_id}: {data}")
-                return data.get("job_id", "")
+                
+                # RunPod returns {"id": "job_id", "status": "IN_QUEUE"}
+                runpod_job_id = data.get("id", "")
+                if not runpod_job_id:
+                    raise RuntimeError(f"Invalid response from RunPod: {data}")
+                    
+                logger.info(f"RunPod successfully accepted job {job_id} -> RunPod Job ID: {runpod_job_id}")
+                return runpod_job_id
             
             except httpx.TimeoutException:
                 logger.error(f"RunPod submission timed out for {job_id}.")
                 raise RuntimeError("RunPod GPU server is currently unreachable (Timeout).")
             except httpx.HTTPError as e:
-                logger.error(f"RunPod submission failed with HTTP error for {job_id}: {e}")
+                response_text = ""
+                if hasattr(e, "response") and e.response:
+                    try:
+                        response_text = e.response.text
+                    except:
+                        pass
+                logger.error(f"RunPod submission failed with HTTP error for {job_id}: {e} - {response_text}")
                 raise RuntimeError(f"RunPod GPU server rejected request: {e}")
             except Exception as e:
                 logger.error(f"Unexpected error submitting job {job_id} to RunPod: {e}")

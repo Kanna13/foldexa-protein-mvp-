@@ -49,6 +49,22 @@ async def lifespan(app: FastAPI):
             f"MinIO validation failed: {e}. "
             "Server will start, but file operations will fail until MinIO is reachable."
         )
+
+    # Validate RunPod credentials on startup (FAIL FAST)
+    if settings.gpu_backend == "runpod":
+        logger.info("Validating RunPod configuration...")
+        missing_vars = []
+        if not settings.runpod_api_key:
+            missing_vars.append("RUNPOD_API_KEY")
+        if not settings.runpod_endpoint_rfdiffusion:
+            missing_vars.append("RUNPOD_ENDPOINT_RFDIFFUSION")
+            
+        if missing_vars:
+            error_msg = f"CRITICAL: Missing required RunPod configuration: {', '.join(missing_vars)}"
+            logger.error(error_msg)
+            # Fail fast as requested by user
+            raise RuntimeError(error_msg)
+        logger.info("RunPod configuration validated successfully.")
     
     yield
     
