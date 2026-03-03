@@ -94,6 +94,8 @@ async def _process_job_background(
                         "pipeline": recommended_pipeline
                     }
                 )
+                job = await JobService.get_job(db, job_id)
+                job.runpod_job_id = runpod_job_id
                 await JobService.update_job_status(db, job_id, JobStatus.QUEUED)
                 await db.commit()
                 logger.info(f"Dispatched job {job_id} to RunPod via BackgroundTask. RunPod ID: {runpod_job_id}")
@@ -209,9 +211,9 @@ async def get_job_status(
         raise HTTPException(status_code=404, detail="Job not found")
 
     # If the job is currently processing on GPU, poll RunPod for updates
-    if job.status in [JobStatus.QUEUED, JobStatus.RUNNING]:
+    if job.status in [JobStatus.QUEUED, JobStatus.RUNNING] and job.runpod_job_id:
         try:
-            runpod_status_data = await RunPodRunner.get_job_status(job_id, job.pipeline_type)
+            runpod_status_data = await RunPodRunner.get_job_status(job.runpod_job_id, job.pipeline_type)
             rp_status = runpod_status_data.get("status")
 
             if rp_status == "COMPLETED":

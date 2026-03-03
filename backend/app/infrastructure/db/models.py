@@ -51,8 +51,9 @@ class Job(Base):
     error_message = Column(Text, nullable=True)
     retry_count = Column(Integer, default=0)
     
-    # Celery task tracking
+    # Execution identifiers
     celery_task_id = Column(String, nullable=True, index=True)
+    runpod_job_id = Column(String, nullable=True, index=True)
     
     # Relationships
     artifacts = relationship("Artifact", back_populates="job", cascade="all, delete-orphan")

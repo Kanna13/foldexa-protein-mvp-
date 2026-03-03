@@ -28,10 +28,12 @@ export default function JobPage({ params }: { params: { id: string } }) {
     const [isComplete, setIsComplete] = useState(false);
     const [currentLog, setCurrentLog] = useState<string>("Initializing pipeline...");
 
+    // Jobs Data
+    const [job, setJob] = useState<any>(null);
+    const [polling, setPolling] = useState(true);
+
     // Metrics
-    const [startTime] = useState<Date>(new Date());
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
-    const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
     // Quotes
     const [quoteIndex, setQuoteIndex] = useState(0);
@@ -47,14 +49,14 @@ export default function JobPage({ params }: { params: { id: string } }) {
         unwrapParams();
     }, [params]);
 
-    // Timer Logic
+    // Timer Logic for updating visual UI safely based on backend started_at
     useEffect(() => {
+        if (!polling) return;
         const interval = setInterval(() => {
             setCurrentTime(new Date());
-            setElapsedSeconds(prev => prev + 1);
         }, 1000);
         return () => clearInterval(interval);
-    }, []);
+    }, [polling]);
 
     // Quote Carousel Logic
     useEffect(() => {
@@ -64,31 +66,31 @@ export default function JobPage({ params }: { params: { id: string } }) {
         return () => clearInterval(interval);
     }, []);
 
-    const [job, setJob] = useState<any>(null);
-    const [polling, setPolling] = useState(true);
-
     // Poll for Job Status
     useEffect(() => {
         if (!jobId) return;
 
+        let isMounted = true;
+
         const fetchStatus = async () => {
             try {
                 const data = await api.getJob(jobId);
+                if (!isMounted) return;
+
                 setJob(data);
 
                 // Map backend status to UI steps
-                // Since the backend is simple 'RUNNING', we'll infer progress based on time or keep it looping
                 if (data.status === "completed") {
                     setIsComplete(true);
                     setPolling(false);
                     setCurrentStep(3); // All done
                     setCurrentLog("Pipeline execution completed successfully.");
                 } else if (data.status === "failed") {
+                    setIsComplete(false);
                     setPolling(false);
                     setCurrentLog(`Job failed: ${data.error_message || "Unknown error"}`);
                 } else if (data.status === "running") {
                     setCurrentLog("Executing pipeline models on GPU cluster...");
-                    // We can cycle steps visually or just show them all pending/active
                 } else {
                     setCurrentLog(`Status: ${data.status.toUpperCase()}`);
                 }
@@ -101,9 +103,10 @@ export default function JobPage({ params }: { params: { id: string } }) {
         // Initial fetch
         fetchStatus();
 
-        // Poll every 3s
-        const interval = polling ? setInterval(fetchStatus, 3000) : null;
+        // Poll every 5s
+        const interval = polling ? setInterval(fetchStatus, 5000) : null;
         return () => {
+            isMounted = false;
             if (interval) clearInterval(interval);
         };
     }, [jobId, polling]);
@@ -112,13 +115,37 @@ export default function JobPage({ params }: { params: { id: string } }) {
         router.push(`/app/results/${jobId}`);
     };
 
+    const handleDownload = async () => {
+        try {
+            const url = await api.downloadJobResult(jobId);
+            window.open(url, '_blank');
+        } catch (err) {
+            console.error("Failed to fetch download link:", err);
+            alert("Download link not available.");
+        }
+    };
+
     // Derived Metrics
     const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const formatDuration = (secs: number) => {
         const mins = Math.floor(secs / 60);
-        const s = secs % 60;
+        const s = Math.round(secs % 60);
         return `${mins}m ${s.toString().padStart(2, '0')}s`;
     };
+
+    const getElapsedSeconds = () => {
+        if (!job) return 0;
+        if ((job.status === "completed" || job.status === "failed") && job.execution_time) {
+            return job.execution_time;
+        }
+        if (!job.started_at) return 0;
+
+        const start = new Date(job.started_at).getTime();
+        const now = currentTime.getTime();
+        return Math.max(0, (now - start) / 1000);
+    };
+
+    const elapsedSeconds = getElapsedSeconds();
 
     // Estimated Total Duration (sum of steps) / Remaining
     const totalEstimatedDuration = useMemo(() => PIPELINE_STEPS.reduce((acc, s) => acc + s.duration, 0) / 1000, []);
@@ -179,17 +206,25 @@ export default function JobPage({ params }: { params: { id: string } }) {
                         <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-4">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-neutral-400">Status</span>
-                                <span className={cn("font-medium px-2 py-0.5 rounded-full text-xs", isComplete ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-blue-700")}>
-                                    {isComplete ? "COMPLETED" : "RUNNING"}
+                                <span className={cn("font-medium px-2 py-0.5 rounded-full text-xs uppercase tracking-wider",
+                                    job?.status === "completed" ? "bg-emerald-100 text-emerald-700" :
+                                        job?.status === "failed" ? "bg-red-100 text-red-700" :
+                                            "bg-blue-100 text-blue-700"
+                                )}>
+                                    {job?.status || "LOADING..."}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-neutral-400">Started At</span>
-                                <span className="font-mono text-neutral-900">{formatTime(startTime)}</span>
+                                <span className="font-mono text-neutral-900">{job?.started_at ? formatTime(new Date(job.started_at)) : "--"}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
-                                <span className="text-neutral-400">Current Time</span>
-                                <span className="font-mono text-neutral-900">{formatTime(currentTime)}</span>
+                                <span className="text-neutral-400">{isComplete ? "Finished At" : "Current Time"}</span>
+                                <span className="font-mono text-neutral-900">
+                                    {(isComplete || job?.status === "failed") && job?.finished_at
+                                        ? formatTime(new Date(job.finished_at))
+                                        : formatTime(currentTime)}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -208,16 +243,29 @@ export default function JobPage({ params }: { params: { id: string } }) {
                                     <CheckCircle className="w-12 h-12 text-emerald-500" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-neutral-900 mb-2">Job Successfully Completed</h2>
-                                <p className="text-neutral-500 mb-8 max-w-sm">All pipeline steps finished without errors. Proceed to view your results.</p>
+                                <p className="text-neutral-500 mb-8 max-w-sm">All pipeline steps finished without errors. Proceed to view your results or download the outputs immediately.</p>
 
-                                <Button
-                                    variant="ghost"
-                                    size="lg"
-                                    onClick={handleViewResults}
-                                    className="bg-emerald-50/80 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm hover:shadow-md transition-all px-8 text-lg h-14 rounded-full font-medium tracking-wide backdrop-blur-sm"
-                                >
-                                    View Results <ArrowRight className="ml-2 w-5 h-5" />
-                                </Button>
+                                <div className="flex items-center gap-4">
+                                    <Button
+                                        variant="ghost"
+                                        size="lg"
+                                        onClick={handleViewResults}
+                                        className="bg-emerald-50/80 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm hover:shadow-md transition-all px-8 text-lg h-14 rounded-full font-medium tracking-wide backdrop-blur-sm"
+                                    >
+                                        View Results <ArrowRight className="ml-2 w-5 h-5" />
+                                    </Button>
+
+                                    {job?.output_s3_key && (
+                                        <Button
+                                            variant="secondary"
+                                            size="lg"
+                                            onClick={handleDownload}
+                                            className="bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200 shadow-sm hover:shadow-md transition-all px-6 h-14 rounded-full font-medium"
+                                        >
+                                            Download
+                                        </Button>
+                                    )}
+                                </div>
                             </motion.div>
                         ) : (
                             // LOADING STATE
@@ -266,8 +314,14 @@ export default function JobPage({ params }: { params: { id: string } }) {
 
                                 {/* Minimal Log */}
                                 <div className="bg-neutral-50 rounded-xl p-4 flex items-center gap-3 text-sm font-mono text-neutral-500 border border-neutral-100">
-                                    <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
-                                    <span>{currentLog}</span>
+                                    {job?.status === "failed" ? (
+                                        <div className="w-2 h-2 rounded-full bg-red-500" />
+                                    ) : (
+                                        <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+                                    )}
+                                    <span className={job?.status === "failed" ? "text-red-600 font-medium" : ""}>
+                                        {currentLog}
+                                    </span>
                                 </div>
                             </div>
                         )}

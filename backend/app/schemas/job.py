@@ -40,6 +40,7 @@ class JobStatusResponse(BaseModel):
     created_at: datetime
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
+    runpod_job_id: Optional[str] = None
     execution_time: Optional[float] = None
     output_s3_key: Optional[str] = None
     error_message: Optional[str] = None
