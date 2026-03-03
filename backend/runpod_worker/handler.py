@@ -37,12 +37,18 @@ logging.basicConfig(
 logger = logging.getLogger("runpod-serverless-worker")
 
 def get_minio_client():
-    return Minio(
+    client = Minio(
         MINIO_ENDPOINT,
         access_key=MINIO_ACCESS_KEY,
         secret_key=MINIO_SECRET_KEY,
         secure=MINIO_SECURE
     )
+    # Auto-create bucket if it doesn't exist yet
+    if not client.bucket_exists(MINIO_BUCKET):
+        logger.info(f"Bucket '{MINIO_BUCKET}' not found — creating it...")
+        client.make_bucket(MINIO_BUCKET)
+        logger.info(f"Bucket '{MINIO_BUCKET}' created successfully.")
+    return client
 
 def ensure_directories():
     for d in [MODEL_DIR, JOB_DIR, LOG_DIR, CACHE_DIR]:
