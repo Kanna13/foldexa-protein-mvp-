@@ -288,7 +288,10 @@ async def get_job_status(
 
             if rp_status == "COMPLETED":
                 output = runpod_data.get("output") or {}
-                output_s3_key = output.get("output_s3_key")
+                # Handle nested strict return schema from handler.py: {"status": "COMPLETED", "output": {"result_s3_key": ...}}
+                inner_output = output.get("output", output)
+                output_s3_key = inner_output.get("result_s3_key") or inner_output.get("output_s3_key")
+                
                 execution_ms = runpod_data.get("executionTime")
 
                 logger.info(

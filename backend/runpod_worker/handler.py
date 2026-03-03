@@ -176,11 +176,14 @@ async def handler(event):
         minio_client.fput_object(MINIO_BUCKET, output_s3_key, str(output_file))
 
         logger.info(f"[{job_id}] Job completed successfully.")
+        print(f"[{job_id}] Returning COMPLETED to RunPod", flush=True)
         return {
             "status": "COMPLETED",
-            "job_id": job_id,
-            "output_s3_key": output_s3_key,
-            "model_name": model_name
+            "output": {
+                "result_s3_key": output_s3_key,
+                "job_id": job_id,
+                "model_name": model_name
+            }
         }
 
     except Exception as e:
@@ -188,7 +191,11 @@ async def handler(event):
         import traceback
         tb = traceback.format_exc()
         logger.error(f"[{job_id}] CRITICAL ERROR in handler:\n{tb}")
-        return {"error": str(e), "traceback": tb}
+        print(f"[{job_id}] Returning FAILED to RunPod", flush=True)
+        return {
+            "status": "FAILED",
+            "error": str(e)
+        }
 
     finally:
         # Clean up job workspace to prevent disk out-of-memory on same machine
