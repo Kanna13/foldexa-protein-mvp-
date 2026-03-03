@@ -17,7 +17,7 @@ JOB_DIR = FOLDEXA_ROOT / "jobs"
 LOG_DIR = FOLDEXA_ROOT / "logs"
 CACHE_DIR = FOLDEXA_ROOT / "cache"
 
-MINIO_ENDPOINT = os.environ.get("S3_ENDPOINT", os.environ.get("MINIO_ENDPOINT", "localhost:9000"))
+MINIO_ENDPOINT = os.environ.get("S3_ENDPOINT", os.environ.get("MINIO_ENDPOINT", "minio-production-6206.up.railway.app"))
 # Strip http:// or https:// for minio client if provided
 if MINIO_ENDPOINT.startswith("http://"):
     MINIO_ENDPOINT = MINIO_ENDPOINT[7:]
@@ -27,7 +27,7 @@ elif MINIO_ENDPOINT.startswith("https://"):
 MINIO_ACCESS_KEY = os.environ.get("S3_ACCESS_KEY", os.environ.get("MINIO_ACCESS_KEY", "minioadmin"))
 MINIO_SECRET_KEY = os.environ.get("S3_SECRET_KEY", os.environ.get("MINIO_SECRET_KEY", "minioadmin"))
 MINIO_BUCKET = os.environ.get("S3_BUCKET_NAME", os.environ.get("MINIO_BUCKET", "foldexa-artifacts"))
-MINIO_SECURE = os.environ.get("S3_USE_SSL", "False").lower() == "true"
+MINIO_SECURE = os.environ.get("S3_USE_SSL", "True").lower() == "true"
 
 # --- LOGGING ---
 logging.basicConfig(
