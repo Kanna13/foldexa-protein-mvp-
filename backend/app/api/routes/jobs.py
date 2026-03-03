@@ -203,11 +203,33 @@ async def get_job_status(
     job_id: str,
     db: AsyncSession = Depends(get_db)
 ):
-    """Get job status and metadata."""
+    """Get job status and metadata. Syncs live status from RunPod if running."""
     job = await JobService.get_job(db, job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-    
+
+    # If the job is currently processing on GPU, poll RunPod for updates
+    if job.status in [JobStatus.QUEUED, JobStatus.RUNNING]:
+        try:
+            runpod_status_data = await RunPodRunner.get_job_status(job_id, job.pipeline_type)
+            rp_status = runpod_status_data.get("status")
+
+            if rp_status == "COMPLETED":
+                output = runpod_status_data.get("output", {})
+                job.output_s3_key = output.get("output_s3_key")
+                job.execution_time = runpod_status_data.get("executionTime", 0) / 1000.0 if runpod_status_data.get("executionTime") else None
+                job = await JobService.update_job_status(db, job_id, JobStatus.COMPLETED)
+                await db.commit()
+            elif rp_status == "FAILED":
+                error_msg = runpod_status_data.get("error", "Unknown RunPod error")
+                job = await JobService.update_job_status(db, job_id, JobStatus.FAILED, error_message=str(error_msg))
+                await db.commit()
+            elif rp_status == "IN_PROGRESS" and job.status != JobStatus.RUNNING:
+                job = await JobService.update_job_status(db, job_id, JobStatus.RUNNING)
+                await db.commit()
+        except Exception as e:
+            logger.warning(f"Failed to sync status with RunPod for job {job_id}: {e}")
+
     return JobStatusResponse.model_validate(job)
 
 
@@ -268,6 +290,30 @@ async def get_job_results(
         artifacts=artifacts,
         metrics=metrics
     )
+
+
+@router.get("/{job_id}/download")
+async def download_job_result(
+    job_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Get a pre-signed download URL for the job's main output file."""
+    job = await JobService.get_job(db, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    if job.status != JobStatus.COMPLETED:
+        raise HTTPException(status_code=400, detail="Job is not completed yet.")
+        
+    if not job.output_s3_key:
+        raise HTTPException(status_code=404, detail="No output file found for this job.")
+        
+    try:
+        download_url = storage_service.get_presigned_url(job.output_s3_key, expires_seconds=3600)
+        return {"download_url": download_url}
+    except Exception as e:
+        logger.error(f"Error generating presigned URL for {job_id}: {e}")
+        raise HTTPException(status_code=500, detail="Could not generate download link.")
 
 
 @router.delete("/{job_id}")

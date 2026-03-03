@@ -42,6 +42,10 @@ class Job(Base):
     
     # Input/Output
     input_s3_key = Column(String, nullable=True)
+    output_s3_key = Column(String, nullable=True)
+    
+    # Execution Tracking
+    execution_time = Column(Float, nullable=True)
     
     # Error tracking
     error_message = Column(Text, nullable=True)

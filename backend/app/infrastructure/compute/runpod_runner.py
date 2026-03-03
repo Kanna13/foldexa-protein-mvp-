@@ -78,3 +78,49 @@ class RunPodRunner:
             except Exception as e:
                 logger.error(f"Unexpected error submitting job {job_id} to RunPod: {e}")
                 raise RuntimeError(f"Unexpected error during RunPod submission: {e}")
+
+    @staticmethod
+    async def get_job_status(runpod_job_id: str, model_name: str) -> dict:
+        """
+        Query the status of a GPU inference job from RunPod Serverless API.
+        Returns a dictionary with status, executionTime, and output.
+        """
+        runpod_api_key = settings.runpod_api_key
+        if model_name.startswith("rfdiffusion"):
+            endpoint_id = settings.runpod_endpoint_rfdiffusion
+        elif model_name.startswith("diffab"):
+            endpoint_id = settings.runpod_endpoint_diffab
+        elif model_name.startswith("af2"):
+            endpoint_id = getattr(settings, "runpod_endpoint_af2", "")
+        else:
+            logger.error(f"Unknown model_name for RunPod status: {model_name}")
+            raise ValueError(f"Unknown model_name: {model_name}")
+
+        if not runpod_api_key or not endpoint_id:
+            logger.error(f"RunPod settings missing for {model_name}. API_KEY and ENDPOINT_ID are required.")
+            raise RuntimeError(f"RunPod credentials/endpoint not configured for {model_name}.")
+
+        url = f"https://api.runpod.ai/v2/{endpoint_id}/status/{runpod_job_id}"
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(
+                    url,
+                    headers={
+                        "Authorization": f"Bearer {runpod_api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    timeout=10.0
+                )
+                response.raise_for_status()
+                return response.json()
+            
+            except httpx.TimeoutException:
+                logger.error(f"RunPod status query timed out for {runpod_job_id}.")
+                return {"status": "UNKNOWN", "error": "Timeout"}
+            except httpx.HTTPError as e:
+                logger.error(f"RunPod status query failed for {runpod_job_id}: {e}")
+                return {"status": "UNKNOWN", "error": str(e)}
+            except Exception as e:
+                logger.error(f"Unexpected error querying RunPod status for {runpod_job_id}: {e}")
+                return {"status": "UNKNOWN", "error": str(e)}

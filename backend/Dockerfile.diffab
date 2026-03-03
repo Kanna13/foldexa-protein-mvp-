@@ -7,6 +7,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+# Устанавливаем anarci (для abnumber), hmmer, pdbfixer/openmm (для релаксации), и ограничиваем biopython во избежание конфликтов
+RUN conda install -y -c bioconda -c conda-forge anarci hmmer pdbfixer openmm "biopython<1.80"
+
 RUN pip install --no-cache-dir runpod minio httpx brotli brotlicffi aiohttp joblib lmdb tqdm easydict pyyaml tensorboard abnumber
 
 # COPY model source
@@ -19,10 +22,10 @@ RUN python /workspace/patch_diffab.py
 # COPY ONLY diffab weights
 COPY Weights/diffab/ /workspace/weights/diffab/
 
+# Non-sensitive defaults — S3_ACCESS_KEY and S3_SECRET_KEY must be injected
+# at runtime via RunPod environment variables (never bake secrets into the image)
 ENV PYTHONPATH=/workspace/code/diffab \
     S3_ENDPOINT=https://minio-production-09da.up.railway.app \
-    S3_ACCESS_KEY=minioadmin \
-    S3_SECRET_KEY=minioadmin123 \
     S3_BUCKET_NAME=foldexa-artifacts \
     S3_USE_SSL=true
 
