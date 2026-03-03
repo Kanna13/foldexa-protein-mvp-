@@ -84,13 +84,21 @@ export default function JobPage({ params }: { params: { id: string } }) {
                     setIsComplete(true);
                     setPolling(false);
                     setCurrentStep(3); // All done
-                    setCurrentLog("Pipeline execution completed successfully.");
+                    setCurrentLog("Pipeline execution completed successfully. Redirecting to results...");
+
+                    // Auto-redirect after 2 seconds
+                    setTimeout(() => {
+                        if (isMounted) {
+                            router.push(`/app/results/${jobId}`);
+                        }
+                    }, 2500);
                 } else if (data.status === "failed") {
                     setIsComplete(false);
                     setPolling(false);
                     setCurrentLog(`Job failed: ${data.error_message || "Unknown error"}`);
                 } else if (data.status === "running") {
                     setCurrentLog("Executing pipeline models on GPU cluster...");
+                    setCurrentStep(1);
                 } else {
                     setCurrentLog(`Status: ${data.status.toUpperCase()}`);
                 }
@@ -138,9 +146,12 @@ export default function JobPage({ params }: { params: { id: string } }) {
         if ((job.status === "completed" || job.status === "failed") && job.execution_time) {
             return job.execution_time;
         }
-        if (!job.started_at) return 0;
 
-        const start = new Date(job.started_at).getTime();
+        // Fallback to created_at if started_at is missing
+        const startTimeStr = job.started_at || job.created_at;
+        if (!startTimeStr) return 0;
+
+        const start = new Date(startTimeStr).getTime();
         const now = currentTime.getTime();
         return Math.max(0, (now - start) / 1000);
     };
@@ -216,7 +227,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-neutral-400">Started At</span>
-                                <span className="font-mono text-neutral-900">{job?.started_at ? formatTime(new Date(job.started_at)) : "--"}</span>
+                                <span className="font-mono text-neutral-900">{job?.started_at ? formatTime(new Date(job.started_at)) : (job?.created_at ? formatTime(new Date(job.created_at)) : "--")}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-neutral-400">{isComplete ? "Finished At" : "Current Time"}</span>

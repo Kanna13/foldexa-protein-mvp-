@@ -31,5 +31,5 @@ RUN mkdir -p /app/storage/uploads /app/storage/results
 # Expose port
 EXPOSE 8080
 
-# Run API
-CMD ["python", "-m", "app.main"]
+# Run Migrations and API
+CMD ["bash", "-c", "alembic upgrade head && python -m app.main"]
