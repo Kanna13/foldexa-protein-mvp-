@@ -10,10 +10,20 @@ import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
 
 const PIPELINE_STEPS = [
-    { id: "diffab", label: "DiffAb", sub: "Antibody Design", duration: 3000 },
-    { id: "rfdiffusion", label: "RFdiffusion", sub: "Scaffold Generation", duration: 5000 },
-    { id: "af2", label: "AlphaFold 2", sub: "Structure Prediction", duration: 6000 },
+    { id: "diffab", label: "DiffAb", sub: "Antibody Design", duration: 330000 }, // ~5.5 min
+    { id: "rfdiffusion", label: "RFdiffusion", sub: "Scaffold Generation", duration: 300000 }, // ~5 min
+    { id: "af2", label: "AlphaFold 2", sub: "Structure Prediction", duration: 360000 }, // ~6 min
 ];
+
+/** Return only the steps relevant to the selected pipeline. */
+function getActiveSteps(pipelineType?: string) {
+    if (!pipelineType) return PIPELINE_STEPS;
+    if (pipelineType.includes("diffab") && pipelineType.includes("rfdiffusion")) return PIPELINE_STEPS;
+    if (pipelineType.includes("diffab")) return PIPELINE_STEPS.filter(s => s.id === "diffab");
+    if (pipelineType.includes("rfdiffusion")) return PIPELINE_STEPS.filter(s => s.id === "rfdiffusion");
+    if (pipelineType.includes("af2")) return PIPELINE_STEPS.filter(s => s.id === "af2");
+    return PIPELINE_STEPS;
+}
 
 const QUOTES = [
     { text: "Science is magic that works.", author: "Kurt Vonnegut" },
@@ -142,22 +152,26 @@ export default function JobPage({ params }: { params: { id: string } }) {
     };
 
     const getElapsedSeconds = () => {
-        // If job is done, show the exact server-reported execution time
+        // Once job is done, lock to the exact server-reported execution time
         if (job && (job.status === "completed" || job.status === "failed") && job.execution_time) {
             return job.execution_time;
         }
 
-        // Use the most accurate start time available: started_at > created_at > page load
-        const startTimeStr = job?.started_at || job?.created_at || null;
-        const start = startTimeStr ? new Date(startTimeStr).getTime() : pageLoadTime.getTime();
-        const now = currentTime.getTime();
-        return Math.max(0, (now - start) / 1000);
+        // Prefer the real GPU start time if available; otherwise count from page load.
+        // Do NOT use created_at — it can be hours old if the job was queued waiting
+        // for the DB to recover, which would make the timer show 360+ minutes.
+        const start = job?.started_at
+            ? new Date(job.started_at).getTime()
+            : pageLoadTime.getTime();
+
+        return Math.max(0, (currentTime.getTime() - start) / 1000);
     };
 
     const elapsedSeconds = getElapsedSeconds();
 
     // Estimated Total Duration (sum of steps) / Remaining
-    const totalEstimatedDuration = useMemo(() => PIPELINE_STEPS.reduce((acc, s) => acc + s.duration, 0) / 1000, []);
+    const activeSteps = useMemo(() => getActiveSteps(job?.pipeline_type), [job?.pipeline_type]);
+    const totalEstimatedDuration = useMemo(() => activeSteps.reduce((acc, s) => acc + s.duration, 0) / 1000, [activeSteps]);
     const remainingSeconds = Math.max(0, totalEstimatedDuration - elapsedSeconds);
 
     if (!jobId) return null;
@@ -281,7 +295,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
                             <div className="flex flex-col h-full justify-center space-y-12">
                                 {/* Steps */}
                                 <div className="space-y-6">
-                                    {PIPELINE_STEPS.map((step, index) => {
+                                    {activeSteps.map((step, index) => {
                                         const status = index < currentStep ? "completed" : index === currentStep ? "active" : "pending";
                                         return (
                                             <div key={step.id} className="flex items-center gap-4">
@@ -302,7 +316,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
                                                                 <div className="w-2 h-2 rounded-full bg-neutral-200" />}
                                                     </motion.div>
                                                     {/* Vertical Line */}
-                                                    {index !== PIPELINE_STEPS.length - 1 && <div className="absolute top-8 left-1/2 w-0.5 h-8 bg-neutral-100 -translate-x-1/2 -z-0" />}
+                                                    {index !== activeSteps.length - 1 && <div className="absolute top-8 left-1/2 w-0.5 h-8 bg-neutral-100 -translate-x-1/2 -z-0" />}
                                                 </div>
 
                                                 {/* Text */}
