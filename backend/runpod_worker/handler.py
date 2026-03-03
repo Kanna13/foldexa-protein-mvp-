@@ -55,26 +55,54 @@ def ensure_directories():
         d.mkdir(parents=True, exist_ok=True)
 
 async def run_subprocess(cmd, timeout=3600):
-    """Run a subprocess with timeout."""
+    """Run a subprocess with streaming output and a heartbeat."""
     logger.info(f"Running: {' '.join(str(c) for c in cmd)}")
+    
     proc = await asyncio.create_subprocess_exec(
         *[str(c) for c in cmd],
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
+        stderr=asyncio.subprocess.STDOUT  # Merge stderr into stdout
     )
+
+    async def _heartbeat():
+        """Periodic heartbeat to keep RunPod serverless proxy alive."""
+        while True:
+            await asyncio.sleep(10)
+            logger.info("... [Heartbeat] Inference still running ...")
+
+    heartbeat_task = asyncio.create_task(_heartbeat())
+    stdout_chunks = []
+
     try:
-        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)
-    except asyncio.TimeoutError:
-        proc.kill()
-        raise RuntimeError(f"GPU execution timed out ({timeout}s)")
+        # Stream output in real-time as it happens
+        while True:
+            line_coro = proc.stdout.readline()
+            try:
+                line = await asyncio.wait_for(line_coro, timeout=timeout)
+            except asyncio.TimeoutError:
+                proc.kill()
+                raise RuntimeError(f"GPU execution timed out after {timeout}s")
+                
+            if not line:
+                break
+                
+            decoded_line = line.decode(errors='replace')
+            stdout_chunks.append(decoded_line)
+            # Log directly so it appears in RunPod web UI
+            print(decoded_line, end="", flush=True)
+
+        await proc.wait()
+    finally:
+        heartbeat_task.cancel()
+
+    full_output = "".join(stdout_chunks)
 
     if proc.returncode != 0:
         raise RuntimeError(
-            f"GPU process failed (exit {proc.returncode}):\n"
-            f"STDOUT: {stdout.decode()}\nSTDERR: {stderr.decode()}"
+            f"GPU process failed (exit {proc.returncode}):\n{full_output}"
         )
 
-    return stdout.decode(), stderr.decode()
+    return full_output, ""
 
 
 async def handler(event):
@@ -156,12 +184,16 @@ async def handler(event):
         }
 
     except Exception as e:
-        logger.error(f"[{job_id}] ERROR: {str(e)}", exc_info=True)
-        return {"error": str(e)}
+        # Failsafe Catch-All: never leave job hanging
+        import traceback
+        tb = traceback.format_exc()
+        logger.error(f"[{job_id}] CRITICAL ERROR in handler:\n{tb}")
+        return {"error": str(e), "traceback": tb}
 
     finally:
-        # Clean up job workspace
+        # Clean up job workspace to prevent disk out-of-memory on same machine
         shutil.rmtree(job_path, ignore_errors=True)
+        logger.info(f"[{job_id}] Workspace cleaned up.")
 
 
 if __name__ == "__main__":

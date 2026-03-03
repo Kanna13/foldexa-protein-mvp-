@@ -65,7 +65,21 @@ async def _process_job_background(
                 recommended_pipeline = mode_to_pipeline.get(pdb_analysis['recommended_mode'], 'diffab_rfdiffusion_af2')
             else:
                 recommended_pipeline = pipeline_type.value
-            
+
+            # PRE-DISPATCH VALIDATION: DiffAb requires valid antibody Fv structures.
+            # If the user selected diffab_only (or full pipeline) and no antibody was detected, fail fast.
+            # This prevents silent GPU hanging crashes deep inside the worker.
+            if recommended_pipeline in ('diffab_only', 'diffab_rfdiffusion_af2') and not pdb_analysis.get('is_antibody'):
+                logger.error(f"Job {job_id} failed validation: PDB is not an antibody.")
+                job = await JobService.get_job(db, job_id)
+                if job:
+                    job.status = JobStatus.FAILED
+                    job.finished_at = datetime.utcnow()
+                    job.error_message = "Input PDB is not a valid antibody Fv structure. DiffAb requires VH/VL domains."
+                    await db.flush()
+                    await db.commit()
+                return
+
             model_list = selected_models.split(",") if selected_models else []
             
             # 3. Update the job configuration in DB
