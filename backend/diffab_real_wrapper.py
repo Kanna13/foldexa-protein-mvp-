@@ -26,7 +26,7 @@ def main():
     os.makedirs(args.output, exist_ok=True)
 
     # 1. Load the base config from the DiffAb source tree
-    base_config_path = DIFFAB_ROOT / "diffab" / "configs" / "test" / "codesign_single.yml"
+    base_config_path = DIFFAB_ROOT / "configs" / "test" / "codesign_single.yml"
     print(f"[Wrapper] Loading config: {base_config_path}")
     with open(base_config_path, 'r') as f:
         config = yaml.safe_load(f)
