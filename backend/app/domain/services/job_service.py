@@ -108,18 +108,24 @@ class JobService:
     @staticmethod
     def _is_valid_transition(current: JobStatus, new: JobStatus) -> bool:
         """Validate state machine transitions."""
+        # Any active job can fail or be cancelled at any point.
+        # QUEUED/PROVISIONING/RUNNING can jump directly to COMPLETED because
+        # RunPod can deliver COMPLETED without the backend catching RUNNING first.
+        TERMINAL = {JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED}
+        ACTIVE   = {JobStatus.QUEUED, JobStatus.PROVISIONING, JobStatus.RUNNING, JobStatus.POST_PROCESSING}
+
         valid_transitions = {
-            JobStatus.CREATED: [JobStatus.UPLOADED, JobStatus.FAILED, JobStatus.CANCELLED],
-            JobStatus.UPLOADED: [JobStatus.QUEUED, JobStatus.FAILED, JobStatus.CANCELLED],
-            JobStatus.QUEUED: [JobStatus.PROVISIONING, JobStatus.FAILED, JobStatus.CANCELLED],
-            JobStatus.PROVISIONING: [JobStatus.RUNNING, JobStatus.FAILED, JobStatus.CANCELLED],
-            JobStatus.RUNNING: [JobStatus.POST_PROCESSING, JobStatus.FAILED, JobStatus.CANCELLED],
-            JobStatus.POST_PROCESSING: [JobStatus.COMPLETED, JobStatus.FAILED],
-            JobStatus.COMPLETED: [],
-            JobStatus.FAILED: [JobStatus.QUEUED],  # Allow retry
-            JobStatus.CANCELLED: [],
+            JobStatus.CREATED:         {JobStatus.UPLOADED} | TERMINAL,
+            JobStatus.UPLOADED:        {JobStatus.QUEUED}   | TERMINAL,
+            JobStatus.QUEUED:          ACTIVE               | TERMINAL,
+            JobStatus.PROVISIONING:    ACTIVE               | TERMINAL,
+            JobStatus.RUNNING:         ACTIVE               | TERMINAL,
+            JobStatus.POST_PROCESSING: ACTIVE               | TERMINAL,
+            JobStatus.COMPLETED:       set(),
+            JobStatus.FAILED:          {JobStatus.QUEUED},   # Allow retry
+            JobStatus.CANCELLED:       set(),
         }
-        return new in valid_transitions.get(current, [])
+        return new in valid_transitions.get(current, set())
     
     @staticmethod
     async def upload_input(

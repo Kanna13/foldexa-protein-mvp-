@@ -79,12 +79,12 @@ async def _process_job_background(
                 job.pipeline_type = recommended_pipeline
                 await db.commit()
             
-            # 4. Upload to S3 (Network bound, minio is synchronous so run_in_threadpool is used inside)
+            # 4. Upload to S3 — upload_input already transitions status to UPLOADED internally
             s3_key = await JobService.upload_input(db=db, job_id=job_id, file_content=file_content, filename=filename)
-            await JobService.update_job_status(db, job_id, JobStatus.UPLOADED)
             await db.commit()
-            
-            # 5. Dispatch to RunPod via HTTP 
+            logger.info(f"Job {job_id}: input uploaded to S3, status=UPLOADED")
+
+            # 5. Dispatch to RunPod GPU
             try:
                 runpod_job_id = await RunPodRunner.submit_job(
                     job_id=job_id,
@@ -95,19 +95,34 @@ async def _process_job_background(
                         "pipeline": recommended_pipeline
                     }
                 )
+                # Atomically save runpod_job_id + transition to QUEUED in one transaction.
+                # We do NOT use update_job_status() here to avoid the extra get_job() call
+                # and potential identity-map staleness after the previous commit().
                 job = await JobService.get_job(db, job_id)
+                if not job:
+                    raise RuntimeError(f"Job {job_id} disappeared from DB after upload!")
                 job.runpod_job_id = runpod_job_id
-                await JobService.update_job_status(db, job_id, JobStatus.QUEUED)
+                job.status = JobStatus.QUEUED
+                await db.flush()
                 await db.commit()
-                logger.info(f"Dispatched job {job_id} to RunPod via BackgroundTask. RunPod ID: {runpod_job_id}")
+                await db.refresh(job)
+                logger.info(
+                    f"Job {job_id} dispatched to RunPod. "
+                    f"runpod_job_id={runpod_job_id}, status=QUEUED"
+                )
             except Exception as runpod_err:
                 logger.error(
                     f"RunPod dispatch failed for job {job_id}: {runpod_err}. "
-                    "Job is marked as FAILED to prevent a silent QUEUED state."
+                    "Marking as FAILED."
                 )
-                await JobService.update_job_status(db, job_id, JobStatus.FAILED, str(runpod_err))
-                await db.commit()
-                return # Stop processing, already failed
+                job = await JobService.get_job(db, job_id)
+                if job:
+                    job.status = JobStatus.FAILED
+                    job.error_message = str(runpod_err)
+                    job.finished_at = datetime.utcnow()
+                    await db.flush()
+                    await db.commit()
+                return
 
         except Exception as e:
             await db.rollback()
@@ -206,53 +221,121 @@ async def get_job_status(
     job_id: str,
     db: AsyncSession = Depends(get_db)
 ):
-    """Get job status and metadata. Syncs live status from RunPod if running."""
+    """Get job status and metadata. Polls RunPod if job is actively processing."""
     job = await JobService.get_job(db, job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    # If the job is currently processing on GPU, poll RunPod for updates
-    if job.status in [JobStatus.QUEUED, JobStatus.RUNNING] and job.runpod_job_id:
+    # -----------------------------------------------------------------
+    # Conditions under which we skip RunPod polling:
+    #  1. Job is already terminal (COMPLETED, FAILED, CANCELLED)
+    #  2. finished_at is set (already reconciled)
+    #  3. runpod_job_id is missing (job never reached RunPod)
+    #  4. Job has been running for > 30 minutes (hard timeout safety)
+    # -----------------------------------------------------------------
+    ACTIVE_STATUSES = {JobStatus.QUEUED, JobStatus.PROVISIONING, JobStatus.RUNNING}
+    TERMINAL_STATUSES = {JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED}
+
+    needs_poll = (
+        job.status in ACTIVE_STATUSES
+        and job.runpod_job_id
+        and not job.finished_at
+    )
+
+    # 30-minute hard timeout
+    if needs_poll and job.created_at:
+        age_minutes = (datetime.utcnow() - job.created_at).total_seconds() / 60
+        if age_minutes > 30:
+            logger.error(
+                f"Job {job_id} exceeded 30-minute timeout (age={age_minutes:.1f}m). "
+                "Marking FAILED."
+            )
+            job.status = JobStatus.FAILED
+            job.finished_at = datetime.utcnow()
+            job.error_message = "Job timed out after 30 minutes."
+            await db.flush()
+            await db.commit()
+            await db.refresh(job)
+            needs_poll = False
+
+    if needs_poll:
         try:
-            runpod_status_data = await RunPodRunner.get_job_status(job.runpod_job_id, job.pipeline_type)
-            rp_status = runpod_status_data.get("status")
+            logger.info(
+                f"[POLL] Job {job_id} | DB status={job.status.value} "
+                f"| runpod_job_id={job.runpod_job_id}"
+            )
+            runpod_data = await RunPodRunner.get_job_status(
+                job.runpod_job_id, job.pipeline_type
+            )
+            # Log FULL RunPod response for debugging
+            logger.info(f"[RUNPOD RESPONSE] job={job_id}: {runpod_data}")
+
+            rp_status: str = runpod_data.get("status", "UNKNOWN")
 
             if rp_status == "COMPLETED":
-                output = runpod_status_data.get("output", {})
-                # Directly mutate the job object — bypasses state machine so we
-                # don't get None back from update_job_status on an unexpected transition.
-                job.output_s3_key = output.get("output_s3_key")
-                job.execution_time = (
-                    runpod_status_data.get("executionTime", 0) / 1000.0
-                    if runpod_status_data.get("executionTime") else None
+                output = runpod_data.get("output") or {}
+                output_s3_key = output.get("output_s3_key")
+                execution_ms = runpod_data.get("executionTime")
+
+                logger.info(
+                    f"[COMPLETED] job={job_id} | output_s3_key={output_s3_key} "
+                    f"| executionTime={execution_ms}ms | full_output={output}"
                 )
+
                 job.status = JobStatus.COMPLETED
                 job.finished_at = datetime.utcnow()
+                job.output_s3_key = output_s3_key
+                job.execution_time = (execution_ms / 1000.0) if execution_ms else None
+                if not job.started_at:
+                    job.started_at = datetime.utcnow()
+
                 await db.flush()
                 await db.commit()
                 await db.refresh(job)
-                logger.info(f"Job {job_id} marked COMPLETED with output_s3_key={job.output_s3_key}")
+                logger.info(
+                    f"[DB COMMITTED] job={job_id} "
+                    f"status=COMPLETED output_s3_key={job.output_s3_key} "
+                    f"execution_time={job.execution_time}s finished_at={job.finished_at}"
+                )
 
             elif rp_status == "FAILED":
-                error_msg = runpod_status_data.get("error", "Unknown RunPod error")
+                error_msg = runpod_data.get("error") or "Unknown RunPod failure"
+                logger.error(f"[FAILED] job={job_id} | error={error_msg}")
+
                 job.status = JobStatus.FAILED
                 job.finished_at = datetime.utcnow()
                 job.error_message = str(error_msg)
+
                 await db.flush()
                 await db.commit()
                 await db.refresh(job)
 
-            elif rp_status in ("IN_PROGRESS", "IN_QUEUE") and job.status != JobStatus.RUNNING:
-                job.status = JobStatus.RUNNING
+            elif rp_status in ("IN_PROGRESS", "IN_QUEUE"):
+                logger.info(f"[RUNNING] job={job_id} | rp_status={rp_status}")
+                if job.status != JobStatus.RUNNING:
+                    job.status = JobStatus.RUNNING
                 if not job.started_at:
                     job.started_at = datetime.utcnow()
                 await db.flush()
                 await db.commit()
                 await db.refresh(job)
 
+            else:
+                # UNKNOWN, CANCELLED, etc.
+                logger.warning(
+                    f"[UNKNOWN STATUS] job={job_id} | rp_status={rp_status} "
+                    f"| full_data={runpod_data}"
+                )
+
         except Exception as e:
-            logger.warning(f"Failed to sync status with RunPod for job {job_id}: {e}")
-            await db.rollback()
+            logger.error(
+                f"[POLL ERROR] Failed to sync RunPod status for job {job_id}: {e}",
+                exc_info=True
+            )
+            try:
+                await db.rollback()
+            except Exception:
+                pass
 
     return JobStatusResponse.model_validate(job)
 

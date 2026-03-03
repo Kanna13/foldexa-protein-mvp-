@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/ui/Navbar";
 import { Loader2, CheckCircle, ArrowRight, Quote, Clock, Activity, Calendar, Hourglass } from "lucide-react";
@@ -41,6 +41,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
     // Jobs Data
     const [job, setJob] = useState<any>(null);
     const [polling, setPolling] = useState(true);
+    const redirectingRef = useRef(false);
 
     // Metrics — page load time is the fallback start for the visible timer
     const pageLoadTime = useMemo(() => new Date(), []);
@@ -96,12 +97,13 @@ export default function JobPage({ params }: { params: { id: string } }) {
                     setCurrentStep(3); // All done
                     setCurrentLog("Pipeline execution completed successfully. Redirecting to results...");
 
-                    // Auto-redirect after 2 seconds
-                    setTimeout(() => {
-                        if (isMounted) {
-                            router.push(`/app/results/${jobId}`);
-                        }
-                    }, 2500);
+                    // Prevent double-redirect if effect re-runs after setPolling(false)
+                    if (!redirectingRef.current) {
+                        redirectingRef.current = true;
+                        setTimeout(() => {
+                            if (isMounted) router.push(`/app/results/${jobId}`);
+                        }, 2500);
+                    }
                 } else if (data.status === "failed") {
                     setIsComplete(false);
                     setPolling(false);
