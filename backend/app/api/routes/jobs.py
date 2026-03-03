@@ -2,6 +2,7 @@ from fastapi import APIRouter, BackgroundTasks, UploadFile, File, Depends, HTTPE
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Annotated, Optional
+from datetime import datetime
 from enum import Enum
 import logging
 
@@ -218,19 +219,40 @@ async def get_job_status(
 
             if rp_status == "COMPLETED":
                 output = runpod_status_data.get("output", {})
+                # Directly mutate the job object — bypasses state machine so we
+                # don't get None back from update_job_status on an unexpected transition.
                 job.output_s3_key = output.get("output_s3_key")
-                job.execution_time = runpod_status_data.get("executionTime", 0) / 1000.0 if runpod_status_data.get("executionTime") else None
-                job = await JobService.update_job_status(db, job_id, JobStatus.COMPLETED)
+                job.execution_time = (
+                    runpod_status_data.get("executionTime", 0) / 1000.0
+                    if runpod_status_data.get("executionTime") else None
+                )
+                job.status = JobStatus.COMPLETED
+                job.finished_at = datetime.utcnow()
+                await db.flush()
                 await db.commit()
+                await db.refresh(job)
+                logger.info(f"Job {job_id} marked COMPLETED with output_s3_key={job.output_s3_key}")
+
             elif rp_status == "FAILED":
                 error_msg = runpod_status_data.get("error", "Unknown RunPod error")
-                job = await JobService.update_job_status(db, job_id, JobStatus.FAILED, error_message=str(error_msg))
+                job.status = JobStatus.FAILED
+                job.finished_at = datetime.utcnow()
+                job.error_message = str(error_msg)
+                await db.flush()
                 await db.commit()
-            elif rp_status == "IN_PROGRESS" and job.status != JobStatus.RUNNING:
-                job = await JobService.update_job_status(db, job_id, JobStatus.RUNNING)
+                await db.refresh(job)
+
+            elif rp_status in ("IN_PROGRESS", "IN_QUEUE") and job.status != JobStatus.RUNNING:
+                job.status = JobStatus.RUNNING
+                if not job.started_at:
+                    job.started_at = datetime.utcnow()
+                await db.flush()
                 await db.commit()
+                await db.refresh(job)
+
         except Exception as e:
             logger.warning(f"Failed to sync status with RunPod for job {job_id}: {e}")
+            await db.rollback()
 
     return JobStatusResponse.model_validate(job)
 
