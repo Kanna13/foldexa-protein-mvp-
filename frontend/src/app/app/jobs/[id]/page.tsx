@@ -146,6 +146,9 @@ export default function JobPage({ params }: { params: { id: string } }) {
     };
 
     // Derived Metrics
+    // Helper to parse backend naive UTC datetimes correctly by appending 'Z'
+    const parseUTC = (dateStr: string) => new Date(dateStr.endsWith('Z') ? dateStr : `${dateStr}Z`);
+
     const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const formatDuration = (secs: number) => {
         const mins = Math.floor(secs / 60);
@@ -164,7 +167,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
         // Otherwise, trust the front-end pageLoadTime to give a clean 0s -> up experience.
         let startTime = pageLoadTime.getTime();
         if (job?.started_at) {
-            const backendStart = new Date(job.started_at).getTime();
+            const backendStart = parseUTC(job.started_at).getTime();
             // If backend start is reasonable (not somehow in the future or way in past), use it.
             if (backendStart < currentTime.getTime() + 10000) {
                 startTime = backendStart;
@@ -246,13 +249,13 @@ export default function JobPage({ params }: { params: { id: string } }) {
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-neutral-400">Started At</span>
-                                <span className="font-mono text-neutral-900">{job?.started_at ? formatTime(new Date(job.started_at)) : (job?.created_at ? formatTime(new Date(job.created_at)) : "--")}</span>
+                                <span className="font-mono text-neutral-900">{job?.started_at ? formatTime(parseUTC(job.started_at)) : (job?.created_at ? formatTime(parseUTC(job.created_at)) : "--")}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-neutral-400">{isComplete ? "Finished At" : "Current Time"}</span>
                                 <span className="font-mono text-neutral-900">
                                     {(isComplete || job?.status === "failed") && job?.finished_at
-                                        ? formatTime(new Date(job.finished_at))
+                                        ? formatTime(parseUTC(job.finished_at))
                                         : formatTime(currentTime)}
                                 </span>
                             </div>
