@@ -17,7 +17,7 @@ JOB_DIR = FOLDEXA_ROOT / "jobs"
 LOG_DIR = FOLDEXA_ROOT / "logs"
 CACHE_DIR = FOLDEXA_ROOT / "cache"
 
-MINIO_ENDPOINT = os.environ.get("S3_ENDPOINT", os.environ.get("MINIO_ENDPOINT", "minio-production-6206.up.railway.app"))
+MINIO_ENDPOINT = os.environ.get("S3_ENDPOINT", os.environ.get("MINIO_ENDPOINT", "minio-production-09da.up.railway.app"))
 # Strip http:// or https:// for minio client if provided
 if MINIO_ENDPOINT.startswith("http://"):
     MINIO_ENDPOINT = MINIO_ENDPOINT[7:]

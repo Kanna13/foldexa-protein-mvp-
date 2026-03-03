@@ -20,7 +20,7 @@ RUN python /workspace/patch_diffab.py
 COPY Weights/diffab/ /workspace/weights/diffab/
 
 ENV PYTHONPATH=/workspace/code/diffab \
-    S3_ENDPOINT=https://minio-production-6206.up.railway.app \
+    S3_ENDPOINT=https://minio-production-09da.up.railway.app \
     S3_ACCESS_KEY=minioadmin \
     S3_SECRET_KEY=minioadmin123 \
     S3_BUCKET_NAME=foldexa-artifacts \
