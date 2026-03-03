@@ -159,14 +159,19 @@ export default function JobPage({ params }: { params: { id: string } }) {
             return job.execution_time;
         }
 
-        // Prefer the real GPU start time if available; otherwise count from page load.
-        // Do NOT use created_at — it can be hours old if the job was queued waiting
-        // for the DB to recover, which would make the timer show 360+ minutes.
-        const start = job?.started_at
-            ? new Date(job.started_at).getTime()
-            : pageLoadTime.getTime();
+        // Only use the DB started_at if it's actually newer than the job's creation time 
+        // to prevent crazy offsets if DB time is out of sync or if it was stuck queued.
+        // Otherwise, trust the front-end pageLoadTime to give a clean 0s -> up experience.
+        let startTime = pageLoadTime.getTime();
+        if (job?.started_at) {
+            const backendStart = new Date(job.started_at).getTime();
+            // If backend start is reasonable (not somehow in the future or way in past), use it.
+            if (backendStart < currentTime.getTime() + 10000) {
+                startTime = backendStart;
+            }
+        }
 
-        return Math.max(0, (currentTime.getTime() - start) / 1000);
+        return Math.max(0, (currentTime.getTime() - startTime) / 1000);
     };
 
     const elapsedSeconds = getElapsedSeconds();
@@ -297,8 +302,25 @@ export default function JobPage({ params }: { params: { id: string } }) {
                             <div className="flex flex-col h-full justify-center space-y-12">
                                 {/* Steps */}
                                 <div className="space-y-6">
-                                    {activeSteps.map((step, index) => {
-                                        const status = index < currentStep ? "completed" : index === currentStep ? "active" : "pending";
+                                    {PIPELINE_STEPS.map((step, index) => {
+                                        // Compute visual status explicitely so skipped steps just stay gray.
+                                        let status: "pending" | "active" | "completed" = "pending";
+
+                                        const type = job?.pipeline_type || "";
+                                        let isIncludedInPipeline = true;
+
+                                        // For MVP single-model pipelines, only highlight the relevant step
+                                        if (type === "diffab_only" && step.id !== "diffab") isIncludedInPipeline = false;
+                                        if (type === "rfdiffusion_only" && step.id !== "rfdiffusion") isIncludedInPipeline = false;
+                                        if (type === "af2_only" && step.id !== "af2") isIncludedInPipeline = false;
+
+                                        if (isIncludedInPipeline) {
+                                            if (isComplete) {
+                                                status = "completed";
+                                            } else if (!job || job?.status === "running" || job?.status === "queued" || job?.status === "provisioning") {
+                                                status = "active";
+                                            }
+                                        }
                                         return (
                                             <div key={step.id} className="flex items-center gap-4">
                                                 {/* Indicator */}
@@ -318,7 +340,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
                                                                 <div className="w-2 h-2 rounded-full bg-neutral-200" />}
                                                     </motion.div>
                                                     {/* Vertical Line */}
-                                                    {index !== activeSteps.length - 1 && <div className="absolute top-8 left-1/2 w-0.5 h-8 bg-neutral-100 -translate-x-1/2 -z-0" />}
+                                                    {index !== PIPELINE_STEPS.length - 1 && <div className="absolute top-8 left-1/2 w-0.5 h-8 bg-neutral-100 -translate-x-1/2 -z-0" />}
                                                 </div>
 
                                                 {/* Text */}
