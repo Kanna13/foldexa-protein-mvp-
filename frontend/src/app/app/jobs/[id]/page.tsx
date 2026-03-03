@@ -32,7 +32,8 @@ export default function JobPage({ params }: { params: { id: string } }) {
     const [job, setJob] = useState<any>(null);
     const [polling, setPolling] = useState(true);
 
-    // Metrics
+    // Metrics — page load time is the fallback start for the visible timer
+    const pageLoadTime = useMemo(() => new Date(), []);
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
     // Quotes
@@ -49,14 +50,13 @@ export default function JobPage({ params }: { params: { id: string } }) {
         unwrapParams();
     }, [params]);
 
-    // Timer Logic for updating visual UI safely based on backend started_at
+    // Always tick every second — used by both the live timer and the completion display
     useEffect(() => {
-        if (!polling) return;
         const interval = setInterval(() => {
             setCurrentTime(new Date());
         }, 1000);
         return () => clearInterval(interval);
-    }, [polling]);
+    }, []);
 
     // Quote Carousel Logic
     useEffect(() => {
@@ -142,16 +142,14 @@ export default function JobPage({ params }: { params: { id: string } }) {
     };
 
     const getElapsedSeconds = () => {
-        if (!job) return 0;
-        if ((job.status === "completed" || job.status === "failed") && job.execution_time) {
+        // If job is done, show the exact server-reported execution time
+        if (job && (job.status === "completed" || job.status === "failed") && job.execution_time) {
             return job.execution_time;
         }
 
-        // Fallback to created_at if started_at is missing
-        const startTimeStr = job.started_at || job.created_at;
-        if (!startTimeStr) return 0;
-
-        const start = new Date(startTimeStr).getTime();
+        // Use the most accurate start time available: started_at > created_at > page load
+        const startTimeStr = job?.started_at || job?.created_at || null;
+        const start = startTimeStr ? new Date(startTimeStr).getTime() : pageLoadTime.getTime();
         const now = currentTime.getTime();
         return Math.max(0, (now - start) / 1000);
     };
