@@ -1,18 +1,56 @@
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.git/
+# ── Python artifacts ─────────────────────────────────────────────
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/*.egg-info
+**/dist
+**/build
+
+# ── Virtual envs ─────────────────────────────────────────────────
+**/venv
+**/.venv
+**/env
+**/.env
+
+# ── Git / IDE ─────────────────────────────────────────────────────
+.git
 .gitignore
+.gitattributes
+**/.DS_Store
+**/.idea
+**/.vscode
+**/*.swp
+
+# ── Docs / tests (not needed in image) ──────────────────────────
+docs/
+**/tests
+**/*.md
+**/*.rst
+**/*.txt
+!requirements*.txt
+
+# ── Docker files themselves ───────────────────────────────────────
+Dockerfile*
 .dockerignore
-Dockerfile
-docker-compose.yml
-README.md
-app/storage/
-.pytest_cache/
-.coverage
-htmlcov/
+
+# ── Frontend (never goes into the backend image) ─────────────────
+frontend/
+
+# ── Backend app code NOT used by the worker ──────────────────────
+# Only these paths are needed: diffab-main, wrapper, handler, Weights
+backend/app/
+backend/alembic/
+backend/venv/
+backend/tests/
+
+# ── Misc ─────────────────────────────────────────────────────────
+**/*.tar
+**/*.gz
+**/*.zip
+**/*.log
+**/.env*
+**/node_modules
