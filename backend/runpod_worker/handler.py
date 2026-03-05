@@ -1,13 +1,17 @@
 import os
+import ssl
 import uuid
 import logging
 import asyncio
 import shutil
-import urllib3
 from pathlib import Path
 
 import runpod
 from minio import Minio
+import urllib3
+
+# Disable noisy SSL warnings when using CERT_NONE
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 # ---------------- ENV PATHS ----------------
@@ -77,28 +81,35 @@ logger.info("===========================================")
 # ---------------- MINIO ----------------
 
 def get_minio_client():
+    try:
+        # Build an SSL context that skips certificate verification.
+        # Required for self-signed or proxy certs on Railway/Supabase.
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
 
-    # Create an HTTP client that bypasses SSL verification for self-signed certs
-    # This matches our backend fix for the same database/storage SSL issue.
-    # Note: Use this only for trusted internal endpoints.
-    http_client = urllib3.PoolManager(
-        cert_reqs='CERT_NONE',
-        assert_hostname=False
-    )
+        # Use urllib3 with the custom SSL context
+        http_client = urllib3.PoolManager(
+            ssl_context=ssl_ctx
+        )
 
-    client = Minio(
-        MINIO_ENDPOINT,
-        access_key=MINIO_ACCESS_KEY,
-        secret_key=MINIO_SECRET_KEY,
-        secure=MINIO_SECURE,
-        http_client=http_client
-    )
+        client = Minio(
+            MINIO_ENDPOINT,
+            access_key=MINIO_ACCESS_KEY,
+            secret_key=MINIO_SECRET_KEY,
+            secure=MINIO_SECURE,
+            http_client=http_client
+        )
 
-    if not client.bucket_exists(MINIO_BUCKET):
-        logger.info(f"Creating bucket {MINIO_BUCKET}")
-        client.make_bucket(MINIO_BUCKET)
+        if not client.bucket_exists(MINIO_BUCKET):
+            logger.info(f"Creating bucket {MINIO_BUCKET}")
+            client.make_bucket(MINIO_BUCKET)
 
-    return client
+        return client
+
+    except Exception as e:
+        logger.error(f"CRITICAL: MinIO client failed to initialise: {e}")
+        raise
 
 
 # ---------------- DIRECTORIES ----------------
