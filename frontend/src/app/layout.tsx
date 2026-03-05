@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   title: "Foldexa",
   description: "Protein engineering platform",
   icons: {
-    icon: "/favicon-v2.ico",
-    shortcut: "/favicon-v2.ico",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
     apple: "/icon.png",
   },
   openGraph: {
