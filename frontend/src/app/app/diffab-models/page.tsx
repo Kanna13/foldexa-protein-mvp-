@@ -660,7 +660,6 @@ log_level: "INFO"
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 }
