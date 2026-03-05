@@ -67,19 +67,15 @@ async def _process_job_background(
             else:
                 recommended_pipeline = pipeline_type.value
 
-            # PRE-DISPATCH VALIDATION: DiffAb requires valid antibody Fv structures.
-            # If the user selected diffab_only (or full pipeline) and no antibody was detected, fail fast.
-            # This prevents silent GPU hanging crashes deep inside the worker.
+            # PRE-DISPATCH NOTE: We no longer hard-fail based on the antibody auto-detection.
+            # PDBAnalyzer uses chain name heuristics that can produce false negatives for
+            # valid antibody structures with non-standard chain labels (e.g. A/B instead of H/L).
+            # We log a warning and allow DiffAb itself to validate the structure.
             if recommended_pipeline in ('diffab_only', 'diffab_rfdiffusion_af2') and not pdb_analysis.get('is_antibody'):
-                logger.error(f"Job {job_id} failed validation: PDB is not an antibody.")
-                job = await JobService.get_job(db, job_id)
-                if job:
-                    job.status = JobStatus.FAILED
-                    job.finished_at = datetime.now(timezone.utc)
-                    job.error_message = "Input PDB is not a valid antibody Fv structure. DiffAb requires VH/VL domains."
-                    await db.flush()
-                    await db.commit()
-                return
+                logger.warning(
+                    f"Job {job_id}: PDB may not be an antibody (heuristic check). "
+                    "Proceeding to RunPod — DiffAb will validate the structure directly."
+                )
 
             model_list = selected_models.split(",") if selected_models else []
             

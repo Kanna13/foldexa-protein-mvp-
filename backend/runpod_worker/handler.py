@@ -62,6 +62,17 @@ logging.basicConfig(
 
 logger = logging.getLogger("foldexa-worker")
 
+# Startup diagnostics — logged once when container initialises
+logger.info("=== Foldexa RunPod Worker v1.9.3 Starting ===")
+logger.info(f"  MinIO endpoint : {MINIO_ENDPOINT}")
+logger.info(f"  MinIO bucket   : {MINIO_BUCKET}")
+logger.info(f"  MinIO secure   : {MINIO_SECURE}")
+logger.info(f"  Access key set : {bool(MINIO_ACCESS_KEY and MINIO_ACCESS_KEY != 'minioadmin')}")
+logger.info(f"  FOLDEXA_ROOT   : {FOLDEXA_ROOT}")
+logger.info(f"  CODE_DIR       : {CODE_DIR}")
+logger.info(f"  MODEL_DIR      : {MODEL_DIR}")
+logger.info("===========================================")
+
 
 # ---------------- MINIO ----------------
 
