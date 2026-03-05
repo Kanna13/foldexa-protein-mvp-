@@ -1,9 +1,12 @@
-"""
-Database session management and engine configuration.
-"""
+import ssl
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from app.core.config import settings
+
+# Create an SSL context that skips verification for cloud DBs with self-signed certs
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 # Create async engine
 engine = create_async_engine(
@@ -15,7 +18,7 @@ engine = create_async_engine(
     connect_args={
         "prepared_statement_cache_size": 0,
         "statement_cache_size": 0,
-        "ssl": True,
+        "ssl": ssl_context,
     }
 )
 
