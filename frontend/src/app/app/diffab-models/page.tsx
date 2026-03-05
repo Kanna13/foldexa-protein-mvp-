@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
     Dna, Network, FlaskConical, Grid, Sparkles,
-    Copy, Check, ArrowRight, Loader2, AlertCircle
+    Copy, Check, ArrowRight, Loader2, AlertCircle, FileCode
 } from "lucide-react";
 import { Navbar } from "@/components/ui/Navbar";
+import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
@@ -32,17 +33,17 @@ const MODELS: DiffAbModel[] = [
         id: "codesign_single",
         name: "Single CDR Co-Design",
         badge: "DEFAULT",
-        badgeClass: "bg-emerald-50 text-emerald-600 border border-emerald-100",
+        badgeClass: "bg-emerald-500 text-white font-bold",
         file: "codesign_single.yml",
         description: "Co-designs the sequence and structure of one CDR on a fixed antibody scaffold using diffusion.",
         tags: [
-            { label: "sequence", colorClass: "text-emerald-600", bgClass: "bg-emerald-50 border border-emerald-100/50" },
-            { label: "structure", colorClass: "text-blue-500", bgClass: "bg-blue-50 border border-blue-100/50" },
-            { label: "single CDR", colorClass: "text-neutral-500", bgClass: "bg-neutral-100 border border-neutral-200/50" },
+            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
+            { label: "structure", colorClass: "text-sky-500", bgClass: "bg-sky-50" },
+            { label: "single CDR", colorClass: "text-amber-500", bgClass: "bg-amber-50" },
         ],
         icon: Dna,
-        iconBg: "bg-emerald-50",
-        iconColor: "text-emerald-600",
+        iconBg: "bg-neutral-100",
+        iconColor: "text-neutral-900",
         disabled: false,
         pipelineType: "diffab_only",
     },
@@ -50,17 +51,17 @@ const MODELS: DiffAbModel[] = [
         id: "codesign_multicdrs",
         name: "Multi-CDR Co-Design",
         badge: "SOON",
-        badgeClass: "bg-neutral-100 text-neutral-400 font-medium",
+        badgeClass: "bg-neutral-200 text-neutral-900 font-bold",
         file: "codesign_multicdrs.yml",
         description: "Simultaneously co-designs sequence and structure across all CDR loops at once.",
         tags: [
-            { label: "sequence", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
-            { label: "structure", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
-            { label: "multi-CDR", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
+            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
+            { label: "structure", colorClass: "text-sky-500", bgClass: "bg-sky-50" },
+            { label: "multi-CDR", colorClass: "text-violet-500", bgClass: "bg-violet-50" },
         ],
         icon: Network,
-        iconBg: "bg-blue-50/30",
-        iconColor: "text-blue-400/70",
+        iconBg: "bg-neutral-100",
+        iconColor: "text-neutral-900",
         disabled: true,
         pipelineType: "diffab_only",
     },
@@ -68,16 +69,16 @@ const MODELS: DiffAbModel[] = [
         id: "abopt_singlecdr",
         name: "Single CDR Optimization",
         badge: "SOON",
-        badgeClass: "bg-neutral-100 text-neutral-400 font-medium",
+        badgeClass: "bg-neutral-200 text-neutral-900 font-bold",
         file: "abopt_singlecdr.yml",
         description: "Optimizes the sequence and structure of one CDR loop on an existing antibody.",
         tags: [
-            { label: "optimize", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
-            { label: "sequence", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
+            { label: "optimize", colorClass: "text-rose-500", bgClass: "bg-rose-50" },
+            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
         ],
         icon: FlaskConical,
-        iconBg: "bg-amber-50/30",
-        iconColor: "text-amber-400/70",
+        iconBg: "bg-neutral-100",
+        iconColor: "text-neutral-900",
         disabled: true,
         pipelineType: "diffab_only",
     },
@@ -85,16 +86,16 @@ const MODELS: DiffAbModel[] = [
         id: "fixedbb_design",
         name: "Fixed Backbone Design",
         badge: "SOON",
-        badgeClass: "bg-neutral-100 text-neutral-400 font-medium",
+        badgeClass: "bg-neutral-200 text-neutral-900 font-bold",
         file: "fixedbb_design.yml",
         description: "Designs sequences on a fixed backbone structure for precise binding control.",
         tags: [
-            { label: "fixed-bb", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
-            { label: "sequence", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
+            { label: "fixed-bb", colorClass: "text-indigo-500", bgClass: "bg-indigo-50" },
+            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
         ],
         icon: Grid,
-        iconBg: "bg-purple-50/30",
-        iconColor: "text-purple-400/70",
+        iconBg: "bg-neutral-100",
+        iconColor: "text-neutral-900",
         disabled: true,
         pipelineType: "diffab_only",
     },
@@ -102,27 +103,27 @@ const MODELS: DiffAbModel[] = [
         id: "denovo_design",
         name: "De Novo Full Design",
         badge: "SOON",
-        badgeClass: "bg-neutral-100 text-neutral-400 font-medium",
+        badgeClass: "bg-neutral-200 text-neutral-900 font-bold",
         file: "denovo_design.yml",
         description: "Full de novo antibody design from scratch — generates sequence and backbone simultaneously.",
         tags: [
-            { label: "de novo", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
-            { label: "sequence", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
-            { label: "structure", colorClass: "text-neutral-400", bgClass: "bg-neutral-100/60" },
+            { label: "de novo", colorClass: "text-orange-500", bgClass: "bg-orange-50" },
+            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
+            { label: "structure", colorClass: "text-sky-500", bgClass: "bg-sky-50" },
         ],
         icon: Sparkles,
-        iconBg: "bg-rose-50/30",
-        iconColor: "text-rose-400/70",
+        iconBg: "bg-neutral-100",
+        iconColor: "text-neutral-900",
         disabled: true,
         pipelineType: "diffab_only",
     },
 ];
 
 // Syntax highlighting helpers for config panel
-const VKey = ({ children }: { children: React.ReactNode }) => <span className="text-neutral-400">{children}</span>;
-const VStr = ({ children }: { children: React.ReactNode }) => <span className="text-amber-400">&quot;{children}&quot;</span>;
-const VNum = ({ children }: { children: React.ReactNode }) => <span className="text-emerald-400">{children}</span>;
-const VBool = ({ val }: { val: boolean }) => <span className={val ? "text-emerald-400" : "text-rose-400"}>{val ? "true" : "false"}</span>;
+const VKey = ({ children }: { children: React.ReactNode }) => <span className="text-white/90">{children}</span>;
+const VStr = ({ children }: { children: React.ReactNode }) => <span className="text-[#fbbf24] font-medium">&quot;{children}&quot;</span>;
+const VNum = ({ children }: { children: React.ReactNode }) => <span className="text-emerald-500 font-bold">{children}</span>;
+const VBool = ({ val }: { val: boolean }) => <span className={cn("font-bold", val ? "text-emerald-500" : "text-rose-500")}>{val ? "true" : "false"}</span>;
 
 export default function DiffAbModelsPage() {
     const router = useRouter();
@@ -143,6 +144,10 @@ export default function DiffAbModelsPage() {
     const [savePdb, setSavePdb] = useState(true);
     const [tqdmBar, setTqdmBar] = useState(false);
     const [fixSeed, setFixSeed] = useState(false);
+
+    // Window control state
+    const [isMinimized, setIsMinimized] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // Helper
     const currentModel = MODELS.find(m => m.id === selectedMode) || MODELS[0];
@@ -267,41 +272,92 @@ log_level: "INFO"
 
     // Render
     return (
-        <div className="min-h-screen flex flex-col bg-[#FDFDFD] text-neutral-900 font-sans">
+        <div className="min-h-screen flex flex-col bg-[#FDFDFD] text-neutral-900 font-sans pt-[72px]">
             <Navbar variant="contrast" />
 
             {/* Main split view */}
-            <div className="flex-1 grid lg:grid-cols-[1fr_420px] items-stretch">
+            <div className="flex-1 flex flex-col lg:flex-row min-h-screen">
 
                 {/* Left column: Setup */}
-                <div className="bg-neutral-50 p-8 lg:p-12 overflow-y-auto min-h-[calc(100vh-64px)]">
+                <div className={cn(
+                    "flex-1 bg-neutral-50 px-8 pt-12 pb-24 lg:px-12 lg:pt-16 lg:pb-32 transition-all duration-500",
+                    isExpanded ? "opacity-30 blur-[2px] scale-[0.98] pointer-events-none" : ""
+                )}>
                     <div className="max-w-3xl mx-auto">
 
-                        {/* Context Badge */}
-                        <div className="flex items-center gap-3 bg-white border border-neutral-200 shadow-sm rounded-xl px-4 py-2 w-fit mb-8 font-mono text-xs">
-                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="font-semibold text-neutral-700">{fileMeta ? fileMeta.name : "no file loaded"}</span>
-                            <span className="text-neutral-300">•</span>
-                            <span className="text-neutral-500">{fileMeta ? (fileMeta.size / 1024).toFixed(1) + " KB" : "—"}</span>
-                        </div>
-
-                        <div className="mb-10">
-                            <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-emerald-600 mb-3">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                DiffAb Pipeline
+                        {/* Integrated Header & Process Bar (Apple-level) */}
+                        <div className="mb-8 flex flex-col items-start px-0">
+                            {/* Focused Process Box - ONLY Stepper */}
+                            <div className="bg-white border border-neutral-200/80 rounded-[30px] px-10 py-7 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.03)] mb-5">
+                                <div className="flex items-center gap-10 text-[12px] font-black tracking-[0.15em] uppercase">
+                                    <div className="flex items-center gap-3 text-emerald-600">
+                                        <div className="relative group">
+                                            {/* Premium Rotating Scanner Animation (Lightweight) */}
+                                            <motion.div
+                                                className="absolute -inset-2 rounded-full border border-emerald-500/10 border-dashed"
+                                                animate={{ rotate: 360 }}
+                                                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                                            />
+                                            <motion.div
+                                                className="absolute -inset-1 rounded-full border-2 border-emerald-500/20 border-t-emerald-500/60"
+                                                animate={{ rotate: -360 }}
+                                                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                                            />
+                                            {/* Soft Breath Glow */}
+                                            <motion.div
+                                                className="absolute inset-0 rounded-full bg-emerald-500/10 blur-md"
+                                                animate={{
+                                                    scale: [1, 1.2, 1],
+                                                    opacity: [0.3, 0.6, 0.3]
+                                                }}
+                                                transition={{
+                                                    duration: 3,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            />
+                                            <div className="relative w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[15px] font-mono shadow-lg border border-emerald-400/30 z-10 overflow-hidden">
+                                                <span className="relative z-10">1</span>
+                                                <motion.div
+                                                    className="absolute inset-x-0 top-0 h-1/2 bg-white/10"
+                                                    animate={{ opacity: [0.1, 0.3, 0.1] }}
+                                                    transition={{ duration: 2, repeat: Infinity }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <span className="text-[14px] font-black tracking-widest pl-2">Configure</span>
+                                    </div>
+                                    <div className="w-16 h-px bg-neutral-200/60" />
+                                    <div className="flex items-center gap-3 text-neutral-400">
+                                        <div className="w-10 h-10 rounded-full border border-neutral-300 flex items-center justify-center text-[15px] font-mono">2</div>
+                                        <span className="text-[14px]">Results</span>
+                                    </div>
+                                    <div className="w-16 h-px bg-neutral-200/60" />
+                                    <div className="flex items-center gap-3 text-neutral-400">
+                                        <div className="w-10 h-10 rounded-full border border-neutral-300 flex items-center justify-center text-[15px] font-mono">3</div>
+                                        <span className="text-[14px]">Viewer</span>
+                                    </div>
+                                </div>
                             </div>
-                            <h1 className="text-4xl lg:text-5xl font-black tracking-tight leading-[1.1] mb-3">
-                                DiffAb <span className="text-emerald-600">Models.</span>
-                            </h1>
-                            <p className="text-neutral-500 text-[15px] leading-relaxed max-w-lg">
-                                Configure and launch antibody design models powered by DiffAb.
-                            </p>
+
+                            {/* Standalone File Info - Positioned BELOW box, Aligned START */}
+                            <div className="flex items-center gap-4 py-2 px-5 rounded-full bg-neutral-50 border border-neutral-200/60 shadow-inner group transition-all hover:border-neutral-300/80 ml-1">
+                                <FileCode className="w-4.5 h-4.5 text-neutral-400 group-hover:text-emerald-500 transition-colors" />
+                                <span className="text-[14px] font-bold text-neutral-900 truncate max-w-[340px] tracking-tight">
+                                    {fileMeta ? fileMeta.name : "mTie2-hTAAB.pdb"}
+                                </span>
+                                <div className="w-px h-4 bg-neutral-300 mx-2" />
+                                <span className="text-[13px] font-mono text-emerald-600 font-black">
+                                    {fileMeta ? (fileMeta.size / 1024).toFixed(1) + " KB" : "390.8 KB"}
+                                </span>
+                            </div>
                         </div>
 
-                        {/* Models list */}
-                        <div className="mb-4 flex items-center justify-between">
-                            <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-neutral-400">01 — Design Mode</span>
-                            <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100/50 text-emerald-600 text-[10px] font-mono font-semibold">
+                        {/* Selection Section */}
+                        <div className="mb-6 flex items-center justify-between">
+                            <span className="text-[13px] font-black tracking-[0.25em] uppercase text-neutral-900">Select Design Mode</span>
+                            <div className="h-px flex-1 mx-6 bg-neutral-200" />
+                            <span className="px-4 py-1.5 rounded-full bg-neutral-100 text-neutral-900 text-[11px] font-mono font-bold border border-neutral-200 shadow-sm leading-none">
                                 {currentModel.file}
                             </span>
                         </div>
@@ -335,15 +391,15 @@ log_level: "INFO"
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="font-mono text-[11px] text-neutral-400 mb-2">
+                                            <div className="font-mono text-[13px] text-neutral-900 mb-2">
                                                 {model.file}
                                             </div>
-                                            <p className="text-neutral-500 text-[13px] leading-relaxed mb-3 pr-4">
+                                            <p className="text-neutral-900 text-[15px] font-medium leading-relaxed mb-3 pr-4">
                                                 {model.description}
                                             </p>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {model.tags.map(t => (
-                                                    <span key={t.label} className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md", t.colorClass, t.bgClass)}>
+                                            <div className="flex flex-wrap gap-2.5">
+                                                {model.tags.map((t: { label: string, colorClass: string, bgClass: string }) => (
+                                                    <span key={t.label} className={cn("text-[12px] font-bold px-3 py-1 rounded-lg", t.colorClass, t.bgClass)}>
                                                         {t.label}
                                                     </span>
                                                 ))}
@@ -351,10 +407,10 @@ log_level: "INFO"
                                         </div>
 
                                         <div className={cn(
-                                            "absolute right-4 top-1/2 -translate-y-1/2 w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center transition-all",
-                                            isActive ? "bg-emerald-500 border-emerald-500" : "border-neutral-300 bg-neutral-50"
+                                            "absolute right-6 top-1/2 -translate-y-1/2 w-[24px] h-[24px] rounded-full border-2 flex items-center justify-center transition-all",
+                                            isActive ? "bg-emerald-500 border-emerald-500" : "border-neutral-400 bg-neutral-100"
                                         )}>
-                                            {isActive && <div className="w-2 h-2 bg-white rounded-full" />}
+                                            {isActive && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
                                         </div>
                                     </motion.div>
                                 );
@@ -362,8 +418,8 @@ log_level: "INFO"
                         </div>
 
                         {/* Configuration Options */}
-                        <div className="mb-4 flex items-center justify-between">
-                            <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-neutral-400">02 — Run Parameters</span>
+                        <div className="mb-6 flex items-center justify-between">
+                            <span className="text-[13px] font-black tracking-[0.2em] uppercase text-neutral-900">02 — Run Parameters</span>
                         </div>
 
                         <div className="bg-neutral-100/70 border border-neutral-200/60 p-2.5 rounded-[20px] flex flex-col gap-2 mb-10 shadow-sm relative overflow-hidden">
@@ -377,11 +433,11 @@ log_level: "INFO"
                                         className="absolute inset-0 z-10 bg-white/60 backdrop-blur-md flex items-center justify-center rounded-[20px]"
                                     >
                                         <div className="bg-white px-6 py-5 rounded-2xl shadow-xl border border-neutral-200 flex flex-col items-center text-center max-w-sm mx-4">
-                                            <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
-                                                <Network className="w-6 h-6 text-neutral-400" />
+                                            <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
+                                                <Network className="w-8 h-8 text-neutral-900" />
                                             </div>
-                                            <h3 className="text-[17px] font-bold text-neutral-900 mb-1.5">{currentModel.name}</h3>
-                                            <p className="text-[13px] text-neutral-500 leading-relaxed mb-1">
+                                            <h3 className="text-[20px] font-bold text-neutral-900 mb-2">{currentModel.name}</h3>
+                                            <p className="text-[15px] text-neutral-900 font-medium leading-relaxed mb-1">
                                                 This design mode will be released in a future Foldexa update.
                                             </p>
                                         </div>
@@ -392,11 +448,11 @@ log_level: "INFO"
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="bg-white border border-neutral-100/80 p-4 rounded-xl flex items-center justify-between gap-4">
                                     <div>
-                                        <div className="text-[13px] font-bold text-neutral-900">Designs</div>
-                                        <div className="text-[11px] text-neutral-400 mt-0.5">Num. candidates</div>
+                                        <div className="text-[15px] font-bold text-neutral-900">Designs</div>
+                                        <div className="text-[13px] text-neutral-900 font-medium mt-0.5">Num. candidates</div>
                                     </div>
                                     <input type="number"
-                                        className="w-[100px] bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-1.5 text-[13px] font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                        className="w-[100px] bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-1.5 text-[15px] font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                                         value={numDesigns} min={1} max={500} onChange={e => setNumDesigns(parseInt(e.target.value) || 10)}
                                         disabled={currentModel.disabled}
                                     />
@@ -404,8 +460,8 @@ log_level: "INFO"
 
                                 <div className="bg-white border border-neutral-100/80 p-4 rounded-xl flex items-center justify-between gap-4">
                                     <div>
-                                        <div className="text-[13px] font-bold text-neutral-900">Temperature</div>
-                                        <div className="text-[11px] text-neutral-400 mt-0.5">Diversity control</div>
+                                        <div className="text-[15px] font-bold text-neutral-900">Temperature</div>
+                                        <div className="text-[13px] text-neutral-900 font-medium mt-0.5">Diversity control</div>
                                     </div>
                                     <select
                                         className="w-[110px] bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-1.5 text-[13px] font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all cursor-pointer"
@@ -431,8 +487,8 @@ log_level: "INFO"
                             ].map((setting) => (
                                 <div key={setting.id} className="bg-white border border-neutral-100/80 p-4 rounded-xl flex items-center justify-between gap-4">
                                     <div>
-                                        <div className="text-[13px] font-bold text-neutral-900">{setting.label}</div>
-                                        <div className="text-[11px] text-neutral-400 mt-0.5">{setting.hint}</div>
+                                        <div className="text-[15px] font-bold text-neutral-900">{setting.label}</div>
+                                        <div className="text-[13px] text-neutral-900 font-medium mt-0.5">{setting.hint}</div>
                                     </div>
                                     {setting.type === 'select' ? (
                                         <select
@@ -481,7 +537,7 @@ log_level: "INFO"
                                 ) : (
                                     <div className={cn("w-2 h-2 rounded-full shrink-0", status.type === "idle" ? "bg-neutral-300" : "bg-emerald-500 animate-pulse")} />
                                 )}
-                                <span className={cn("text-[12px] font-medium leading-none mt-0.5", status.type === "error" ? "text-rose-600" : "text-neutral-500")}>
+                                <span className={cn("text-[14px] font-bold leading-none mt-0.5", status.type === "error" ? "text-rose-600" : "text-neutral-900")}>
                                     {status.msg}
                                 </span>
                                 {!pdbFile && status.type === "error" && (
@@ -495,99 +551,116 @@ log_level: "INFO"
                     </div>
                 </div>
 
-                {/* Right column: Config Preview */}
-                <div className="bg-[#0A0A0A] border-l border-[#1A1A1A] flex flex-col h-full sticky top-[64px]">
-
-                    <div className="p-6 border-b border-[#1A1A1A]">
-                        <div className="flex justify-between items-center mb-1.5">
-                            <h2 className="text-[11px] font-bold tracking-[1.5px] uppercase text-neutral-500">Configuration File</h2>
-                            <span className="font-mono text-[12px] text-emerald-500">{currentModel.file}</span>
+                <div className={cn(
+                    "bg-[#050505] border-l border-[#1A1A1A] flex flex-col transition-all duration-500",
+                    isMinimized ? "h-[64px] cursor-pointer" : "lg:min-h-screen",
+                    isExpanded ? "w-[90%] fixed right-0 top-[72px] bottom-0 z-[60] shadow-2xl" : "hidden lg:flex lg:w-[500px] lg:sticky lg:top-[72px] lg:h-[calc(100vh-72px)]"
+                )}
+                    onClick={() => isMinimized && setIsMinimized(false)}
+                >
+                    <div className="flex flex-col h-full overflow-hidden">
+                        <div className="bg-[#0a0a0a] px-6 py-5 border-b border-neutral-900/40 flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-4">
+                                <div className="flex gap-1.5 grayscale opacity-60">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setPdbFile(null); setFileMeta(null); }}
+                                        className="w-3 h-3 rounded-full bg-rose-500 hover:bg-rose-400 transition-colors cursor-pointer"
+                                    />
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setIsMinimized(!isMinimized); setIsExpanded(false); }}
+                                        className="w-3 h-3 rounded-full bg-amber-500 hover:bg-amber-400 transition-colors cursor-pointer"
+                                    />
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); setIsMinimized(false); }}
+                                        className="w-3 h-3 rounded-full bg-emerald-500 hover:bg-emerald-400 transition-colors cursor-pointer"
+                                    />
+                                </div>
+                                <span className="font-mono text-[12px] text-white font-bold ml-1">configs/test/{currentModel.file}</span>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                                <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest leading-none">Live Sync</span>
+                            </div>
                         </div>
-                        <p className="text-[12px] text-neutral-600">Live preview — updates automatically</p>
+
+                        {!isMinimized && (
+                            <>
+                                <div className="flex-1 overflow-y-auto p-1 scrollbar-none">
+                                    <div className="p-8 font-mono text-[13px] leading-[2.2] relative">
+                                        <AnimatePresence mode="popLayout">
+                                            <motion.div
+                                                key={currentModel.id + numDesigns + samplingTemp + device + relaxPdb + savePdb + tqdmBar + fixSeed}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="text-white italic mb-2"># Foldexa.bio — auto-generated config</div>
+                                                <div className="text-white italic mb-8"># Do not edit manually. Use the UI.</div>
+
+                                                {currentModel.disabled && (
+                                                    <div className="mb-8">
+                                                        <div className="text-white text-[11px] font-black tracking-widest leading-none mb-3">## STATUS</div>
+                                                        <div className="flex"><div className="w-36 shrink-0"><VKey>status:</VKey></div><VStr>coming_soon</VStr></div>
+                                                        <div className="flex"><div className="w-36 shrink-0"><VKey>message:</VKey></div><VStr>This design mode will be released.</VStr></div>
+                                                    </div>
+                                                )}
+
+                                                <div className="text-white text-[11px] font-black tracking-widest leading-none mb-3">## PIPELINE</div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>design_mode:</VKey></div><VStr>{currentModel.id}</VStr></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>config_file:</VKey></div><VStr>configs/test/{currentModel.file}</VStr></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>pipeline_type:</VKey></div><VStr>diffab_only</VStr></div>
+
+                                                <div className="h-8" />
+                                                <div className="text-white text-[11px] font-black tracking-widest leading-none mb-3">## SAMPLING</div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>num_designs:</VKey></div><VNum>{numDesigns}</VNum></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>sampling_temp:</VKey></div><VNum>{samplingTemp}</VNum></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>num_diffusion_steps:</VKey></div><VNum>100</VNum></div>
+
+                                                <div className="h-8" />
+                                                <div className="text-white text-[11px] font-black tracking-widest leading-none mb-3">## HARDWARE</div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>device:</VKey></div><VStr>{device}</VStr></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>num_workers:</VKey></div><VNum>4</VNum></div>
+
+                                                <div className="h-8" />
+                                                <div className="text-white text-[11px] font-black tracking-widest leading-none mb-3">## OUTPUT</div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>pdb_relax:</VKey></div><VBool val={relaxPdb} /></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>save_pdb:</VKey></div><VBool val={savePdb} /></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>output_dir:</VKey></div><VStr>./results/</VStr></div>
+
+                                                <div className="h-8" />
+                                                <div className="text-white text-[11px] font-black tracking-widest leading-none mb-3">## LOGGING</div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>tqdm_bar:</VKey></div><VBool val={tqdmBar} /></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>fix_seed:</VKey></div><VBool val={fixSeed} /></div>
+                                                <div className="flex mb-2"><div className="w-44 shrink-0"><VKey>log_level:</VKey></div><VStr>INFO</VStr></div>
+
+                                                {/* Action Button - Follows text immediately */}
+                                                <div className="mt-12 pt-8 border-t border-white/5">
+                                                    <Button
+                                                        variant="secondary"
+                                                        className={cn(
+                                                            "w-full bg-transparent font-medium transition-all h-10 text-[12px] border-neutral-800 hover:border-neutral-700 hover:bg-white/5",
+                                                            copied ? "text-emerald-500 border-emerald-500/30" : "text-neutral-500"
+                                                        )}
+                                                        onClick={handleCopy}
+                                                    >
+                                                        {copied ? (
+                                                            <span className="flex items-center gap-2"><Check className="w-4 h-4" /> Copied to Clipboard</span>
+                                                        ) : (
+                                                            <span className="flex items-center gap-2"><Copy className="w-4 h-4" /> Copy Config</span>
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                                <div className="h-12" />
+                                            </motion.div>
+                                        </AnimatePresence>
+                                    </div>
+                                </div>
+
+                            </>
+                        )}
                     </div>
-
-                    <div className="flex-1 overflow-y-auto bg-[#0A0A0A]">
-                        <div className="flex items-center gap-1.5 px-4 py-3 bg-[#111] border-b border-[#1A1A1A]">
-                            <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
-                            <span className="font-mono text-[11px] text-neutral-500 ml-2">configs/test/{currentModel.file}</span>
-                        </div>
-
-                        <div className="p-6 font-mono text-[13px] leading-[2] relative">
-                            <AnimatePresence mode="popLayout">
-                                <motion.div
-                                    key={currentModel.id + numDesigns + samplingTemp + device + relaxPdb + savePdb + tqdmBar + fixSeed}
-                                    initial={{ opacity: 0, filter: "blur(2px)", y: 2 }}
-                                    animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                >
-                                    <div className="text-neutral-600"># Foldexa.bio — auto-generated config</div>
-                                    <div className="text-neutral-600"># Do not edit manually. Use the UI.</div>
-
-                                    {currentModel.disabled && (
-                                        <>
-                                            <div className="h-4"></div>
-                                            <div className="text-neutral-500 text-[11px] tracking-wider">## STATUS</div>
-                                            <div className="flex"><div className="w-32"><VKey>status:</VKey></div><VStr>coming_soon</VStr></div>
-                                            <div className="flex"><div className="w-32"><VKey>message:</VKey></div><VStr>This design mode will be released.</VStr></div>
-                                        </>
-                                    )}
-
-                                    <div className="h-4"></div>
-                                    <div className="text-neutral-500 text-[11px] tracking-wider">## PIPELINE</div>
-                                    <div className="flex"><div className="w-48"><VKey>design_mode:</VKey></div><VStr>{currentModel.id}</VStr></div>
-                                    <div className="flex"><div className="w-48"><VKey>config_file:</VKey></div><VStr>configs/test/{currentModel.file}</VStr></div>
-                                    <div className="flex"><div className="w-48"><VKey>pipeline_type:</VKey></div><VStr>diffab_only</VStr></div>
-
-                                    <div className="h-4"></div>
-                                    <div className="text-neutral-500 text-[11px] tracking-wider">## SAMPLING</div>
-                                    <div className="flex"><div className="w-48"><VKey>num_designs:</VKey></div><VNum>{numDesigns}</VNum></div>
-                                    <div className="flex"><div className="w-48"><VKey>sampling_temp:</VKey></div><VNum>{samplingTemp}</VNum></div>
-                                    <div className="flex"><div className="w-48"><VKey>num_diffusion_steps:</VKey></div><VNum>100</VNum></div>
-
-                                    <div className="h-4"></div>
-                                    <div className="text-neutral-500 text-[11px] tracking-wider">## HARDWARE</div>
-                                    <div className="flex"><div className="w-48"><VKey>device:</VKey></div><VStr>{device}</VStr></div>
-                                    <div className="flex"><div className="w-48"><VKey>num_workers:</VKey></div><VNum>4</VNum></div>
-
-                                    <div className="h-4"></div>
-                                    <div className="text-neutral-500 text-[11px] tracking-wider">## OUTPUT</div>
-                                    <div className="flex"><div className="w-48"><VKey>pdb_relax:</VKey></div><VBool val={relaxPdb} /></div>
-                                    <div className="flex"><div className="w-48"><VKey>save_pdb:</VKey></div><VBool val={savePdb} /></div>
-                                    <div className="flex"><div className="w-48"><VKey>output_dir:</VKey></div><VStr>./results/</VStr></div>
-
-                                    <div className="h-4"></div>
-                                    <div className="text-neutral-500 text-[11px] tracking-wider">## LOGGING</div>
-                                    <div className="flex"><div className="w-48"><VKey>tqdm_bar:</VKey></div><VBool val={tqdmBar} /></div>
-                                    <div className="flex"><div className="w-48"><VKey>fix_seed:</VKey></div><VBool val={fixSeed} /></div>
-                                    <div className="flex"><div className="w-48"><VKey>log_level:</VKey></div><VStr>INFO</VStr></div>
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
-                    </div>
-
-                    <div className="p-4 border-t border-[#1A1A1A] bg-[#0A0A0A]">
-                        <Button
-                            variant="secondary"
-                            className={cn(
-                                "w-full bg-transparent font-medium transition-all h-10 text-[13px] border-[#2A2A2A] hover:bg-[#111] hover:text-white hover:border-[#444]",
-                                copied ? "text-emerald-500 border-emerald-500/30 hover:bg-transparent hover:text-emerald-500" : "text-neutral-400"
-                            )}
-                            onClick={handleCopy}
-                        >
-                            {copied ? (
-                                <span className="flex items-center gap-2"><Check className="w-4 h-4" /> Copied to Clipboard</span>
-                            ) : (
-                                <span className="flex items-center gap-2"><Copy className="w-4 h-4" /> Copy Config</span>
-                            )}
-                        </Button>
-                    </div>
-
                 </div>
-
             </div>
-
+            <Footer />
         </div>
     );
 }
