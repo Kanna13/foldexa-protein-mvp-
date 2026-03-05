@@ -11,7 +11,7 @@
 set -euo pipefail
 
 IMAGE="kanseu/foldexa-diffab"
-TAG="v1.9.1"
+TAG="v1.9.2"
 CACHE_REF="${IMAGE}:buildcache"
 DOCKERFILE="Dockerfile.diffab"
 
