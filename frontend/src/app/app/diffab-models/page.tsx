@@ -588,7 +588,7 @@ log_level: "INFO"
                                     <div className="p-8 font-mono text-[13px] leading-[2.2] relative">
                                         <AnimatePresence mode="popLayout">
                                             <motion.div
-                                                key={currentModel.id + numDesigns + samplingTemp + device + relaxPdb + savePdb + tqdmBar + fixSeed}
+                                                key={currentModel.id}
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 transition={{ duration: 0.2 }}
