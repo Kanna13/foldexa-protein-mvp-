@@ -1,33 +1,53 @@
-import json
 import logging
 import httpx
+from typing import Optional, Dict, Any
 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 class RunPodRunner:
-    """Runner for dispatching GPU jobs over HTTP to dedicated RunPod Serverless."""
+    """
+    Runner for dispatching GPU jobs over HTTP to dedicated RunPod Serverless.
+    Supports asynchronous execution, status polling, and webhook callbacks.
+    """
 
     @staticmethod
-    async def submit_job(job_id: str, model_name: str, input_s3_key: str, params: dict = None) -> str:
+    def _get_endpoint_id(model_name: str) -> str:
+        """Map model prefixes to RunPod endpoint IDs."""
+        if model_name.startswith("rfdiffusion"):
+            return settings.runpod_endpoint_rfdiffusion
+        elif model_name.startswith("diffab"):
+            return settings.runpod_endpoint_diffab
+        elif model_name.startswith("af2"):
+            return getattr(settings, "runpod_endpoint_af2", "")
+        
+        logger.error(f"Unknown model_name for RunPod dispatch: {model_name}")
+        raise ValueError(f"Unknown model_name: {model_name}")
+
+    @staticmethod
+    async def submit_job(
+        job_id: str, 
+        model_name: str, 
+        input_s3_key: str, 
+        params: Optional[Dict[str, Any]] = None
+    ) -> str:
         """
         Submit a GPU inference job via HTTP to RunPod Serverless API.
+        Returns the RunPod Job ID.
         """
-        runpod_api_key = settings.runpod_api_key
-        if model_name.startswith("rfdiffusion"):
-            endpoint_id = settings.runpod_endpoint_rfdiffusion
-        elif model_name.startswith("diffab"):
-            endpoint_id = settings.runpod_endpoint_diffab
-        elif model_name.startswith("af2"):
-            endpoint_id = getattr(settings, "runpod_endpoint_af2", "")
-        else:
-            logger.error(f"Unknown model_name for RunPod dispatch: {model_name}")
-            raise ValueError(f"Unknown model_name: {model_name}")
+        api_key = settings.runpod_api_key
+        endpoint_id = RunPodRunner._get_endpoint_id(model_name)
 
-        if not runpod_api_key or not endpoint_id:
+        if not api_key or not endpoint_id:
             logger.error(f"RunPod settings missing for {model_name}. API_KEY and ENDPOINT_ID are required.")
-            raise RuntimeError(f"RunPod credentials/endpoint not configured for {model_name}. Job cannot be dispatched.")
+            raise RuntimeError(f"RunPod credentials/endpoint not configured for {model_name}.")
+
+        # -----------------------------------------------------------------
+        # WEBHOOK: If app_url is set, tell RunPod to POST back when finished.
+        # This is more efficient than polling alone.
+        # -----------------------------------------------------------------
+        webhook_url = f"{settings.app_url}/api/v1/webhook/job_completed" if settings.app_url else None
 
         payload = {
             "input": {
@@ -35,11 +55,22 @@ class RunPodRunner:
                 "model_name": model_name,
                 "input_s3_key": input_s3_key,
                 "params": params or {}
+            },
+            "policy": {
+                "executionTimeout": 3600000, # 60 minutes safety (in ms)
+                "priority": 1
             }
         }
 
+        if webhook_url:
+            payload["webhook"] = webhook_url
+            logger.info(f"Using webhook for RunPod job: {webhook_url}")
+
         url = f"https://api.runpod.ai/v2/{endpoint_id}/run"
-        logger.info(f"Dispatching job {job_id} ({model_name}) to RunPod Serverless endpoint: {endpoint_id}...")
+        
+        logger.info(
+            f"Dispatching job {job_id} ({model_name}) to RunPod endpoint: {endpoint_id}..."
+        )
 
         async with httpx.AsyncClient() as client:
             try:
@@ -47,58 +78,43 @@ class RunPodRunner:
                     url,
                     json=payload,
                     headers={
-                        "Authorization": f"Bearer {runpod_api_key}",
+                        "Authorization": f"Bearer {api_key}",
                         "Content-Type": "application/json"
                     },
-                    timeout=15.0  # Fast timeout since server should reply 'IN_QUEUE' immediately 
+                    timeout=20.0  # Slightly longer timeout for initial queueing
                 )
                 response.raise_for_status()
                 data = response.json()
                 
-                # RunPod returns {"id": "job_id", "status": "IN_QUEUE"}
                 runpod_job_id = data.get("id", "")
                 if not runpod_job_id:
                     raise RuntimeError(f"Invalid response from RunPod: {data}")
                     
-                logger.info(f"RunPod successfully accepted job {job_id} -> RunPod Job ID: {runpod_job_id}")
+                logger.info(f"RunPod accepted job {job_id} -> RP ID: {runpod_job_id}")
                 return runpod_job_id
             
             except httpx.TimeoutException:
                 logger.error(f"RunPod submission timed out for {job_id}.")
-                raise RuntimeError("RunPod GPU server is currently unreachable (Timeout).")
-            except httpx.HTTPError as e:
-                response_text = ""
-                if hasattr(e, "response") and e.response:
-                    try:
-                        response_text = e.response.text
-                    except:
-                        pass
-                logger.error(f"RunPod submission failed with HTTP error for {job_id}: {e} - {response_text}")
+                raise RuntimeError("RunPod GPU server unreachable (Timeout).")
+            except httpx.HTTPStatusError as e:
+                resp_text = e.response.text if e.response else "No body"
+                logger.error(f"RunPod API error {e.response.status_code}: {resp_text}")
                 raise RuntimeError(f"RunPod GPU server rejected request: {e}")
             except Exception as e:
-                logger.error(f"Unexpected error submitting job {job_id} to RunPod: {e}")
+                logger.error(f"Unexpected error submitting job {job_id}: {e}")
                 raise RuntimeError(f"Unexpected error during RunPod submission: {e}")
 
     @staticmethod
-    async def get_job_status(runpod_job_id: str, model_name: str) -> dict:
+    async def get_job_status(runpod_job_id: str, model_name: str) -> Dict[str, Any]:
         """
-        Query the status of a GPU inference job from RunPod Serverless API.
-        Returns a dictionary with status, executionTime, and output.
+        Query the status of a GPU inference job from RunPod.
         """
-        runpod_api_key = settings.runpod_api_key
-        if model_name.startswith("rfdiffusion"):
-            endpoint_id = settings.runpod_endpoint_rfdiffusion
-        elif model_name.startswith("diffab"):
-            endpoint_id = settings.runpod_endpoint_diffab
-        elif model_name.startswith("af2"):
-            endpoint_id = getattr(settings, "runpod_endpoint_af2", "")
-        else:
-            logger.error(f"Unknown model_name for RunPod status: {model_name}")
-            raise ValueError(f"Unknown model_name: {model_name}")
+        api_key = settings.runpod_api_key
+        endpoint_id = RunPodRunner._get_endpoint_id(model_name)
 
-        if not runpod_api_key or not endpoint_id:
-            logger.error(f"RunPod settings missing for {model_name}. API_KEY and ENDPOINT_ID are required.")
-            raise RuntimeError(f"RunPod credentials/endpoint not configured for {model_name}.")
+        if not api_key or not endpoint_id:
+            logger.error(f"RunPod settings missing for status check.")
+            raise RuntimeError("RunPod credentials/endpoint not configured.")
 
         url = f"https://api.runpod.ai/v2/{endpoint_id}/status/{runpod_job_id}"
         
@@ -107,7 +123,7 @@ class RunPodRunner:
                 response = await client.get(
                     url,
                     headers={
-                        "Authorization": f"Bearer {runpod_api_key}",
+                        "Authorization": f"Bearer {api_key}",
                         "Content-Type": "application/json"
                     },
                     timeout=10.0
@@ -115,12 +131,28 @@ class RunPodRunner:
                 response.raise_for_status()
                 return response.json()
             
-            except httpx.TimeoutException:
-                logger.error(f"RunPod status query timed out for {runpod_job_id}.")
-                return {"status": "UNKNOWN", "error": "Timeout"}
-            except httpx.HTTPError as e:
-                logger.error(f"RunPod status query failed for {runpod_job_id}: {e}")
-                return {"status": "UNKNOWN", "error": str(e)}
             except Exception as e:
-                logger.error(f"Unexpected error querying RunPod status for {runpod_job_id}: {e}")
+                logger.error(f"Failed to query RunPod status for {runpod_job_id}: {e}")
                 return {"status": "UNKNOWN", "error": str(e)}
+
+    @staticmethod
+    async def cancel_job(runpod_job_id: str, model_name: str) -> bool:
+        """
+        Cancel a running or queued job on RunPod.
+        """
+        api_key = settings.runpod_api_key
+        endpoint_id = RunPodRunner._get_endpoint_id(model_name)
+
+        url = f"https://api.runpod.ai/v2/{endpoint_id}/cancel/{runpod_job_id}"
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(
+                    url,
+                    headers={"Authorization": f"Bearer {api_key}"},
+                    timeout=10.0
+                )
+                return response.status_code == 200
+            except Exception as e:
+                logger.error(f"Failed to cancel RunPod job {runpod_job_id}: {e}")
+                return False

@@ -312,6 +312,33 @@ async def get_job_status(
 
             rp_status: str = runpod_data.get("status", "UNKNOWN")
 
+            # Normalize status text for easier comparisons
+            if isinstance(rp_status, str):
+                rp_status = rp_status.upper()
+
+            # If RunPod returns UNKNOWN with an HTTP 404 in the error message,
+            # this typically means the worker container crashed and the job
+            # record has been evicted on RunPod's side. Treat this as a hard
+            # failure instead of leaving the job stuck in RUNNING/UNKNOWN.
+            if rp_status == "UNKNOWN":
+                error_text = (runpod_data.get("error") or "").lower()
+                if "404" in error_text and "not found" in error_text:
+                    logger.error(
+                        f"[RUNPOD 404] job={job_id} | "
+                        f"runpod_job_id={job.runpod_job_id} | marking FAILED. "
+                        f"full_data={runpod_data}"
+                    )
+                    job.status = JobStatus.FAILED
+                    job.finished_at = datetime.utcnow()
+                    job.error_message = (
+                        "RunPod job not found (worker likely crashed or was evicted)."
+                    )
+                    await db.flush()
+                    await db.commit()
+                    await db.refresh(job)
+                    # After this, we can safely return the updated job response.
+                    return JobStatusResponse.model_validate(job)
+
             if rp_status == "COMPLETED":
                 output = runpod_data.get("output") or {}
                 # Handle nested strict return schema from handler.py: {"status": "COMPLETED", "output": {"result_s3_key": ...}}

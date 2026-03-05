@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     debug: bool = False
     environment: str = "development"
+    app_url: str = "http://localhost:8000"
     
     # API
     api_host: str = "0.0.0.0"
