@@ -138,12 +138,40 @@ async def handler(event):
 
         # Prepare command based on model_name
         if model_name.startswith("diffab"):
+            # Extract DiffAb UI params from job input
+            diffab_cfg = job_input.get("params", {}).get("diffab_config", {})
+            num_designs  = int(diffab_cfg.get("num_designs",  5))
+            device       = str(diffab_cfg.get("device",       "cuda"))
+            temperature  = float(diffab_cfg.get("sampling_temp", 0.5))
+            pdb_relax    = bool(diffab_cfg.get("pdb_relax",   True))
+            save_pdb     = bool(diffab_cfg.get("save_pdb",    True))
+            tqdm_bar     = bool(diffab_cfg.get("tqdm_bar",    False))
+            fix_seed     = bool(diffab_cfg.get("fix_seed",    False))
+            design_mode  = str(diffab_cfg.get("design_mode",  "codesign_single"))
+
+            logger.info(
+                f"[{job_id}] DiffAb config: mode={design_mode} n={num_designs} "
+                f"temp={temperature} device={device} relax={pdb_relax}"
+            )
+
             cmd = [
                 "python",
                 CODE_DIR / "diffab" / "wrapper.py",
-                "--input", input_file,
-                "--output", output_dir
+                "--input",       input_file,
+                "--output",      output_dir,
+                "--num_designs", str(num_designs),
+                "--temperature", str(temperature),
+                "--device",      device,
+                "--design_mode", design_mode,
             ]
+            if not pdb_relax:
+                cmd.append("--no_relax")
+            if not save_pdb:
+                cmd.append("--no_save_pdb")
+            if tqdm_bar:
+                cmd.append("--tqdm")
+            if fix_seed:
+                cmd.append("--fix_seed")
         elif model_name.startswith("rfdiffusion"):
             cmd = [
                 "python",

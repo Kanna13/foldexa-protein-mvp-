@@ -40,6 +40,7 @@ async def _process_job_background(
     filename: str,
     pipeline_type: PipelineType,
     selected_models: str,
+    diffab_config: Optional[dict] = None,
 ):
     """Background task to analyze, upload, and dispatch the job without blocking HTTP response."""
     async with AsyncSessionLocal() as db:
@@ -100,14 +101,19 @@ async def _process_job_background(
 
             # 5. Dispatch to RunPod GPU
             try:
+                runpod_params = {
+                    "atom_count": file_info.get("atom_count", 0),
+                    "pipeline": recommended_pipeline,
+                }
+                # Merge DiffAb UI config if provided
+                if diffab_config:
+                    runpod_params["diffab_config"] = diffab_config
+
                 runpod_job_id = await RunPodRunner.submit_job(
                     job_id=job_id,
                     model_name=recommended_pipeline,
                     input_s3_key=s3_key,
-                    params={
-                        "atom_count": file_info.get("atom_count", 0),
-                        "pipeline": recommended_pipeline
-                    }
+                    params=runpod_params
                 )
                 # Atomically save runpod_job_id + transition to QUEUED in one transaction.
                 # We do NOT use update_job_status() here to avoid the extra get_job() call
@@ -163,8 +169,12 @@ async def create_job(
         Form(description="Pipeline type to execute")
     ] = PipelineType.FULL_PIPELINE,
     selected_models: Annotated[
-        Optional[str], 
+        Optional[str],
         Form(description="Comma-separated list of selected models (e.g. 'diffab,alphafold2')")
+    ] = None,
+    diffab_config: Annotated[
+        Optional[str],
+        Form(description="JSON string with DiffAb config params (num_designs, sampling_temp, device, etc.)")
     ] = None,
     db: AsyncSession = Depends(get_db)
 ):
@@ -204,6 +214,15 @@ async def create_job(
         )
         await db.commit()
         
+        # Parse optional DiffAb config JSON
+        parsed_diffab_config = None
+        if diffab_config:
+            import json as _json
+            try:
+                parsed_diffab_config = _json.loads(diffab_config)
+            except Exception:
+                logger.warning(f"Failed to parse diffab_config JSON: {diffab_config!r}")
+
         # Offload heavy text splitting, S3 networking, and HTTP dispatch to BackgroundTasks
         background_tasks.add_task(
             _process_job_background,
@@ -211,7 +230,8 @@ async def create_job(
             file_content=file_content,
             filename=file.filename,
             pipeline_type=pipeline_type,
-            selected_models=selected_models
+            selected_models=selected_models,
+            diffab_config=parsed_diffab_config,
         )
         
         logger.info(f"Received and delegated job {job.id} to background tasks.")

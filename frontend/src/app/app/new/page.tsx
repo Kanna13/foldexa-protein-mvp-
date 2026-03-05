@@ -110,28 +110,48 @@ export default function UploadPage() {
     const canSubmit = file !== null && selectedModels.length > 0;
 
     const handleUpload = async () => {
-        if (!canSubmit) return;
+        if (!canSubmit || !file) return;
         setUploading(true);
 
+        const hasDiffAb = selectedModels.includes("diffab");
+        const hasRF = selectedModels.includes("rfdiffusion");
+        const hasAF2 = selectedModels.includes("alphafold2");
+
+        // ── DiffAb-only: redirect to model selection page instead of submitting ──
+        if (hasDiffAb && !hasRF && !hasAF2) {
+            try {
+                // Serialise File → base64 so it survives the page navigation
+                const buffer = await file.arrayBuffer();
+                const bytes = new Uint8Array(buffer);
+                let binary = '';
+                for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+                const b64 = btoa(binary);
+
+                sessionStorage.setItem('foldexa_pdb_meta', JSON.stringify({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                }));
+                sessionStorage.setItem('foldexa_pdb_data', b64);
+
+                // Navigate to the standalone HTML model selection page
+                window.location.href = '/diffab_model_selection.html';
+            } catch (err) {
+                console.error('Failed to serialise file:', err);
+                alert('Could not prepare file for transfer. Please try again.');
+                setUploading(false);
+            }
+            return;
+        }
+
+        // ── All other pipeline combos: submit directly ──
         try {
-            // Map selected models to backend PipelineType
             let pipelineType = "diffab_rfdiffusion_af2"; // Default fallback
-
-            const hasDiffAb = selectedModels.includes("diffab");
-            const hasRF = selectedModels.includes("rfdiffusion");
-            const hasAF2 = selectedModels.includes("alphafold2");
-
-            if (hasDiffAb && !hasRF && !hasAF2) pipelineType = "diffab_only";
-            else if (!hasDiffAb && hasRF && !hasAF2) pipelineType = "rfdiffusion_only";
+            if (!hasDiffAb && hasRF && !hasAF2) pipelineType = "rfdiffusion_only";
             else if (!hasDiffAb && !hasRF && hasAF2) pipelineType = "af2_only";
-            // For combinations (e.g. DiffAb+RF), we default to FULL_PIPELINE for MVP 
-            // as the backend doesn't support partial custom chains yet.
-
 
             const data = await api.createJob(file, pipelineType, selectedModels.join(","));
-            // Redirect to the real job page
             router.push(`/app/jobs/${data.job_id}`);
-
         } catch (error) {
             console.error("Upload error:", error);
             alert(error instanceof Error ? error.message : "Failed to create job");
@@ -253,7 +273,13 @@ export default function UploadPage() {
                                 onClick={handleUpload}
                                 className="w-full text-lg h-12 shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {uploading ? "Initializing Pipeline..." : "Run Pipeline"}
+                                {uploading
+                                    ? (selectedModels.includes("diffab") && selectedModels.length === 1
+                                        ? "Preparing…"
+                                        : "Initializing Pipeline...")
+                                    : (selectedModels.includes("diffab") && selectedModels.length === 1
+                                        ? "Configure DiffAb →"
+                                        : "Run Pipeline")}
                             </Button>
                             {!canSubmit && (
                                 <p className="text-xs text-center text-red-500 mt-3 font-medium flex items-center justify-center gap-1">
