@@ -80,7 +80,7 @@ export function BetaAccessForm() {
                 </div>
                 <h3 className="text-3xl font-bold text-white mb-4">Request Received</h3>
                 <p className="text-neutral-400 text-lg mb-8 max-w-md mx-auto">
-                    Thank you for your interest. We've added you to our priority queue and will contact you via {formData.contactPref} soon.
+                    Thank you for your interest. We&apos;ve added you to our priority queue and will contact you via {formData.contactPref} soon.
                 </p>
                 <button
                     onClick={() => window.location.href = '/'}

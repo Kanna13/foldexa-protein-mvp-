@@ -175,7 +175,7 @@ export function PricingSection() {
                                     { feature: "Private Storage", free: false, standard: true, premium: true },
                                     { feature: "API Access", free: false, standard: false, premium: true },
                                     { feature: "Priority Support", free: false, standard: "Email", premium: "Dedicated" },
-                                ].map((row, idx) => (
+                                ].map((row) => (
                                     <tr
                                         key={row.feature}
                                         className="hover:bg-white/5 transition-colors"

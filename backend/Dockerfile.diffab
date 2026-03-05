@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ── LAYER 2: Heavy conda deps (changes rarely) ────────────────────
 # This is the 2 GB layer. As long as this line doesn't change, Docker
 # skips it entirely on every rebuild — no matter what else changed below.
-RUN conda install -y -c bioconda -c conda-forge \
+RUN conda config --set channel_priority flexible \
+    && conda install -y --no-update-deps -c bioconda -c conda-forge \
     anarci hmmer pdbfixer openmm "biopython<1.80" \
     && conda clean -afy \
     && find /opt/conda -name "*.pyc" -delete

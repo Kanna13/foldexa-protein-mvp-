@@ -7,15 +7,15 @@ const API_BASE =
 export interface Job {
   job_id: string;
   status:
-    | "created"
-    | "uploaded"
-    | "queued"
-    | "provisioning"
-    | "running"
-    | "post_processing"
-    | "completed"
-    | "failed"
-    | "cancelled";
+  | "created"
+  | "uploaded"
+  | "queued"
+  | "provisioning"
+  | "running"
+  | "post_processing"
+  | "completed"
+  | "failed"
+  | "cancelled";
   created_at: string;
   started_at?: string;
   finished_at?: string;
@@ -46,17 +46,23 @@ export interface JobResult {
 }
 
 export const api = {
-  /** Create a new job with a PDB file */
+  /** Create a new job with a PDB file or direct FormData (for advanced configs) */
   createJob: async (
-    file: File,
+    fileOrFormData: File | FormData,
     pipelineType: string = "diffab_rfdiffusion_af2",
     selectedModels: string = "",
   ): Promise<Job> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("pipeline_type", pipelineType);
-    if (selectedModels) {
-      formData.append("selected_models", selectedModels);
+    let formData: FormData;
+
+    if (fileOrFormData instanceof FormData) {
+      formData = fileOrFormData;
+    } else {
+      formData = new FormData();
+      formData.append("file", fileOrFormData);
+      formData.append("pipeline_type", pipelineType);
+      if (selectedModels) {
+        formData.append("selected_models", selectedModels);
+      }
     }
 
     const response = await axios.post(`${API_BASE}/api/v1/jobs/`, formData, {

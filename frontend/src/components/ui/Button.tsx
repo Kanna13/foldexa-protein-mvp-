@@ -4,10 +4,11 @@ import * as React from "react";
 import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends HTMLMotionProps<"button"> {
     variant?: "primary" | "secondary" | "glass" | "ghost";
     size?: "sm" | "md" | "lg";
     isLoading?: boolean;
+    children?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -28,7 +29,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         return (
             <motion.button
-                ref={ref as any}
+                ref={ref}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className={cn(
@@ -37,7 +38,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                     sizes[size],
                     className
                 )}
-                {...(props as any)} // Cast props to satisfy HTMLMotionProps (mostly compatible)
+                {...props}
             >
                 {isLoading && (
                     <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />

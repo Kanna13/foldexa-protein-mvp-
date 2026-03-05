@@ -4,12 +4,9 @@ import { Navbar } from "@/components/ui/Navbar";
 import { Button } from "@/components/ui/Button";
 import {
   Download,
-  Share2,
-  X,
-  ChevronRight,
-  FileText,
   Activity,
   Dna,
+  FileText
 } from "lucide-react";
 import { api, JobResult } from "@/lib/api";
 import { useState, useEffect, use } from "react";
@@ -221,7 +218,7 @@ export default function ResultsPage({
               <div>
                 <p className="text-xs text-neutral-400 mb-1">Duration</p>
                 <p className="text-4xl font-mono font-medium text-neutral-900">
-                  {formatTime((result as any).execution_time || 0)}
+                  {formatTime(result.execution_time)}
                 </p>
               </div>
             </div>

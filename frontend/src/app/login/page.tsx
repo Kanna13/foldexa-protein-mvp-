@@ -49,7 +49,7 @@ export default function LoginPage() {
                         </form>
 
                         <div className="mt-6 pt-6 border-t border-white/5 text-center text-sm text-neutral-500">
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <Link href="/beta-access" className="text-emerald-500 hover:text-emerald-400 font-medium inline-flex items-center gap-1 group">
                                 Request Access <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                             </Link>

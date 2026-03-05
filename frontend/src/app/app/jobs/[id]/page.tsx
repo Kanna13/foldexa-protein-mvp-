@@ -3,11 +3,11 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/ui/Navbar";
-import { Loader2, CheckCircle, ArrowRight, Quote, Clock, Activity, Calendar, Hourglass } from "lucide-react";
+import { Loader2, CheckCircle, ArrowRight, Clock, Activity, Hourglass } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { api } from "@/lib/api";
+import { api, Job } from "@/lib/api";
 
 const PIPELINE_STEPS = [
     { id: "diffab", label: "DiffAb", sub: "Antibody Design", duration: 330000 }, // ~5.5 min
@@ -34,12 +34,11 @@ const QUOTES = [
 
 export default function JobPage({ params }: { params: { id: string } }) {
     const [jobId, setJobId] = useState<string>("");
-    const [currentStep, setCurrentStep] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
     const [currentLog, setCurrentLog] = useState<string>("Initializing pipeline...");
 
     // Jobs Data
-    const [job, setJob] = useState<any>(null);
+    const [job, setJob] = useState<Job | null>(null);
     const [polling, setPolling] = useState(true);
     const redirectingRef = useRef(false);
 
@@ -54,7 +53,6 @@ export default function JobPage({ params }: { params: { id: string } }) {
 
     useEffect(() => {
         const unwrapParams = async () => {
-            // @ts-ignore
             const p = await params;
             setJobId(p.id);
         };
@@ -94,7 +92,6 @@ export default function JobPage({ params }: { params: { id: string } }) {
                 if (data.status === "completed") {
                     setIsComplete(true);
                     setPolling(false);
-                    setCurrentStep(3); // All done
                     setCurrentLog("Pipeline execution completed successfully. Redirecting to results...");
 
                     // Prevent double-redirect if effect re-runs after setPolling(false)
@@ -110,7 +107,6 @@ export default function JobPage({ params }: { params: { id: string } }) {
                     setCurrentLog(`Job failed: ${data.error_message || "Unknown error"}`);
                 } else if (data.status === "running") {
                     setCurrentLog("Executing pipeline models on GPU cluster...");
-                    setCurrentStep(1);
                 } else {
                     setCurrentLog(`Status: ${data.status.toUpperCase()}`);
                 }
@@ -129,7 +125,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
             isMounted = false;
             if (interval) clearInterval(interval);
         };
-    }, [jobId, polling]);
+    }, [jobId, polling, router]);
 
     const handleViewResults = () => {
         router.push(`/app/results/${jobId}`);
@@ -387,7 +383,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
                                     transition={{ duration: 0.4 }}
                                     className="text-center px-4"
                                 >
-                                    <p className="text-neutral-600 italic font-medium text-lg mb-2 leading-relaxed">"{QUOTES[quoteIndex].text}"</p>
+                                    <p className="text-neutral-600 italic font-medium text-lg mb-2 leading-relaxed">&quot;{QUOTES[quoteIndex].text}&quot;</p>
                                     <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">— {QUOTES[quoteIndex].author}</p>
                                 </motion.div>
                             </AnimatePresence>

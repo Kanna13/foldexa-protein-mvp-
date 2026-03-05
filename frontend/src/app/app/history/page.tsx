@@ -7,10 +7,8 @@ import { cn } from "@/lib/utils";
 import {
   Activity,
   Clock,
-  FileText,
   CheckCircle,
   XCircle,
-  PlayCircle,
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";

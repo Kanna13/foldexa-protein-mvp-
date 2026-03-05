@@ -29,7 +29,7 @@ import { StorySection } from "@/components/marketing/StorySection";
     <div className="w-24 h-px bg-neutral-200 mx-auto mb-8" />
 
     <p className="text-lg text-neutral-500 max-w-2xl mx-auto font-light leading-relaxed">
-      We believe that breakthrough discoveries shouldn't be limited by computational barriers. we built Foldexa to bridge the gap between biology and software.
+      We believe that breakthrough discoveries shouldn&apos;t be limited by computational barriers. we built Foldexa to bridge the gap between biology and software.
     </p>
   </div>
 </section>
@@ -367,7 +367,7 @@ export default function Home() {
                 desc: "Interactive 3D viewer with quality metrics",
                 detail: "Download PDB, sequences, and reports"
               },
-            ].map((item, idx) => (
+            ].map((item) => (
               <div
                 key={item.step}
                 className="group relative bg-white p-8 rounded-3xl border border-neutral-100 hover:border-emerald-500/50 hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] transition-all duration-300"
@@ -423,7 +423,7 @@ export default function Home() {
           <div className="w-16 h-px bg-neutral-200 mx-auto mb-8" />
 
           <p className="text-lg md:text-xl text-neutral-500 font-light max-w-2xl mx-auto">
-            We believe that breakthrough discoveries shouldn't be limited by computational barriers.
+            We believe that breakthrough discoveries shouldn&apos;t be limited by computational barriers.
           </p>
         </div>
       </section>
@@ -441,7 +441,7 @@ export default function Home() {
             Interested in partnering with us?
           </h2>
           <p className="text-lg text-neutral-400 max-w-xl mx-auto mb-10 font-light">
-            Whether you want to learn more or explore collaboration opportunities, we'd love to connect.
+            Whether you want to learn more or explore collaboration opportunities, we&apos;d love to connect.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">

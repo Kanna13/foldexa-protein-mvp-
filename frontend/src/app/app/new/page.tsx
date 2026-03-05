@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, CheckCircle, AlertCircle, X, ArrowRight, Activity, Zap, Layers, Clock, AlertTriangle } from "lucide-react";
+import { Upload, FileText, CheckCircle, Activity, Zap, Layers, Clock, AlertTriangle } from "lucide-react";
 import { Navbar } from "@/components/ui/Navbar";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
@@ -134,8 +134,8 @@ export default function UploadPage() {
                 }));
                 sessionStorage.setItem('foldexa_pdb_data', b64);
 
-                // Navigate to the standalone HTML model selection page
-                window.location.href = '/diffab_model_selection.html';
+                // Navigate to the DiffAb models page
+                router.push('/app/diffab-models');
             } catch (err) {
                 console.error('Failed to serialise file:', err);
                 alert('Could not prepare file for transfer. Please try again.');

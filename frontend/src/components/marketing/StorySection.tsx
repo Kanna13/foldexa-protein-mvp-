@@ -177,7 +177,7 @@ export function StorySection() {
                                     <div className="h-px w-full bg-neutral-800 mb-6" />
 
                                     <blockquote className="text-2xl font-medium text-neutral-300 leading-snug">
-                                        "{founder.quote}"
+                                        &quot;{founder.quote}&quot;
                                     </blockquote>
                                 </div>
 
@@ -284,7 +284,7 @@ export function StorySection() {
                                                     className="mt-12 pt-8 border-t border-neutral-800"
                                                 >
                                                     <p className="text-neutral-500 italic text-xl">
-                                                        "{founder.quote}"
+                                                        &quot;{founder.quote}&quot;
                                                     </p>
                                                 </motion.div>
                                             </div>
