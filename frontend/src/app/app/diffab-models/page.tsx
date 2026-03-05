@@ -260,7 +260,7 @@ log_level: "INFO"
             sessionStorage.removeItem('foldexa_pdb_data');
 
             setTimeout(() => {
-                router.push(`/app/jobs/${data.job_id}`);
+                router.push(`/app/analyzing/${data.job_id}`);
             }, 1000);
         } catch (error) {
             console.error(error);
@@ -327,15 +327,15 @@ log_level: "INFO"
                                         </div>
                                         <span className="text-[14px] font-black tracking-widest pl-2">Configure</span>
                                     </div>
-                                    <div className="w-16 h-px bg-neutral-200/60" />
+                                    <div className="w-12 h-px bg-neutral-200/60" />
                                     <div className="flex items-center gap-3 text-neutral-400">
                                         <div className="w-10 h-10 rounded-full border border-neutral-300 flex items-center justify-center text-[15px] font-mono">2</div>
-                                        <span className="text-[14px]">Results</span>
+                                        <span className="text-[14px]">Analyze</span>
                                     </div>
-                                    <div className="w-16 h-px bg-neutral-200/60" />
+                                    <div className="w-12 h-px bg-neutral-200/60" />
                                     <div className="flex items-center gap-3 text-neutral-400">
                                         <div className="w-10 h-10 rounded-full border border-neutral-300 flex items-center justify-center text-[15px] font-mono">3</div>
-                                        <span className="text-[14px]">Viewer</span>
+                                        <span className="text-[14px]">Result</span>
                                     </div>
                                 </div>
                             </div>
