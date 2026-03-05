@@ -141,7 +141,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-4 py-1.5 text-emerald-400 text-xs font-mono uppercase tracking-[0.2em] opacity-90"
             >
               <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse" />
-              v1.0 Public Beta
+              v1.9.3 Public Beta
             </motion.div>
 
             <motion.h1
