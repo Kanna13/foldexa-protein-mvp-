@@ -3,6 +3,7 @@ Database models for the Foldexa platform.
 """
 from sqlalchemy import Column, String, Integer, Float, DateTime, Enum, JSON, ForeignKey, Text
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from datetime import datetime
 import enum
 from app.infrastructure.db.session import Base
@@ -32,9 +33,9 @@ class Job(Base):
     status = Column(Enum(JobStatus), default=JobStatus.CREATED, nullable=False, index=True)
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    started_at = Column(DateTime, nullable=True)
-    finished_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    started_at = Column(DateTime(timezone=True), nullable=True)
+    finished_at = Column(DateTime(timezone=True), nullable=True)
     
     # Configuration
     pipeline_type = Column(String, nullable=False)  # e.g., "diffab_rfdiffusion_af2"
@@ -71,7 +72,7 @@ class Artifact(Base):
     s3_key = Column(String, nullable=False)
     size_bytes = Column(Integer, nullable=True)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
     # Relationships
     job = relationship("Job", back_populates="artifacts")
@@ -87,7 +88,7 @@ class Metric(Base):
     metric_name = Column(String, nullable=False)  # "plddt", "ddg", "ipae"
     metric_value = Column(Float, nullable=False)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
     # Relationships
     job = relationship("Job", back_populates="metrics")

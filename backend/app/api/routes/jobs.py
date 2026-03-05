@@ -2,7 +2,7 @@ from fastapi import APIRouter, BackgroundTasks, UploadFile, File, Depends, HTTPE
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Annotated, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import logging
 
@@ -75,7 +75,7 @@ async def _process_job_background(
                 job = await JobService.get_job(db, job_id)
                 if job:
                     job.status = JobStatus.FAILED
-                    job.finished_at = datetime.utcnow()
+                    job.finished_at = datetime.now(timezone.utc)
                     job.error_message = "Input PDB is not a valid antibody Fv structure. DiffAb requires VH/VL domains."
                     await db.flush()
                     await db.commit()
@@ -121,6 +121,12 @@ async def _process_job_background(
                 job = await JobService.get_job(db, job_id)
                 if not job:
                     raise RuntimeError(f"Job {job_id} disappeared from DB after upload!")
+                
+                # Hidden Bug 1 & 2: Terminal check & RunPod ID assignment
+                if job.status in {JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED}:
+                    logger.info(f"Job {job_id} reached terminal state ({job.status}) during dispatch. Skipping QUEUED update.")
+                    return
+
                 job.runpod_job_id = runpod_job_id
                 job.status = JobStatus.QUEUED
                 await db.flush()
@@ -139,7 +145,7 @@ async def _process_job_background(
                 if job:
                     job.status = JobStatus.FAILED
                     job.error_message = str(runpod_err)
-                    job.finished_at = datetime.utcnow()
+                    job.finished_at = datetime.now(timezone.utc)
                     await db.flush()
                     await db.commit()
                 return
