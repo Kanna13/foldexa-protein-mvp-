@@ -3,6 +3,7 @@ import uuid
 import logging
 import asyncio
 import shutil
+import urllib3
 from pathlib import Path
 
 import runpod
@@ -66,11 +67,20 @@ logger = logging.getLogger("foldexa-worker")
 
 def get_minio_client():
 
+    # Create an HTTP client that bypasses SSL verification for self-signed certs
+    # This matches our backend fix for the same database/storage SSL issue.
+    # Note: Use this only for trusted internal endpoints.
+    http_client = urllib3.PoolManager(
+        cert_reqs='CERT_NONE',
+        assert_hostname=False
+    )
+
     client = Minio(
         MINIO_ENDPOINT,
         access_key=MINIO_ACCESS_KEY,
         secret_key=MINIO_SECRET_KEY,
-        secure=MINIO_SECURE
+        secure=MINIO_SECURE,
+        http_client=http_client
     )
 
     if not client.bucket_exists(MINIO_BUCKET):
@@ -253,10 +263,9 @@ async def handler(event):
             "status": "COMPLETED",
             "output": {
                 "job_id": job_id,
-                "result_s3_key": output_s3_key,
                 "output_s3_key": output_s3_key,
-                "model_name": model_name,
-            },
+                "model_name": model_name
+            }
         }
 
     except Exception as e:
@@ -266,7 +275,7 @@ async def handler(event):
         # Let the backend and/or RunPod know this is a hard failure.
         return {
             "status": "FAILED",
-            "error": str(e),
+            "error": str(e)
         }
 
     finally:
