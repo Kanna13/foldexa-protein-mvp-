@@ -278,16 +278,19 @@ async def get_job_status(
         and not job.finished_at
     )
 
-    # 30-minute hard timeout
+    # 30-minute hard timeout — use timezone-aware datetime to compare with DB timestamps
     if needs_poll and job.created_at:
-        age_minutes = (datetime.utcnow() - job.created_at).total_seconds() / 60
+        now_utc = datetime.now(timezone.utc)
+        # Ensure comparison is timezone-aware on both sides
+        created_tz = job.created_at if job.created_at.tzinfo else job.created_at.replace(tzinfo=timezone.utc)
+        age_minutes = (now_utc - created_tz).total_seconds() / 60
         if age_minutes > 30:
             logger.error(
                 f"Job {job_id} exceeded 30-minute timeout (age={age_minutes:.1f}m). "
                 "Marking FAILED."
             )
             job.status = JobStatus.FAILED
-            job.finished_at = datetime.utcnow()
+            job.finished_at = datetime.now(timezone.utc)
             job.error_message = "Job timed out after 30 minutes."
             await db.flush()
             await db.commit()
@@ -349,11 +352,11 @@ async def get_job_status(
                 )
 
                 job.status = JobStatus.COMPLETED
-                job.finished_at = datetime.utcnow()
+                job.finished_at = datetime.now(timezone.utc)
                 job.output_s3_key = output_s3_key
                 job.execution_time = (execution_ms / 1000.0) if execution_ms else None
                 if not job.started_at:
-                    job.started_at = datetime.utcnow()
+                    job.started_at = datetime.now(timezone.utc)
 
                 await db.flush()
                 await db.commit()
@@ -369,7 +372,7 @@ async def get_job_status(
                 logger.error(f"[FAILED] job={job_id} | error={error_msg}")
 
                 job.status = JobStatus.FAILED
-                job.finished_at = datetime.utcnow()
+                job.finished_at = datetime.now(timezone.utc)
                 job.error_message = str(error_msg)
 
                 await db.flush()
@@ -381,13 +384,25 @@ async def get_job_status(
                 if job.status != JobStatus.RUNNING:
                     job.status = JobStatus.RUNNING
                 if not job.started_at:
-                    job.started_at = datetime.utcnow()
+                    job.started_at = datetime.now(timezone.utc)
                 await db.flush()
                 await db.commit()
                 await db.refresh(job)
 
+            elif rp_status == "CANCELLED":
+                # RunPod cancelled the job (e.g., worker was killed manually or from the UI).
+                # Mark as FAILED in our DB so the UI doesn't leave the user stuck in 'running'.
+                logger.warning(f"[CANCELLED] job={job_id} | RunPod job was cancelled. Marking FAILED.")
+                job.status = JobStatus.FAILED
+                job.finished_at = datetime.now(timezone.utc)
+                job.error_message = "RunPod job was cancelled (manually or by the system)."
+                await db.flush()
+                await db.commit()
+                await db.refresh(job)
+
+
             else:
-                # UNKNOWN, CANCELLED, etc.
+                # Truly unknown status — log it but don't fail the job, wait for next poll
                 logger.warning(
                     f"[UNKNOWN STATUS] job={job_id} | rp_status={rp_status} "
                     f"| full_data={runpod_data}"
