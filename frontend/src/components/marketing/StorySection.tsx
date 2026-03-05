@@ -10,7 +10,7 @@ import Link from "next/link";
 const FOUNDERS = [
     {
         id: "azamat",
-        name: "Azamat",
+        name: "Azamat Armanuly",
         role: "Bioengineer — KAIST",
         quote: "Understanding life at molecular level",
         bio: [

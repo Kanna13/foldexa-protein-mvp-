@@ -209,7 +209,7 @@ export default function Home() {
             >
               <h2 className="text-5xl font-bold tracking-tight leading-tight">From the Lab<br />to the Clone.</h2>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Foldexa was created by four enthusiasts: <strong className="text-black">Azamat, Kanat, Issabek, and Rauan</strong> — with a vision to democratize protein science.
+                Foldexa was created by four enthusiasts: <strong className="text-black">Azamat Armanuly, Kanat, Issabek, and Rauan</strong> — with a vision to democratize protein science.
               </p>
               <p className="text-lg text-gray-500 leading-relaxed">
                 We combine state-of-the-art diffusion models (DiffAb, RFdiffusion) with AlphaFold2 to create a seamless pipeline for de novo protein design.
@@ -241,6 +241,11 @@ export default function Home() {
                     name: "AlphaFold2",
                     desc: "Structure Validation",
                     color: "bg-amber-500",
+                  },
+                  {
+                    name: "ProteinMPNN",
+                    desc: "Sequence Design",
+                    color: "bg-indigo-500",
                   },
                 ].map((model) => (
                   <div
