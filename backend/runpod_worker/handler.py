@@ -136,7 +136,7 @@ def ensure_directories():
 
 # ---------------- SUBPROCESS ----------------
 
-async def run_subprocess(cmd, timeout=3600):
+def run_subprocess(cmd, timeout=3600):
 
     logger.info("Running command:")
     logger.info(" ".join(str(c) for c in cmd))
