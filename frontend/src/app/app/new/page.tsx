@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, CheckCircle, Activity, Zap, Layers, Clock, AlertTriangle, ArrowRight } from "lucide-react";
+import { Upload, FileText, CheckCircle, Activity, Zap, Layers, Clock, AlertTriangle } from "lucide-react";
 import { Navbar } from "@/components/ui/Navbar";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,9 @@ type PipelineModel = {
     description: string;
     timeEstimate: number; // in minutes
     icon: React.ElementType<{ className?: string }>;
-    accentClass: string;
+    color: string;
+    bg: string;
+    accent: string;
 };
 
 const MODELS: PipelineModel[] = [
@@ -25,7 +27,9 @@ const MODELS: PipelineModel[] = [
         description: "Antibody CDR loop design via diffusion. Generates high-fidelity backbones.",
         timeEstimate: 12,
         icon: Zap,
-        accentClass: "text-emerald-500",
+        color: "text-blue-600",
+        bg: "bg-blue-50",
+        accent: "border-blue-500 ring-blue-500",
     },
     {
         id: "rfdiffusion",
@@ -33,7 +37,9 @@ const MODELS: PipelineModel[] = [
         description: "Scaffold generation. Fine-tunes structure for functional motifs.",
         timeEstimate: 45,
         icon: Activity,
-        accentClass: "text-blue-500",
+        color: "text-purple-600",
+        bg: "bg-purple-50",
+        accent: "border-purple-500 ring-purple-500",
     },
     {
         id: "alphafold2",
@@ -41,7 +47,9 @@ const MODELS: PipelineModel[] = [
         description: "Structure validation & pLDDT scoring. Ensures physical viability.",
         timeEstimate: 30,
         icon: Layers,
-        accentClass: "text-purple-500",
+        color: "text-orange-600",
+        bg: "bg-orange-50",
+        accent: "border-orange-500 ring-orange-500",
     },
 ];
 
@@ -85,13 +93,6 @@ export default function UploadPage() {
             return;
         }
         setFile(file);
-    };
-
-    const loadSampleStructure = () => {
-        // Create a fake file for demonstration
-        const sampleContent = "HEADER    SAMPLE STRUCTURE\\n";
-        const sampleFile = new File([sampleContent], "sample_antibody_6vxx.pdb", { type: "chemical/x-pdb" });
-        setFile(sampleFile);
     };
 
     const toggleModel = (id: string) => {
@@ -160,237 +161,193 @@ export default function UploadPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] text-neutral-900 font-sans relative overflow-x-hidden">
-            {/* Animated Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none select-none opacity-[0.4]">
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="min-h-screen bg-[#FDFDFD] text-neutral-900 font-sans">
+            {/* Black Navigation Bar */}
+            <Navbar variant="contrast" />
 
-                {/* Floating Orbs */}
-                <motion.div
-                    animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] min-w-[500px] min-h-[500px] rounded-full bg-emerald-100/50 blur-[100px] mix-blend-multiply"
-                />
-                <motion.div
-                    animate={{ rotate: -360, scale: [1, 1.2, 1] }}
-                    transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-                    className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] min-w-[600px] min-h-[600px] rounded-full bg-blue-50/50 blur-[120px] mix-blend-multiply"
-                />
-            </div>
+            <main className="max-w-7xl mx-auto px-6 pt-32 pb-20 grid lg:grid-cols-2 gap-16 items-start min-h-[80vh]">
 
-            <Navbar variant="white" className="bg-transparent border-none z-50" />
-
-            <main className="relative z-10 max-w-[1100px] mx-auto px-6 pt-32 pb-24 flex flex-col items-center">
-
-                {/* Hero Section */}
-                <div className="text-center max-w-2xl mb-16 space-y-6">
-                    {/* Minimal Molecular Visual */}
-                    <div className="mx-auto w-24 h-24 relative mb-10 flex items-center justify-center">
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-0 border border-neutral-300 rounded-full border-dashed opacity-50"
-                        />
-                        <motion.div
-                            animate={{ rotate: -360 }}
-                            transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-3 border border-neutral-200 rounded-full opacity-60"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center z-10">
-                            <div className="w-10 h-10 bg-white border border-neutral-200 shadow-sm rounded-full flex items-center justify-center text-neutral-800">
-                                <Activity className="w-5 h-5" />
-                            </div>
+                {/* Left: Upload Area */}
+                <div className="space-y-8 z-10 lg:sticky lg:top-32">
+                    <div className="space-y-4">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-200 bg-white text-emerald-600 text-xs font-mono uppercase tracking-widest shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                            Advanced Pipeline
                         </div>
-                        {/* Orbiting Particles */}
-                        <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="absolute inset-0 origin-center">
-                            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
-                        </motion.div>
-                        <motion.div animate={{ rotate: -360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="absolute inset-3 origin-center">
-                            <div className="absolute bottom-[-2px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-blue-400 rounded-full shadow-[0_0_6px_rgba(96,165,250,0.5)]" />
-                        </motion.div>
+                        <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-neutral-900">Start Folding Job</h1>
+                        <p className="text-neutral-500 text-lg max-w-md leading-relaxed">
+                            Upload your PDB structure and configure our proprietary generative pipeline steps.
+                        </p>
                     </div>
 
-                    <h1 className="text-[40px] md:text-[52px] font-bold tracking-tight text-neutral-900 leading-[1.1]">
-                        Design the next generation of proteins
-                    </h1>
-                    <p className="text-[17px] text-neutral-500 leading-relaxed font-normal max-w-xl mx-auto">
-                        Upload a PDB structure and run our AI-powered diffusion models to generate high-fidelity protein designs.
-                    </p>
+                    <div className="bg-white rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-neutral-100 p-2 overflow-hidden">
+                        {/* Drag Zone */}
+                        <div
+                            onDragEnter={handleDrag}
+                            onDragLeave={handleDrag}
+                            onDragOver={handleDrag}
+                            onDrop={handleDrop}
+                            className={`
+                relative h-72 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-all duration-300
+                ${isDragging ? "border-emerald-500 bg-emerald-50/50 scale-[1.01]" : "border-neutral-200 hover:border-emerald-200 hover:bg-neutral-50"}
+              `}
+                        >
+                            <AnimatePresence mode="wait">
+                                {!file ? (
+                                    <motion.div
+                                        key="empty"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="text-center p-8"
+                                    >
+                                        <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-6">
+                                            <Upload className="w-8 h-8 text-neutral-400" />
+                                        </div>
+                                        <p className="text-lg font-medium mb-2 text-neutral-900">Drag & Drop PDB file</p>
+                                        <p className="text-sm text-neutral-400 mb-8">or click to browse local files</p>
+                                        <input
+                                            type="file"
+                                            accept=".pdb"
+                                            className="hidden"
+                                            id="file-upload"
+                                            onChange={handleFileSelect}
+                                        />
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            className="bg-white border border-neutral-200 shadow-sm hover:bg-neutral-50 text-neutral-700"
+                                            onClick={() => document.getElementById("file-upload")?.click()}
+                                        >
+                                            Browse Files
+                                        </Button>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="file"
+                                        initial={{ scale: 0.9, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        exit={{ scale: 0.9, opacity: 0 }}
+                                        className="flex flex-col items-center gap-4 w-full px-8"
+                                    >
+                                        <div className="relative">
+                                            <FileText className="w-16 h-16 text-emerald-500" />
+                                            <div className="absolute -top-2 -right-2 bg-emerald-100 rounded-full p-1 border-2 border-white">
+                                                <CheckCircle className="w-4 h-4 text-emerald-600" />
+                                            </div>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="font-mono text-lg font-medium text-neutral-900">{file.name}</p>
+                                            <p className="text-sm text-neutral-400">{(file.size / 1024).toFixed(2)} KB</p>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                            onClick={(e) => { e.stopPropagation(); setFile(null); }}
+                                        >
+                                            Remove File
+                                        </Button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Summary / Estimate */}
+                        <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-sm text-neutral-500">
+                                <Clock className="w-4 h-4" />
+                                <span>Estimated Runtime:</span>
+                            </div>
+                            <div className="font-mono font-medium text-neutral-900">
+                                {totalTime > 0 ? `~${totalTime} mins` : "--"}
+                            </div>
+                        </div>
+
+                        {/* Action Bar */}
+                        <div className="p-6">
+                            <Button
+                                variant="primary"
+                                disabled={!canSubmit || uploading}
+                                isLoading={uploading}
+                                onClick={handleUpload}
+                                className="w-full text-lg h-12 shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {uploading
+                                    ? (selectedModels.includes("diffab") && selectedModels.length === 1
+                                        ? "Preparing…"
+                                        : "Initializing Pipeline...")
+                                    : (selectedModels.includes("diffab") && selectedModels.length === 1
+                                        ? "Configure DiffAb →"
+                                        : "Run Pipeline")}
+                            </Button>
+                            {!canSubmit && (
+                                <p className="text-xs text-center text-red-500 mt-3 font-medium flex items-center justify-center gap-1">
+                                    <AlertTriangle className="w-3 h-3" />
+                                    Please upload a file and select at least one model.
+                                </p>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Main Action Area */}
-                <div className="w-full grid lg:grid-cols-12 gap-8 items-start">
+                {/* Right: Selectable Models */}
+                <div className="space-y-6 pt-8 lg:pt-0">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold text-neutral-900 flex items-center gap-2">
+                            <Layers className="w-5 h-5 text-emerald-500" />
+                            Select Pipeline Models
+                        </h2>
+                        <span className="text-xs font-mono text-neutral-400 uppercase tracking-widest">
+                            {selectedModels.length} Selected
+                        </span>
+                    </div>
 
-                    {/* Left: Upload Dropzone */}
-                    <div className="lg:col-span-7 flex flex-col items-center w-full">
-                        <div className="w-full bg-white/70 backdrop-blur-xl rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.03)] border border-neutral-200/60 p-2 overflow-hidden hover:shadow-[0_4px_40px_rgba(0,0,0,0.05)] transition-shadow">
-                            <div
-                                onDragEnter={handleDrag}
-                                onDragLeave={handleDrag}
-                                onDragOver={handleDrag}
-                                onDrop={handleDrop}
+                    {MODELS.map((model, index) => {
+                        const isSelected = selectedModels.includes(model.id);
+                        return (
+                            <motion.div
+                                key={model.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 * (index + 1) }}
+                                onClick={() => toggleModel(model.id)}
                                 className={cn(
-                                    "relative h-72 rounded-[18px] border-2 border-dashed flex flex-col items-center justify-center transition-all duration-300",
-                                    isDragging ? "border-emerald-500 bg-emerald-50/30 scale-[0.99]" : "border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50/50"
+                                    "group relative rounded-2xl p-6 shadow-sm border cursor-pointer transition-all duration-300 overflow-hidden",
+                                    isSelected && "bg-white shadow-md ring-2",
+                                    isSelected && model.accent,
+                                    !isSelected && "bg-white border-neutral-100 opacity-60 hover:opacity-100 hover:shadow-md"
                                 )}
                             >
-                                <AnimatePresence mode="wait">
-                                    {!file ? (
-                                        <motion.div
-                                            key="empty"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="text-center p-8 w-full"
-                                        >
-                                            <div className="w-14 h-14 rounded-[14px] bg-white border border-neutral-100 shadow-sm flex items-center justify-center mx-auto mb-6 transition-transform group-hover:scale-105">
-                                                <Upload className="w-6 h-6 text-neutral-600" />
-                                            </div>
-                                            <p className="text-[16px] font-medium mb-1.5 text-neutral-900">Drag & drop your PDB file</p>
-                                            <p className="text-[13px] text-neutral-400 mb-8 font-normal">or <span className="text-neutral-600 underline cursor-pointer" onClick={() => document.getElementById("file-upload")?.click()}>browse your computer</span></p>
-                                            <input
-                                                type="file"
-                                                accept=".pdb"
-                                                className="hidden"
-                                                id="file-upload"
-                                                onChange={handleFileSelect}
-                                            />
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div
-                                            key="file"
-                                            initial={{ scale: 0.95, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            exit={{ scale: 0.95, opacity: 0 }}
-                                            className="flex flex-col items-center gap-5 w-full px-8"
-                                        >
-                                            <div className="relative">
-                                                <div className="w-16 h-16 bg-white border border-neutral-100 shadow-sm rounded-[16px] flex items-center justify-center">
-                                                    <FileText className="w-7 h-7 text-neutral-800" />
-                                                </div>
-                                                <div className="absolute -top-2 -right-2 bg-emerald-500 rounded-full p-0.5 border-2 border-white shadow-sm">
-                                                    <CheckCircle className="w-3.5 h-3.5 text-white" />
-                                                </div>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="font-mono text-[14px] font-semibold text-neutral-800 tracking-tight">{file.name}</p>
-                                                <p className="text-[12px] text-neutral-400 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
-                                            </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-neutral-500 hover:text-red-500 hover:bg-neutral-100 text-[12px] h-8 mt-2"
-                                                onClick={(e) => { e.stopPropagation(); setFile(null); }}
-                                            >
-                                                Choose another file
-                                            </Button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
+                                {/* Selection Indicator */}
+                                <div className={cn(
+                                    "absolute top-6 right-6 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                                    isSelected
+                                        ? "bg-emerald-500 border-emerald-500 scale-100"
+                                        : "border-neutral-200 bg-transparent scale-90"
+                                )}>
+                                    {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
+                                </div>
 
-                            {/* Compute Config UI (Only fully visible when file exists to keep empty state minimal) */}
-                            {file && (
-                                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-2 border-t border-neutral-100 px-6 py-5">
-                                    <Button
-                                        variant="primary"
-                                        disabled={!canSubmit || uploading}
-                                        isLoading={uploading}
-                                        onClick={handleUpload}
-                                        className="w-full text-[15px] font-medium h-12 rounded-[12px] shadow-sm tracking-wide"
-                                    >
-                                        {uploading
-                                            ? (selectedModels.includes("diffab") && selectedModels.length === 1
-                                                ? "Preparing…"
-                                                : "Initializing Pipeline...")
-                                            : (selectedModels.includes("diffab") && selectedModels.length === 1
-                                                ? "Configure pipeline →"
-                                                : "Run selected pipelines")}
-                                    </Button>
-                                    {!canSubmit && (
-                                        <div className="flex items-center justify-center gap-1.5 mt-3 text-[12px] text-red-500 font-medium bg-red-50/50 py-1.5 rounded-md">
-                                            <AlertTriangle className="w-3.5 h-3.5" />
-                                            <span>Please select at least one AI model</span>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            )}
-                        </div>
-
-                        {/* Hint Section */}
-                        <AnimatePresence>
-                            {!file && (
-                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-6 text-center">
-                                    <button
-                                        onClick={loadSampleStructure}
-                                        className="group inline-flex items-center gap-1.5 text-[13px] font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
-                                    >
-                                        Try a sample structure
-                                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                                    </button>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Right: Pipeline Cards */}
-                    <div className="lg:col-span-5 flex flex-col space-y-3">
-                        {MODELS.map((model, index) => {
-                            const isSelected = selectedModels.includes(model.id);
-                            return (
-                                <motion.div
-                                    key={model.id}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.1 * (index + 1), duration: 0.4 }}
-                                    onClick={() => toggleModel(model.id)}
-                                    className={cn(
-                                        "group relative flex items-start gap-4 rounded-[16px] p-5 cursor-pointer transition-all duration-300 border bg-white/50 backdrop-blur-md",
-                                        isSelected ? "border-neutral-900 shadow-sm ring-1 ring-neutral-900 bg-white" : "border-neutral-200/60 hover:border-neutral-300 hover:bg-white"
-                                    )}
-                                >
-                                    {/* Icon */}
-                                    <div className={cn(
-                                        "w-10 h-10 shrink-0 rounded-[10px] flex items-center justify-center border transition-colors",
-                                        isSelected ? "bg-neutral-900 border-neutral-900" : "bg-white border-neutral-100 group-hover:bg-neutral-50"
-                                    )}>
-                                        <model.icon className={cn("w-4 h-4", isSelected ? "text-white" : "text-neutral-500")} />
+                                <div className="relative z-10 pr-12">
+                                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-colors", model.bg)}>
+                                        <model.icon className={cn("w-5 h-5", model.color)} />
                                     </div>
-
-                                    <div className="flex-1 pr-6">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="text-[15px] font-semibold text-neutral-900 tracking-tight">{model.name}</h3>
-                                        </div>
-                                        <p className="text-[13px] text-neutral-500 leading-relaxed mb-3">
-                                            {model.description}
-                                        </p>
-                                        <div className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-400 bg-neutral-100/50 w-fit px-2 py-0.5 rounded-md">
-                                            <Clock className="w-3 h-3" />
-                                            ~{model.timeEstimate}m
-                                        </div>
+                                    <h3 className="text-lg font-bold text-neutral-900 mb-2 flex items-center gap-2">
+                                        {model.name}
+                                        {isSelected && <span className="text-xs font-normal text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Active</span>}
+                                    </h3>
+                                    <p className="text-neutral-500 text-sm leading-relaxed mb-4">
+                                        {model.description}
+                                    </p>
+                                    <div className="flex items-center gap-1 text-xs font-mono text-neutral-400">
+                                        <Clock className="w-3 h-3" />
+                                        +{model.timeEstimate} mins
                                     </div>
-
-                                    {/* Selection Toggle Visual */}
-                                    <div className="absolute top-5 right-5">
-                                        <div className={cn(
-                                            "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
-                                            isSelected ? "bg-neutral-900 border-neutral-900" : "bg-transparent border-neutral-300"
-                                        )}>
-                                            {isSelected && <CheckCircle className="w-3 h-3 text-white" />}
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-
-                        {/* Total runtime calculation */}
-                        {selectedModels.length > 0 && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-4 px-2 flex items-center justify-between text-[13px] font-medium text-neutral-500">
-                                <span>Estimated total runtime</span>
-                                <span className="text-neutral-900 font-mono">~{totalTime}m</span>
+                                </div>
                             </motion.div>
-                        )}
-                    </div>
+                        );
+                    })}
                 </div>
             </main>
         </div>
