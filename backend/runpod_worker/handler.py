@@ -324,10 +324,14 @@ async def handler(event):
 
 # ---------------- START ----------------
 
+def sync_handler(event):
+    """
+    Synchronous wrapper to safely execute the async handler.
+    RunPod serverless SDK can instantly crash if it incorrectly
+    handles async loop resolution depending on the installed version.
+    """
+    return asyncio.run(handler(event))
+
 if __name__ == "__main__":
-
-    logger.info("Starting Foldexa RunPod worker")
-
-    runpod.serverless.start(
-        {"handler": handler}
-    )
+    logger.info("Starting Foldexa RunPod worker...")
+    runpod.serverless.start({"handler": sync_handler})
