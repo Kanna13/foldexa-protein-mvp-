@@ -11,6 +11,7 @@ import {
 import { api, JobResult } from "@/lib/api";
 import { useState, useEffect, use } from "react";
 import { cn } from "@/lib/utils";
+import { OutputDemo } from "@/components/results/OutputDemo";
 
 import Link from "next/link";
 
@@ -25,9 +26,26 @@ export default function ResultsPage({
   const [activeTab, setActiveTab] = useState<
     "overview" | "sequence" | "measurements"
   >("overview");
+  const [demoElapsed, setDemoElapsed] = useState(0);
 
   // Unwrap params Promise (Next.js 15+)
   const { id: jobId } = use(params);
+
+  // 1-minute demo timer
+  useEffect(() => {
+    if (!loading && result) {
+      const interval = setInterval(() => {
+        setDemoElapsed((prev) => {
+          if (prev >= 60) {
+            clearInterval(interval);
+            return 60;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [loading, result]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,6 +94,11 @@ export default function ResultsPage({
     );
   }
 
+  // DEMO LOGIC: After 1 minute of viewing the page, show the new interactive Output html
+  if (demoElapsed >= 60) {
+    return <OutputDemo />;
+  }
+
   // Logic: Extract metrics and Artifacts
   const rank =
     result.metrics.find((m) => m.metric_name === "rank")?.metric_value || 1;
@@ -106,8 +129,8 @@ export default function ResultsPage({
     }
   };
 
-  const formatTime = (seconds?: number) => {
-    if (!seconds) return "--";
+  const formatTime = (seconds?: number | null) => {
+    if (seconds === undefined || seconds === null || isNaN(seconds)) return "--";
     if (seconds < 60) return `${Math.round(seconds)}s`;
     const mins = Math.floor(seconds / 60);
     const secs = Math.round(seconds % 60);
@@ -160,8 +183,11 @@ export default function ResultsPage({
             <h1 className="text-4xl font-bold tracking-tight text-neutral-900 mb-2">
               Protein Structure Analysis
             </h1>
-            <p className="text-neutral-500 text-lg">
-              Generated via Foldexa Pipeline
+            <p className="text-neutral-500 text-lg flex items-center gap-2">
+              <span>Generating Demo Benchmark Report...</span>
+              <span className="font-mono text-emerald-600 font-semibold bg-emerald-50 px-2 rounded">
+                00:{(60 - demoElapsed).toString().padStart(2, "0")}
+              </span>
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-3">
