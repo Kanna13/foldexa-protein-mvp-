@@ -176,7 +176,7 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
 
     return (
         <div className="min-h-screen bg-[#FDFDFD] text-neutral-900 flex flex-col font-sans overflow-x-hidden">
-            <Navbar variant="white" />
+            <Navbar variant="contrast" />
 
             {/* --- TOP: Premium Global Progress matching Results --- */}
             <div className="pt-28 pb-8 flex justify-center bg-transparent z-10 relative">
