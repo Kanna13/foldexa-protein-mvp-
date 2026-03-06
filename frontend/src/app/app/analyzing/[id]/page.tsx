@@ -20,12 +20,6 @@ import { cn } from "@/lib/utils";
 
 // --- CONFIG & CONSTANTS ---
 
-const PIPELINE_GLOBAL = [
-    { id: 1, label: "Configure", status: "completed" },
-    { id: 2, label: "Analyze", status: "active" },
-    { id: 3, label: "Result", status: "pending" },
-];
-
 const ANALYSIS_SUB_STAGES = [
     { id: "upload", label: "Upload", icon: Database },
     { id: "preprocessing", label: "Preprocessing", icon: Cpu },
@@ -184,32 +178,23 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
         <div className="min-h-screen bg-[#FDFDFD] text-neutral-900 flex flex-col font-sans overflow-x-hidden">
             <Navbar variant="white" />
 
-            {/* --- TOP: Minimal Global Progress matching /app/new --- */}
+            {/* --- TOP: Premium Global Progress matching Results --- */}
             <div className="pt-28 pb-8 flex justify-center bg-transparent z-10 relative">
-                <div className="flex items-center gap-8">
-                    {PIPELINE_GLOBAL.map((step, i) => (
-                        <div key={step.id} className="flex items-center gap-4">
-                            <div className={cn(
-                                "flex items-center justify-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all",
-                                step.status === "active" ? "bg-black text-white" :
-                                    step.status === "completed" ? "bg-neutral-100 text-neutral-500" :
-                                        "bg-white text-neutral-300"
-                            )}>
-                                <span className={cn(
-                                    "w-4 h-4 rounded-full flex items-center justify-center text-[9px]",
-                                    step.status === "active" ? "bg-white text-black" :
-                                        step.status === "completed" ? "bg-white text-neutral-500" :
-                                            "bg-neutral-100 text-neutral-300"
-                                )}>
-                                    {step.status === "completed" ? "✓" : step.id}
-                                </span>
-                                {step.label}
-                            </div>
-                            {i < PIPELINE_GLOBAL.length - 1 && (
-                                <div className="w-12 h-[2px] bg-neutral-100 rounded-full" />
-                            )}
-                        </div>
-                    ))}
+                <div className="flex items-center gap-8 text-[11px] font-black tracking-[0.1em] uppercase text-neutral-400">
+                    <div className="flex items-center gap-2 text-neutral-500 opacity-60">
+                        <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono font-bold border border-neutral-200">✓</div>
+                        <span>Configure</span>
+                    </div>
+                    <div className="w-8 h-px bg-neutral-200" />
+                    <div className="flex items-center gap-2 text-neutral-900">
+                        <div className="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center text-[11px] font-mono shadow-md shadow-neutral-900/10">2</div>
+                        <span className="tracking-widest font-black">Analyze</span>
+                    </div>
+                    <div className="w-8 h-px bg-neutral-200" />
+                    <div className="flex items-center gap-2 text-neutral-400 opacity-50">
+                        <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[11px] font-mono border border-neutral-200">3</div>
+                        <span>Result</span>
+                    </div>
                 </div>
             </div>
 
