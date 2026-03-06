@@ -111,53 +111,43 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
         return () => clearInterval(timer);
     }, []);
 
-    // Simulated Log/Progress progression while polling
-    useEffect(() => {
-        if (!job) return;
-
-        // Based on backend status, update logs and sub-stages
-        if (job.status === "queued" || job.status === "provisioning") {
-            setActiveSubStage(1); // Preprocessing
-            setStatusText("PREPARING STRUCTURE");
-            setLogs(prev => {
-                const newLogs = ["Resource allocated on execution cluster.", "Scaling container environment...", "Uploading structure to storage..."];
-                return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
-            });
-        }
-        else if (job.status === "running") {
-            setActiveSubStage(2); // Diffusion
-            setStatusText("DIFFUSION SAMPLING");
-            setLogs(prev => {
-                const newLogs = ["Loading model weights into VRAM...", "Diffusion step 1 initialized.", "Batch sampling started..."];
-                return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
-            });
-        }
-        else if (job.status === "completed") {
-            setActiveSubStage(4); // Finalizing
-            setStatusText("PROCESSING COMPLETE");
-            setLogs(prev => {
-                const newLogs = ["Validation metrics passed.", "Result artifact uploaded successfully.", "Synthesized PDB ready for download."];
-                return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
-            });
-        }
-    }, [job]);
-
     // Polling Logic
     useEffect(() => {
         if (!jobId) return;
-
-        let interval: NodeJS.Timeout;
 
         const poll = async () => {
             try {
                 const data = await api.getJob(jobId);
                 setJob(data);
 
-                if (data.status === "completed") {
+                // Inline logical assignments to avoid cascading render effects
+                if (data.status === "queued" || data.status === "provisioning") {
+                    setActiveSubStage(1);
+                    setStatusText("PREPARING STRUCTURE");
+                    setLogs(prev => {
+                        const newLogs = ["Resource allocated on execution cluster.", "Scaling container environment...", "Uploading structure to storage..."];
+                        return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
+                    });
+                }
+                else if (data.status === "running") {
+                    setActiveSubStage(2);
+                    setStatusText("DIFFUSION SAMPLING");
+                    setLogs(prev => {
+                        const newLogs = ["Loading model weights into VRAM...", "Diffusion step 1 initialized.", "Batch sampling started..."];
+                        return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
+                    });
+                }
+                else if (data.status === "completed") {
+                    setActiveSubStage(4);
+                    setStatusText("PROCESSING COMPLETE");
+                    setProgress(100);
+                    setLogs(prev => {
+                        const newLogs = ["Validation metrics passed.", "Result artifact uploaded successfully.", "Synthesized PDB ready for download."];
+                        return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
+                    });
                     setTimeout(() => router.push(`/app/results/${jobId}`), 2000);
-                    clearInterval(interval);
                 } else if (data.status === "failed") {
-                    clearInterval(interval);
+                    // Handled inside component
                 }
             } catch (err) {
                 console.error("Poll error:", err);
@@ -165,20 +155,23 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
         };
 
         poll();
-        interval = setInterval(poll, 4000);
-        return () => clearInterval(interval);
-    }, [jobId, router]);
+        const intervalId = setInterval(poll, 4000);
+
+        if (job?.status === "completed" || job?.status === "failed") {
+            clearInterval(intervalId);
+        }
+
+        return () => clearInterval(intervalId);
+    }, [jobId, router, job?.status]);
 
     // Smoother progress bar
     useEffect(() => {
-        if (job?.status === "completed") {
-            setProgress(100);
-            return;
-        }
+        if (job?.status === "completed") return;
 
         const target = activeSubStage * 25;
         const timer = setInterval(() => {
             setProgress(prev => {
+                if (prev >= 100) return 100;
                 if (prev < target) return prev + 0.5;
                 if (prev < 90) return prev + 0.1; // slow crawl near end
                 return prev;

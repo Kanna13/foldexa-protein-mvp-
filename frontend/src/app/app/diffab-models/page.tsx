@@ -8,7 +8,6 @@ import {
     Copy, Check, ArrowRight, Loader2, AlertCircle, FileCode
 } from "lucide-react";
 import { Navbar } from "@/components/ui/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";

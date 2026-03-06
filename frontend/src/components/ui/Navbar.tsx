@@ -18,9 +18,10 @@ const navLinks = [
 
 interface NavbarProps {
     variant?: "default" | "light" | "contrast" | "white";
+    className?: string;
 }
 
-export function Navbar({ variant = "default" }: NavbarProps) {
+export function Navbar({ variant = "default", className }: NavbarProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const pathname = usePathname();
@@ -58,7 +59,8 @@ export function Navbar({ variant = "default" }: NavbarProps) {
             className={cn(
                 "fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-3",
                 navBg,
-                borderClass
+                borderClass,
+                className
             )}
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-12">

@@ -218,7 +218,7 @@ export default function ResultsPage({
                 "pb-4 px-1 border-b-2 font-medium text-sm transition-all flex items-center gap-2 whitespace-nowrap",
                 activeTab === tab.id
                   ? "border-emerald-500 text-neutral-900"
-                  : "border-transparent text-neutral-500 hover:text-neutral-800 hover:border-neutral-200",
+                  : "border-transparent text-neutral-500 hover:text-neutral-800 hover:border-neutral-200"
               )}
             >
               <tab.icon
@@ -226,7 +226,7 @@ export default function ResultsPage({
                   "w-4 h-4",
                   activeTab === tab.id
                     ? "text-emerald-500"
-                    : "text-neutral-400",
+                    : "text-neutral-400"
                 )}
               />
               {tab.label}
