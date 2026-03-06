@@ -87,7 +87,7 @@ export function OutputDemo() {
         viewerRef.current.clear();
 
         if (curStyle === 'surface') {
-            try { viewerRef.current.removeAllSurfaces(); } catch (e) { /* ignore */ }
+            try { viewerRef.current.removeAllSurfaces(); } catch { /* ignore */ }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,7 +118,7 @@ export function OutputDemo() {
 
     const setStyle = (style: string) => {
         if (style !== 'surface' && curStyle === 'surface') {
-            try { viewerRef.current.removeAllSurfaces(); } catch (e) { /* ignore */ }
+            try { viewerRef.current.removeAllSurfaces(); } catch { /* ignore */ }
         }
         setCurStyle(style);
     };
