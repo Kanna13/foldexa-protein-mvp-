@@ -17,7 +17,7 @@ const navLinks = [
 ];
 
 interface NavbarProps {
-    variant?: "default" | "light" | "contrast";
+    variant?: "default" | "light" | "contrast" | "white";
 }
 
 export function Navbar({ variant = "default" }: NavbarProps) {
@@ -33,15 +33,18 @@ export function Navbar({ variant = "default" }: NavbarProps) {
 
     const isContrast = variant === "contrast";
     const isLight = variant === "light";
+    const isWhite = variant === "white";
 
-    const textColor = isContrast ? "text-white" : (isLight ? "text-neutral-900" : "text-white");
+    const textColor = isContrast ? "text-white" : (isLight || isWhite ? "text-neutral-900" : "text-white");
     // Premium typography: heavier weight, tighter tracking
-    const linkColor = isContrast ? "text-white/80 hover:text-white" : (isLight ? "text-neutral-600 hover:text-black" : "text-neutral-300 hover:text-white");
+    const linkColor = isContrast ? "text-white/80 hover:text-white" : (isLight || isWhite ? "text-neutral-600 hover:text-black" : "text-neutral-300 hover:text-white");
 
     let navBg = "bg-transparent";
     let borderClass = "";
 
-    if (isContrast) {
+    if (isWhite) {
+        navBg = "bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/80 border-b border-[#E5E5EA] shadow-sm";
+    } else if (isContrast) {
         navBg = "bg-[#0A0A0A] border-b border-white/5 shadow-sm";
     } else if (isScrolled) {
         navBg = isLight ? "bg-white/80 backdrop-blur-xl" : "bg-black/60 backdrop-blur-xl supports-[backdrop-filter]:bg-black/60";

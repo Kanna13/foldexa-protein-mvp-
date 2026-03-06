@@ -183,21 +183,21 @@ export default function JobPage({ params }: { params: { id: string } }) {
     if (!jobId) return null;
 
     return (
-        <div className="min-h-screen bg-[#FDFDFD] text-neutral-900 relative font-sans">
-            <Navbar variant="contrast" />
+        <div className="min-h-screen bg-[#FBFBFD] text-[#1D1D1F] relative font-sans antialiased selection:bg-[#0066CC] selection:text-white pb-20">
+            <Navbar variant="white" />
 
-            <main className="max-w-5xl mx-auto px-6 pt-32 pb-20 flex flex-col items-center justify-center min-h-[90vh]">
+            <main className="max-w-5xl mx-auto px-6 pt-32 flex flex-col items-center justify-center min-h-[90vh]">
 
                 {/* Header Section */}
-                <div className="text-center mb-12 space-y-3">
-                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-neutral-900 text-white text-sm font-mono font-bold tracking-widest mb-4 shadow-lg shadow-neutral-200">
-                        <Activity className="w-4 h-4 text-emerald-400" />
-                        JOB ID: {jobId}
+                <div className="text-center mb-16 space-y-4 pt-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#E5E5EA] shadow-sm text-[11px] font-semibold tracking-widest text-[#86868B] uppercase">
+                        <Activity className="w-3.5 h-3.5" />
+                        Job {jobId}
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
-                        {isComplete ? "Generation Complete" : "Folding Protein Structure"}
+                    <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#1D1D1F] pb-1">
+                        {isComplete ? "Generation Complete." : "Folding Protein Structure."}
                     </h1>
-                    <p className="text-neutral-500 max-w-lg mx-auto text-lg">
+                    <p className="text-[#86868B] max-w-lg mx-auto text-lg font-medium">
                         {isComplete
                             ? "Structure analysis finished. Design ready for review."
                             : "Running generative AI models on high-performance compute clusters."
@@ -210,46 +210,42 @@ export default function JobPage({ params }: { params: { id: string } }) {
                     {/* LEFT PANEL: Metrics Grid */}
                     <div className="lg:col-span-1 space-y-4">
                         {/* Metric Card: Time Elapsed */}
-                        <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="text-xs text-neutral-400 uppercase tracking-widest font-mono mb-1">Elapsed</p>
-                                <p className="text-2xl font-mono font-medium text-neutral-900">{formatDuration(elapsedSeconds)}</p>
+                        <div className="bg-white p-6 rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-center border border-[#F5F5F7]">
+                            <div className="flex items-center gap-2 mb-2 text-[#86868B]">
+                                <Clock className="w-4 h-4" />
+                                <p className="text-[11px] font-semibold uppercase tracking-wider">Elapsed Time</p>
                             </div>
-                            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-                                <Clock className="w-5 h-5 text-blue-500" />
-                            </div>
+                            <p className="text-3xl font-medium tracking-tight text-[#1D1D1F]">{formatDuration(elapsedSeconds)}</p>
                         </div>
 
                         {/* Metric Card: Remaining */}
-                        <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="text-xs text-neutral-400 uppercase tracking-widest font-mono mb-1">Est. Remaining</p>
-                                <p className="text-2xl font-mono font-medium text-neutral-900">{isComplete ? "0m 00s" : `~${formatDuration(remainingSeconds)}`}</p>
+                        <div className="bg-white p-6 rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-center border border-[#F5F5F7]">
+                            <div className="flex items-center gap-2 mb-2 text-[#86868B]">
+                                <Hourglass className="w-4 h-4" />
+                                <p className="text-[11px] font-semibold uppercase tracking-wider">Est. Remaining</p>
                             </div>
-                            <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
-                                <Hourglass className="w-5 h-5 text-purple-500" />
-                            </div>
+                            <p className="text-3xl font-medium tracking-tight text-[#1D1D1F]">{isComplete ? "0m 00s" : `~${formatDuration(remainingSeconds)}`}</p>
                         </div>
 
                         {/* Metric Card: Details */}
-                        <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-4">
+                        <div className="bg-white p-6 rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] space-y-5 border border-[#F5F5F7]">
                             <div className="flex justify-between items-center text-sm">
-                                <span className="text-neutral-400">Status</span>
-                                <span className={cn("font-medium px-2 py-0.5 rounded-full text-xs uppercase tracking-wider",
-                                    job?.status === "completed" ? "bg-emerald-100 text-emerald-700" :
-                                        job?.status === "failed" ? "bg-red-100 text-red-700" :
-                                            "bg-blue-100 text-blue-700"
+                                <span className="text-[#86868B] font-medium">Status</span>
+                                <span className={cn("font-semibold px-2.5 py-1 rounded-full text-[11px] uppercase tracking-wider",
+                                    job?.status === "completed" ? "bg-[#e8f5e9] text-[#1b5e20]" :
+                                        job?.status === "failed" ? "bg-[#ffebee] text-[#b71c1c]" :
+                                            "bg-[#e3f2fd] text-[#0d47a1]"
                                 )}>
                                     {job?.status || "LOADING..."}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
-                                <span className="text-neutral-400">Started At</span>
-                                <span className="font-mono text-neutral-900">{job?.started_at ? formatTime(parseUTC(job.started_at)) : (job?.created_at ? formatTime(parseUTC(job.created_at)) : "--")}</span>
+                                <span className="text-[#86868B] font-medium">Started</span>
+                                <span className="font-medium text-[#1D1D1F]">{job?.started_at ? formatTime(parseUTC(job.started_at)) : (job?.created_at ? formatTime(parseUTC(job.created_at)) : "--")}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
-                                <span className="text-neutral-400">{isComplete ? "Finished At" : "Current Time"}</span>
-                                <span className="font-mono text-neutral-900">
+                                <span className="text-[#86868B] font-medium">{isComplete ? "Finished" : "Current"}</span>
+                                <span className="font-medium text-[#1D1D1F]">
                                     {(isComplete || job?.status === "failed") && job?.finished_at
                                         ? formatTime(parseUTC(job.finished_at))
                                         : formatTime(currentTime)}
@@ -259,37 +255,37 @@ export default function JobPage({ params }: { params: { id: string } }) {
                     </div>
 
                     {/* RIGHT PANEL: Main Progress Card */}
-                    <div className="lg:col-span-2 w-full bg-white rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-neutral-100 p-8 md:p-10 relative overflow-hidden flex flex-col justify-between min-h-[400px]">
+                    <div className="lg:col-span-2 w-full bg-white rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.04)] border border-[#E5E5EA] p-8 md:p-12 relative overflow-hidden flex flex-col justify-between min-h-[460px]">
 
                         {isComplete ? (
                             // SUCCESS STATE
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                                 className="flex flex-col items-center justify-center h-full py-8 text-center"
                             >
-                                <div className="w-24 h-24 rounded-full bg-emerald-50 flex items-center justify-center mb-6 shadow-sm">
-                                    <CheckCircle className="w-12 h-12 text-emerald-500" />
+                                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6">
+                                    <CheckCircle className="w-14 h-14 text-[#1D1D1F]" strokeWidth={1.5} />
                                 </div>
-                                <h2 className="text-2xl font-bold text-neutral-900 mb-2">Job Successfully Completed</h2>
-                                <p className="text-neutral-500 mb-8 max-w-sm">All pipeline steps finished without errors. Proceed to view your results or download the outputs immediately.</p>
+                                <h2 className="text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-3">Generation Complete</h2>
+                                <p className="text-[#86868B] mb-10 max-w-sm text-lg leading-relaxed">All pipeline steps finished without errors. Proceed to view your results or download the outputs.</p>
 
                                 <div className="flex items-center gap-4">
                                     <Button
-                                        variant="ghost"
                                         size="lg"
                                         onClick={handleViewResults}
-                                        className="bg-emerald-50/80 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm hover:shadow-md transition-all px-8 text-lg h-14 rounded-full font-medium tracking-wide backdrop-blur-sm"
+                                        className="bg-[#1D1D1F] hover:bg-[#333336] text-white shadow-md transition-all px-8 text-lg h-[52px] rounded-full font-medium"
                                     >
                                         View Results <ArrowRight className="ml-2 w-5 h-5" />
                                     </Button>
 
                                     {job?.output_s3_key && (
                                         <Button
-                                            variant="secondary"
+                                            variant="outline"
                                             size="lg"
                                             onClick={handleDownload}
-                                            className="bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200 shadow-sm hover:shadow-md transition-all px-6 h-14 rounded-full font-medium"
+                                            className="bg-transparent hover:bg-[#F5F5F7] text-[#1D1D1F] border-[#D2D2D7] shadow-sm transition-all px-8 text-lg h-[52px] rounded-full font-medium"
                                         >
                                             Download
                                         </Button>
@@ -326,16 +322,16 @@ export default function JobPage({ params }: { params: { id: string } }) {
                                                 <div className="relative">
                                                     <motion.div
                                                         animate={{
-                                                            scale: status === "active" ? 1.1 : 1,
-                                                            borderColor: status === "active" || status === "completed" ? "#10b981" : "#e5e5e5"
+                                                            scale: status === "active" ? 1.05 : 1,
+                                                            borderColor: status === "active" || status === "completed" ? "#0066CC" : "#e5e5e5"
                                                         }}
                                                         className={cn(
-                                                            "w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors duration-500 bg-white z-10 relative",
-                                                            (status === "active" || status === "completed") && "border-emerald-500"
+                                                            "w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors duration-500 bg-white z-10 relative",
+                                                            (status === "active" || status === "completed") && "border-[#0066CC]"
                                                         )}
                                                     >
-                                                        {status === "completed" ? <CheckCircle className="w-4 h-4 text-emerald-500" /> :
-                                                            status === "active" ? <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" /> :
+                                                        {status === "completed" ? <CheckCircle className="w-4 h-4 text-[#0066CC]" /> :
+                                                            status === "active" ? <Loader2 className="w-4 h-4 text-[#0066CC] animate-spin" /> :
                                                                 <div className="w-2 h-2 rounded-full bg-neutral-200" />}
                                                     </motion.div>
                                                     {/* Vertical Line */}
@@ -344,14 +340,14 @@ export default function JobPage({ params }: { params: { id: string } }) {
 
                                                 {/* Text */}
                                                 <div>
-                                                    <p className={cn("font-semibold text-sm transition-colors", status === "pending" ? "text-neutral-300" : "text-neutral-900")}>{step.label}</p>
-                                                    <p className="text-xs text-neutral-400">{step.sub}</p>
+                                                    <p className={cn("font-medium text-base transition-colors tracking-tight", status === "pending" ? "text-neutral-400" : "text-[#1D1D1F]")}>{step.label}</p>
+                                                    <p className="text-sm text-[#86868B]">{step.sub}</p>
                                                 </div>
 
                                                 {/* Status Label (Right aligned) */}
                                                 <div className="ml-auto">
-                                                    {status === "active" && <span className="text-xs font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md animate-pulse">RUNNING</span>}
-                                                    {status === "completed" && <span className="text-xs font-mono text-neutral-400">DONE</span>}
+                                                    {status === "active" && <span className="text-[11px] font-semibold tracking-wider text-[#0066CC] uppercase bg-blue-50/50 px-2 py-0.5 rounded">Running</span>}
+                                                    {status === "completed" && <span className="text-[11px] font-semibold tracking-wider text-[#86868B] uppercase">Done</span>}
                                                 </div>
                                             </div>
                                         );
@@ -359,13 +355,13 @@ export default function JobPage({ params }: { params: { id: string } }) {
                                 </div>
 
                                 {/* Minimal Log */}
-                                <div className="bg-neutral-50 rounded-xl p-4 flex items-center gap-3 text-sm font-mono text-neutral-500 border border-neutral-100">
+                                <div className="bg-[#F5F5F7] rounded-xl px-4 py-3 border border-[#E5E5EA] flex items-center gap-3 text-sm font-medium text-[#1D1D1F]">
                                     {job?.status === "failed" ? (
-                                        <div className="w-2 h-2 rounded-full bg-red-500" />
+                                        <div className="w-2 h-2 rounded-full bg-[#FF3B30] shrink-0" />
                                     ) : (
-                                        <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+                                        <Loader2 className="w-4 h-4 animate-spin text-[#86868B] shrink-0" />
                                     )}
-                                    <span className={job?.status === "failed" ? "text-red-600 font-medium" : ""}>
+                                    <span className={job?.status === "failed" ? "text-[#FF3B30]" : "text-[#86868B]"}>
                                         {currentLog}
                                     </span>
                                 </div>
@@ -373,18 +369,18 @@ export default function JobPage({ params }: { params: { id: string } }) {
                         )}
 
                         {/* Fading Quotes Bottom */}
-                        <div className="mt-auto pt-10 border-t border-neutral-100/50 h-32 flex flex-col justify-end">
+                        <div className="mt-auto pt-10 h-32 flex flex-col justify-end">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={quoteIndex}
                                     initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -5 }}
-                                    transition={{ duration: 0.4 }}
+                                    transition={{ duration: 0.6, ease: "easeInOut" }}
                                     className="text-center px-4"
                                 >
-                                    <p className="text-neutral-600 italic font-medium text-lg mb-2 leading-relaxed">&quot;{QUOTES[quoteIndex].text}&quot;</p>
-                                    <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">— {QUOTES[quoteIndex].author}</p>
+                                    <p className="text-[#1D1D1F] text-lg font-medium tracking-tight mb-2 leading-relaxed">&quot;{QUOTES[quoteIndex].text}&quot;</p>
+                                    <p className="text-[11px] font-semibold text-[#86868B] tracking-widest uppercase">— {QUOTES[quoteIndex].author}</p>
                                 </motion.div>
                             </AnimatePresence>
                         </div>
