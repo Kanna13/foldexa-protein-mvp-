@@ -113,8 +113,6 @@ def main():
         "--tag",        "diffab_run",
         "--batch_size", "1",
     ]
-    if args.num_designs:
-        cmd += ["--num_samples", str(args.num_designs)]
 
     print(f"[Wrapper] Executing: {' '.join(cmd)}", flush=True)
 
