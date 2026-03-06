@@ -65,10 +65,16 @@ export default function ResultsPage({
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FDFDFD] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-neutral-500 font-mono text-sm">
-            Loading analysis...
+        <div className="text-center flex flex-col items-center">
+          <div className="relative w-16 h-16 mb-6">
+            <div className="absolute inset-0 rounded-full border-[3px] border-neutral-100" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-neutral-900 border-t-transparent animate-spin flex items-center justify-center" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-neutral-900 rounded-full animate-pulse" />
+            </div>
+          </div>
+          <p className="text-neutral-500 font-mono text-[11px] uppercase tracking-widest font-bold">
+            Compiling Analysis...
           </p>
         </div>
       </div>
@@ -151,57 +157,57 @@ export default function ResultsPage({
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 pt-32 pb-20">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12 border-b border-neutral-100 pb-8">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12 pb-8">
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-mono font-bold rounded uppercase tracking-wider">
+              <span className="px-3 py-1 bg-neutral-100 text-neutral-500 text-[10px] font-mono font-bold rounded-full uppercase tracking-[0.2em] border border-neutral-200">
                 {result.status}
               </span>
-              <span className="text-sm font-mono text-neutral-400">
+              <span className="text-[11px] font-mono font-bold tracking-widest text-neutral-400">
                 ID: {jobId.slice(0, 8)}
               </span>
             </div>
 
             {/* 3-Stage Pipeline Stepper */}
             <div className="mb-8 flex items-center gap-8 text-[11px] font-black tracking-[0.1em] uppercase text-neutral-400">
-              <div className="flex items-center gap-2 text-emerald-600">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[11px] font-mono">✓</div>
+              <div className="flex items-center gap-2 text-neutral-500 opacity-60">
+                <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono font-bold border border-neutral-200">✓</div>
                 <span>Configure</span>
               </div>
               <div className="w-8 h-px bg-neutral-200" />
-              <div className="flex items-center gap-2 text-emerald-600">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[11px] font-mono">✓</div>
+              <div className="flex items-center gap-2 text-neutral-500 opacity-60">
+                <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono font-bold border border-neutral-200">✓</div>
                 <span>Analyze</span>
               </div>
               <div className="w-8 h-px bg-neutral-200" />
               <div className="flex items-center gap-2 text-neutral-900">
-                <div className="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center text-[11px] font-mono">3</div>
-                <span>Result</span>
+                <div className="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center text-[11px] font-mono shadow-md shadow-neutral-900/10">3</div>
+                <span className="tracking-widest font-black">Result</span>
               </div>
             </div>
 
-            <h1 className="text-4xl font-bold tracking-tight text-neutral-900 mb-2">
+            <h1 className="text-4xl font-black tracking-tight text-neutral-900 mb-3">
               Protein Structure Analysis
             </h1>
-            <p className="text-neutral-500 text-lg flex items-center gap-2">
+            <p className="text-neutral-500 text-[14px] flex items-center gap-2 font-medium">
               <span>Generating Demo Benchmark Report...</span>
-              <span className="font-mono text-emerald-600 font-semibold bg-emerald-50 px-2 rounded">
+              <span className="font-mono text-neutral-900 font-bold bg-neutral-100 px-2.5 py-0.5 rounded-md border border-neutral-200">
                 00:{(60 - demoElapsed).toString().padStart(2, "0")}
               </span>
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 md:mt-20">
             <Button
               variant="secondary"
-              className="border-neutral-200 shadow-sm hover:bg-neutral-50 text-neutral-700"
+              className="border-neutral-200 shadow-sm hover:bg-neutral-50 text-neutral-700 h-11 px-5 rounded-2xl text-[13px] font-bold tracking-wide transition-all"
               onClick={handleDownload}
             >
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="w-4 h-4 mr-2 text-neutral-400" />
               Download Results
             </Button>
             <Button
               variant="primary"
-              className="shadow-lg shadow-emerald-500/20"
+              className="bg-neutral-900 text-white hover:bg-black h-11 px-6 rounded-2xl text-[13px] font-black tracking-wider shadow-[0_4px_14px_0_rgba(0,0,0,0.15)] transition-all"
             >
               Share Report
             </Button>
@@ -209,24 +215,24 @@ export default function ResultsPage({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-8 border-b border-neutral-100 mb-10 overflow-x-auto">
+        <div className="flex gap-8 border-b-2 border-neutral-100 mb-12 overflow-x-auto relative pb-px -mt-px pt-2">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "pb-4 px-1 border-b-2 font-medium text-sm transition-all flex items-center gap-2 whitespace-nowrap",
+                "pb-4 px-1 border-b-2 font-bold text-[13px] tracking-wide transition-all flex items-center gap-2.5 whitespace-nowrap relative z-10 -mb-[2px]",
                 activeTab === tab.id
-                  ? "border-emerald-500 text-neutral-900"
-                  : "border-transparent text-neutral-500 hover:text-neutral-800 hover:border-neutral-200"
+                  ? "border-neutral-900 text-neutral-900"
+                  : "border-transparent text-neutral-400 hover:text-neutral-700"
               )}
             >
               <tab.icon
                 className={cn(
                   "w-4 h-4",
                   activeTab === tab.id
-                    ? "text-emerald-500"
-                    : "text-neutral-400"
+                    ? "text-neutral-900"
+                    : "text-neutral-300"
                 )}
               />
               {tab.label}
@@ -234,35 +240,41 @@ export default function ResultsPage({
           ))}
         </div>
 
-        {/* Dashboard Grid - Centered Single Column Layout */}
-        <div className="max-w-4xl mx-auto space-y-8">
+        {/* Dashboard Grid - Centered Layout */}
+        <div className="max-w-4xl mx-auto space-y-6">
           {/* Key Metrics Card */}
-          <div className="bg-white rounded-2xl border border-neutral-100 p-8 shadow-sm">
-            <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest mb-6">
+          <div className="bg-white rounded-[24px] border border-neutral-200/80 p-8 shadow-[0_2px_24px_-8px_rgba(0,0,0,0.06)]">
+            <h3 className="text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-8">
               Key Metrics
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div>
-                <p className="text-xs text-neutral-400 mb-1">Mean pLDDT</p>
-                <p className="text-4xl font-mono font-medium text-neutral-900">
-                  {plddt.toFixed(1)}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-neutral-100">
+              <div className="pl-0">
+                <p className="text-[12px] font-bold text-neutral-400 mb-2">Mean pLDDT</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="text-4xl font-mono font-medium tracking-tight text-neutral-900">
+                    {plddt.toFixed(1)}
+                  </p>
+                  <span className="text-sm font-mono text-neutral-300">/ 100</span>
+                </div>
+              </div>
+              <div className="pl-8">
+                <p className="text-[12px] font-bold text-neutral-400 mb-2">Max pLDDT</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="text-4xl font-mono font-medium tracking-tight text-neutral-900 hover:text-emerald-500 transition-colors">
+                    {maxPlddt.toFixed(1)}
+                  </p>
+                  <span className="text-sm font-mono text-neutral-300">/ 100</span>
+                </div>
+              </div>
+              <div className="pl-8">
+                <p className="text-[12px] font-bold text-neutral-400 mb-2">Candidate Rank</p>
+                <p className="text-4xl font-mono font-medium tracking-tight text-neutral-900">
+                  <span className="text-neutral-300 text-2xl mr-1">#</span>{rank}
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-neutral-400 mb-1">Max pLDDT</p>
-                <p className="text-4xl font-mono font-medium text-emerald-600">
-                  {maxPlddt.toFixed(1)}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-neutral-400 mb-1">Rank</p>
-                <p className="text-4xl font-mono font-medium text-neutral-900">
-                  {rank}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-neutral-400 mb-1">Duration</p>
-                <p className="text-4xl font-mono font-medium text-neutral-900">
+              <div className="pl-8">
+                <p className="text-[12px] font-bold text-neutral-400 mb-2">Compute Duration</p>
+                <p className="text-3xl mt-1 font-mono font-medium tracking-tight text-neutral-900">
                   {formatTime(result.execution_time)}
                 </p>
               </div>
@@ -270,22 +282,25 @@ export default function ResultsPage({
           </div>
 
           {/* Detailed Stats */}
-          <div className="bg-white rounded-2xl border border-neutral-100 overflow-hidden shadow-sm">
-            <div className="px-6 py-4 border-b border-neutral-50 bg-neutral-50/50">
-              <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">
-                Quality Analysis
+          <div className="bg-white rounded-[24px] border border-neutral-200/80 overflow-hidden shadow-[0_2px_24px_-8px_rgba(0,0,0,0.06)]">
+            <div className="px-8 py-5 border-b border-neutral-100 bg-neutral-50/30">
+              <h3 className="text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                Quality Analysis Deep Dive
               </h3>
             </div>
-            <div className="divide-y divide-neutral-50">
+            <div className="divide-y divide-neutral-100">
               {result.metrics.map((metric, idx) => (
                 <div
                   key={idx}
-                  className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 transition-colors"
+                  className="flex justify-between items-center px-8 py-5 hover:bg-neutral-50/50 transition-colors cursor-default"
                 >
-                  <span className="text-sm text-neutral-600 capitalize">
-                    {metric.metric_name.replace(/_/g, " ")}
-                  </span>
-                  <span className="font-mono text-sm font-medium text-neutral-900">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-200" />
+                    <span className="text-[13px] font-bold text-neutral-600 tracking-wide capitalize">
+                      {metric.metric_name.replace(/_/g, " ")}
+                    </span>
+                  </div>
+                  <span className="font-mono text-[14px] font-medium tracking-tight text-neutral-900 bg-neutral-100/50 px-3 py-1 rounded-md border border-neutral-200/50">
                     {metric.metric_value.toFixed(3)}
                   </span>
                 </div>
