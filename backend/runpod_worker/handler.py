@@ -330,7 +330,15 @@ def sync_handler(event):
     RunPod serverless SDK can instantly crash if it incorrectly
     handles async loop resolution depending on the installed version.
     """
-    return asyncio.run(handler(event))
+    try:
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(handler(event))
+    except RuntimeError as e:
+        if "There is no current event loop" in str(e):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return loop.run_until_complete(handler(event))
+        raise
 
 if __name__ == "__main__":
     logger.info("Starting Foldexa RunPod worker...")
