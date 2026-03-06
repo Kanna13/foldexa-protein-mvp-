@@ -54,7 +54,14 @@ class RunPodRunner:
                 "job_id": job_id,
                 "model_name": model_name,
                 "input_s3_key": input_s3_key,
-                "params": params or {}
+                "params": params or {},
+                "s3_config": {
+                    "s3_endpoint": settings.s3_endpoint,
+                    "s3_access_key": settings.s3_access_key,
+                    "s3_secret_key": settings.s3_secret_key,
+                    "s3_bucket_name": settings.s3_bucket_name,
+                    "s3_use_ssl": settings.s3_use_ssl,
+                }
             },
             "policy": {
                 "executionTimeout": 3600000, # 60 minutes safety (in ms)

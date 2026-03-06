@@ -1,6 +1,6 @@
 FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
-# kanseu/foldexa-diffab:v1.10.2  — ssl.create_default_context() fix, handler diagnostics
-LABEL version="1.10.2" maintainer="foldexa"
+# kanseu/foldexa-diffab:v1.10.3  — Pass dynamic s3_config to handler
+LABEL version="1.10.3" maintainer="foldexa"
 
 WORKDIR /workspace
 

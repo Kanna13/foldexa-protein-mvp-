@@ -80,10 +80,23 @@ logger.info("===========================================")
 
 # ---------------- MINIO ----------------
 
-def get_minio_client():
+def get_minio_client(s3_config=None):
     try:
+        # Use provided config or fall back to defaults
+        endpoint = s3_config.get("s3_endpoint") if s3_config else MINIO_ENDPOINT
+        access_key = s3_config.get("s3_access_key") if s3_config else MINIO_ACCESS_KEY
+        secret_key = s3_config.get("s3_secret_key") if s3_config else MINIO_SECRET_KEY
+        bucket = s3_config.get("s3_bucket_name") if s3_config else MINIO_BUCKET
+        secure = s3_config.get("s3_use_ssl") if s3_config else MINIO_SECURE
+
+        # Strip prefixes if provided in dynamic config
+        if isinstance(endpoint, str):
+            if endpoint.startswith("http://"):
+                endpoint = endpoint[7:]
+            elif endpoint.startswith("https://"):
+                endpoint = endpoint[8:]
+
         # Build an SSL context that skips certificate verification.
-        # Required for self-signed or proxy certs on Railway/Supabase.
         ssl_ctx = ssl.create_default_context()
         ssl_ctx.check_hostname = False
         ssl_ctx.verify_mode = ssl.CERT_NONE
@@ -94,18 +107,18 @@ def get_minio_client():
         )
 
         client = Minio(
-            MINIO_ENDPOINT,
-            access_key=MINIO_ACCESS_KEY,
-            secret_key=MINIO_SECRET_KEY,
-            secure=MINIO_SECURE,
+            endpoint,
+            access_key=access_key,
+            secret_key=secret_key,
+            secure=secure,
             http_client=http_client
         )
 
-        if not client.bucket_exists(MINIO_BUCKET):
-            logger.info(f"Creating bucket {MINIO_BUCKET}")
-            client.make_bucket(MINIO_BUCKET)
+        if not client.bucket_exists(bucket):
+            logger.info(f"Creating bucket {bucket}")
+            client.make_bucket(bucket)
 
-        return client
+        return client, bucket
 
     except Exception as e:
         logger.error(f"CRITICAL: MinIO client failed to initialise: {e}")
@@ -197,6 +210,7 @@ async def handler(event):
 
     model_name = job_input.get("model_name")
     input_s3_key = job_input.get("input_s3_key")
+    s3_config = job_input.get("s3_config")
 
     if not model_name or not input_s3_key:
         logger.error("Missing model_name or input_s3_key in event payload")
@@ -207,7 +221,7 @@ async def handler(event):
 
     ensure_directories()
 
-    minio = get_minio_client()
+    minio, bucket_name = get_minio_client(s3_config)
 
     job_path = JOB_DIR / job_id
     job_path.mkdir(parents=True, exist_ok=True)
@@ -220,10 +234,10 @@ async def handler(event):
 
         # ---------- DOWNLOAD INPUT ----------
 
-        logger.info(f"Downloading {input_s3_key}")
+        logger.info(f"Downloading {input_s3_key} from {bucket_name}")
 
         minio.fget_object(
-            MINIO_BUCKET,
+            bucket_name,
             input_s3_key,
             str(input_file)
         )
@@ -272,7 +286,7 @@ async def handler(event):
         # ---------- UPLOAD RESULT ----------
 
         minio.fput_object(
-            MINIO_BUCKET,
+            bucket_name,
             output_s3_key,
             str(result_file)
         )
