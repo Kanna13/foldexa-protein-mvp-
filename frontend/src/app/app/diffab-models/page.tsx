@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-    Dna, Network, FlaskConical, Grid, Sparkles,
     Copy, Check, ArrowRight, Loader2, AlertCircle, FileCode
 } from "lucide-react";
 import { Navbar } from "@/components/ui/Navbar";
@@ -16,13 +15,9 @@ type DiffAbModel = {
     id: string;
     name: string;
     badge?: string;
-    badgeClass?: string;
     file: string;
     description: string;
-    tags: { label: string; colorClass: string; bgClass: string }[];
-    icon: React.ElementType;
-    iconBg: string;
-    iconColor: string;
+    tags: string[];
     disabled: boolean;
     pipelineType: string;
 };
@@ -32,17 +27,9 @@ const MODELS: DiffAbModel[] = [
         id: "codesign_single",
         name: "Single CDR Co-Design",
         badge: "DEFAULT",
-        badgeClass: "bg-emerald-500 text-white font-bold",
         file: "codesign_single.yml",
         description: "Co-designs the sequence and structure of one CDR on a fixed antibody scaffold using diffusion.",
-        tags: [
-            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
-            { label: "structure", colorClass: "text-sky-500", bgClass: "bg-sky-50" },
-            { label: "single CDR", colorClass: "text-amber-500", bgClass: "bg-amber-50" },
-        ],
-        icon: Dna,
-        iconBg: "bg-neutral-100",
-        iconColor: "text-neutral-900",
+        tags: ["sequence", "structure", "single CDR"],
         disabled: false,
         pipelineType: "diffab_only",
     },
@@ -50,17 +37,9 @@ const MODELS: DiffAbModel[] = [
         id: "codesign_multicdrs",
         name: "Multi-CDR Co-Design",
         badge: "SOON",
-        badgeClass: "bg-neutral-200 text-neutral-900 font-bold",
         file: "codesign_multicdrs.yml",
         description: "Simultaneously co-designs sequence and structure across all CDR loops at once.",
-        tags: [
-            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
-            { label: "structure", colorClass: "text-sky-500", bgClass: "bg-sky-50" },
-            { label: "multi-CDR", colorClass: "text-violet-500", bgClass: "bg-violet-50" },
-        ],
-        icon: Network,
-        iconBg: "bg-neutral-100",
-        iconColor: "text-neutral-900",
+        tags: ["sequence", "structure", "multi-CDR"],
         disabled: true,
         pipelineType: "diffab_only",
     },
@@ -68,16 +47,9 @@ const MODELS: DiffAbModel[] = [
         id: "abopt_singlecdr",
         name: "Single CDR Optimization",
         badge: "SOON",
-        badgeClass: "bg-neutral-200 text-neutral-900 font-bold",
         file: "abopt_singlecdr.yml",
         description: "Optimizes the sequence and structure of one CDR loop on an existing antibody.",
-        tags: [
-            { label: "optimize", colorClass: "text-rose-500", bgClass: "bg-rose-50" },
-            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
-        ],
-        icon: FlaskConical,
-        iconBg: "bg-neutral-100",
-        iconColor: "text-neutral-900",
+        tags: ["optimize", "sequence"],
         disabled: true,
         pipelineType: "diffab_only",
     },
@@ -85,16 +57,9 @@ const MODELS: DiffAbModel[] = [
         id: "fixedbb_design",
         name: "Fixed Backbone Design",
         badge: "SOON",
-        badgeClass: "bg-neutral-200 text-neutral-900 font-bold",
         file: "fixedbb_design.yml",
         description: "Designs sequences on a fixed backbone structure for precise binding control.",
-        tags: [
-            { label: "fixed-bb", colorClass: "text-indigo-500", bgClass: "bg-indigo-50" },
-            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
-        ],
-        icon: Grid,
-        iconBg: "bg-neutral-100",
-        iconColor: "text-neutral-900",
+        tags: ["fixed-bb", "sequence"],
         disabled: true,
         pipelineType: "diffab_only",
     },
@@ -102,17 +67,9 @@ const MODELS: DiffAbModel[] = [
         id: "denovo_design",
         name: "De Novo Full Design",
         badge: "SOON",
-        badgeClass: "bg-neutral-200 text-neutral-900 font-bold",
         file: "denovo_design.yml",
         description: "Full de novo antibody design from scratch — generates sequence and backbone simultaneously.",
-        tags: [
-            { label: "de novo", colorClass: "text-orange-500", bgClass: "bg-orange-50" },
-            { label: "sequence", colorClass: "text-emerald-500", bgClass: "bg-emerald-50" },
-            { label: "structure", colorClass: "text-sky-500", bgClass: "bg-sky-50" },
-        ],
-        icon: Sparkles,
-        iconBg: "bg-neutral-100",
-        iconColor: "text-neutral-900",
+        tags: ["de novo", "sequence", "structure"],
         disabled: true,
         pipelineType: "diffab_only",
     },
@@ -354,14 +311,14 @@ log_level: "INFO"
 
                         {/* Selection Section */}
                         <div className="mb-6 flex items-center justify-between">
-                            <span className="text-[13px] font-black tracking-[0.25em] uppercase text-neutral-900">Select Design Mode</span>
+                            <span className="text-[13px] font-black tracking-[0.2em] uppercase text-neutral-900">Select Design Mode</span>
                             <div className="h-px flex-1 mx-6 bg-neutral-200" />
-                            <span className="px-4 py-1.5 rounded-full bg-neutral-100 text-neutral-900 text-[11px] font-mono font-bold border border-neutral-200 shadow-sm leading-none">
+                            <span className="px-4 py-1.5 rounded-full bg-neutral-100/50 text-neutral-500 text-[11px] font-mono font-bold border border-neutral-200 shadow-sm leading-none">
                                 {currentModel.file}
                             </span>
                         </div>
 
-                        <div className="bg-neutral-100/70 border border-neutral-200/60 p-2.5 rounded-[20px] flex flex-col gap-2 mb-10 shadow-sm">
+                        <div className="flex flex-col gap-3 mb-10">
                             {MODELS.map((model) => {
                                 const isActive = selectedMode === model.id;
                                 return (
@@ -369,47 +326,50 @@ log_level: "INFO"
                                         key={model.id}
                                         onClick={() => setSelectedMode(model.id)}
                                         className={cn(
-                                            "relative p-4 rounded-xl flex items-start gap-4 transition-all duration-200 border-2 cursor-pointer",
+                                            "relative p-5 rounded-2xl flex items-start flex-col sm:flex-row transition-all duration-300 border cursor-pointer",
                                             isActive
-                                                ? "bg-white border-emerald-500 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.15)]"
-                                                : "bg-white border-transparent hover:border-neutral-200 hover:shadow-sm"
+                                                ? "bg-white border-neutral-900 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.12)] ring-1 ring-neutral-900"
+                                                : "bg-white border-neutral-200 hover:border-neutral-300 opacity-[0.65] hover:opacity-100"
                                         )}
                                     >
-                                        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5", model.iconBg)}>
-                                            <model.icon className={cn("w-5 h-5", model.iconColor)} />
-                                        </div>
-
-                                        <div className="flex-1 min-w-0 pr-6">
-                                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                <span className={cn("font-bold text-[15px]", model.disabled && !isActive ? "text-neutral-500" : "text-neutral-900")}>
-                                                    {model.name}
-                                                </span>
-                                                {model.badge && (
-                                                    <span className={cn("text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-[5px]", model.badgeClass)}>
-                                                        {model.badge}
+                                        <div className="flex-1 min-w-0 pr-8 w-full">
+                                            <div className="flex justify-between w-full">
+                                                <div className="flex items-center gap-3 mb-1.5 flex-wrap">
+                                                    <span className={cn("font-bold text-[16px] tracking-tight", isActive ? "text-neutral-900" : "text-neutral-700")}>
+                                                        {model.name}
                                                     </span>
-                                                )}
+                                                    {model.badge && (
+                                                        <span className={cn(
+                                                            "text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-[5px]",
+                                                            isActive && model.badge === "DEFAULT" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-500"
+                                                        )}>
+                                                            {model.badge}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className={cn(
+                                                    "w-5 h-5 rounded-full border flex items-center justify-center transition-all absolute right-5 top-5",
+                                                    isActive ? "bg-neutral-900 border-neutral-900" : "border-neutral-300 bg-neutral-50"
+                                                )}>
+                                                    {isActive && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                                                </div>
                                             </div>
-                                            <div className="font-mono text-[13px] text-neutral-900 mb-2">
+                                            <div className="font-mono text-[11px] text-neutral-400 font-bold mb-3 tracking-wide">
                                                 {model.file}
                                             </div>
-                                            <p className="text-neutral-900 text-[15px] font-medium leading-relaxed mb-3 pr-4">
+                                            <p className={cn(
+                                                "text-[14px] leading-relaxed mb-4 max-w-[95%]",
+                                                isActive ? "text-neutral-700 font-medium" : "text-neutral-500"
+                                            )}>
                                                 {model.description}
                                             </p>
-                                            <div className="flex flex-wrap gap-2.5">
-                                                {model.tags.map((t: { label: string, colorClass: string, bgClass: string }) => (
-                                                    <span key={t.label} className={cn("text-[12px] font-bold px-3 py-1 rounded-lg", t.colorClass, t.bgClass)}>
-                                                        {t.label}
+                                            <div className="flex flex-wrap gap-2">
+                                                {model.tags.map((t) => (
+                                                    <span key={t} className="text-[11px] font-bold px-3 py-1 rounded-[6px] bg-neutral-100/80 text-neutral-500 uppercase tracking-widest border border-neutral-200/50">
+                                                        {t}
                                                     </span>
                                                 ))}
                                             </div>
-                                        </div>
-
-                                        <div className={cn(
-                                            "absolute right-6 top-1/2 -translate-y-1/2 w-[24px] h-[24px] rounded-full border-2 flex items-center justify-center transition-all",
-                                            isActive ? "bg-emerald-500 border-emerald-500" : "border-neutral-400 bg-neutral-100"
-                                        )}>
-                                            {isActive && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
                                         </div>
                                     </motion.div>
                                 );
@@ -419,9 +379,10 @@ log_level: "INFO"
                         {/* Configuration Options */}
                         <div className="mb-6 flex items-center justify-between">
                             <span className="text-[13px] font-black tracking-[0.2em] uppercase text-neutral-900">02 — Run Parameters</span>
+                            <div className="h-px flex-1 ml-6 bg-neutral-200" />
                         </div>
 
-                        <div className="bg-neutral-100/70 border border-neutral-200/60 p-2.5 rounded-[20px] flex flex-col gap-2 mb-10 shadow-sm relative overflow-hidden">
+                        <div className="flex flex-col gap-3 mb-10 relative">
 
                             <AnimatePresence>
                                 {currentModel.disabled && (
@@ -429,47 +390,44 @@ log_level: "INFO"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="absolute inset-0 z-10 bg-white/60 backdrop-blur-md flex items-center justify-center rounded-[20px]"
+                                        className="absolute inset-0 z-20 bg-neutral-50/80 backdrop-blur-sm flex items-center justify-center rounded-2xl"
                                     >
-                                        <div className="bg-white px-6 py-5 rounded-2xl shadow-xl border border-neutral-200 flex flex-col items-center text-center max-w-sm mx-4">
-                                            <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
-                                                <Network className="w-8 h-8 text-neutral-900" />
-                                            </div>
-                                            <h3 className="text-[20px] font-bold text-neutral-900 mb-2">{currentModel.name}</h3>
-                                            <p className="text-[15px] text-neutral-900 font-medium leading-relaxed mb-1">
-                                                This design mode will be released in a future Foldexa update.
+                                        <div className="bg-white px-8 py-6 rounded-2xl shadow-lg border border-neutral-200 flex flex-col items-center text-center max-w-sm mx-4">
+                                            <h3 className="text-[18px] font-bold text-neutral-900 tracking-tight mb-2">{currentModel.name}</h3>
+                                            <p className="text-[14px] text-neutral-500 font-medium leading-relaxed">
+                                                This design mode will be natively integrated in a future Foldexa update.
                                             </p>
                                         </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
 
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="bg-white border border-neutral-100/80 p-4 rounded-xl flex items-center justify-between gap-4">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-white border border-neutral-200 p-5 rounded-2xl flex items-center justify-between gap-4 transition-all hover:border-neutral-300">
                                     <div>
-                                        <div className="text-[15px] font-bold text-neutral-900">Designs</div>
-                                        <div className="text-[13px] text-neutral-900 font-medium mt-0.5">Num. candidates</div>
+                                        <div className="text-[14px] font-bold text-neutral-900 tracking-tight">Designs</div>
+                                        <div className="text-[12px] text-neutral-500 font-medium mt-0.5">Num. candidates</div>
                                     </div>
                                     <input type="number"
-                                        className="w-[100px] bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-1.5 text-[15px] font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                        className="w-[80px] bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-1.5 text-[14px] font-mono focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 outline-none transition-all text-center font-bold text-neutral-900"
                                         value={numDesigns} min={1} max={500} onChange={e => setNumDesigns(parseInt(e.target.value) || 10)}
                                         disabled={currentModel.disabled}
                                     />
                                 </div>
 
-                                <div className="bg-white border border-neutral-100/80 p-4 rounded-xl flex items-center justify-between gap-4">
+                                <div className="bg-white border border-neutral-200 p-5 rounded-2xl flex items-center justify-between gap-4 transition-all hover:border-neutral-300">
                                     <div>
-                                        <div className="text-[15px] font-bold text-neutral-900">Temperature</div>
-                                        <div className="text-[13px] text-neutral-900 font-medium mt-0.5">Diversity control</div>
+                                        <div className="text-[14px] font-bold text-neutral-900 tracking-tight">Temperature</div>
+                                        <div className="text-[12px] text-neutral-500 font-medium mt-0.5">Diversity control</div>
                                     </div>
                                     <select
-                                        className="w-[110px] bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-1.5 text-[13px] font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all cursor-pointer"
+                                        className="w-[90px] bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-1.5 text-[14px] font-mono focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 outline-none transition-all cursor-pointer font-bold text-neutral-900"
                                         value={samplingTemp} onChange={e => setSamplingTemp(parseFloat(e.target.value))}
                                         disabled={currentModel.disabled}
                                     >
-                                        <option value={0.1}>0.1 - Low</option>
-                                        <option value={0.5}>0.5 - Med</option>
-                                        <option value={1.0}>1.0 - High</option>
+                                        <option value={0.1}>0.1</option>
+                                        <option value={0.5}>0.5</option>
+                                        <option value={1.0}>1.0</option>
                                     </select>
                                 </div>
                             </div>
@@ -477,21 +435,21 @@ log_level: "INFO"
                             {[
                                 {
                                     id: 'device', label: 'Compute Device', hint: 'Hardware target for inference', type: 'select', val: device, setter: setDevice,
-                                    opts: [{ v: 'cuda', l: 'CUDA (GPU)' }, { v: 'cpu', l: 'CPU' }, { v: 'mps', l: 'Apple MPS' }]
+                                    opts: [{ v: 'cuda', l: 'CUDA' }, { v: 'cpu', l: 'CPU' }, { v: 'mps', l: 'Apple MPS' }]
                                 },
                                 { id: 'relax', label: 'Relax PDB', hint: 'Energy-minimize output structures', type: 'toggle', val: relaxPdb, setter: setRelaxPdb },
                                 { id: 'save', label: 'Save PDB', hint: 'Write structures to disk', type: 'toggle', val: savePdb, setter: setSavePdb },
                                 { id: 'tqdm', label: 'Progress Bar', hint: 'Show tqdm in terminal output', type: 'toggle', val: tqdmBar, setter: setTqdmBar },
                                 { id: 'seed', label: 'Fix Random Seed', hint: 'For reproducible results', type: 'toggle', val: fixSeed, setter: setFixSeed }
                             ].map((setting) => (
-                                <div key={setting.id} className="bg-white border border-neutral-100/80 p-4 rounded-xl flex items-center justify-between gap-4">
+                                <div key={setting.id} className="bg-white border border-neutral-200 p-5 rounded-2xl flex items-center justify-between gap-4 transition-all hover:border-neutral-300">
                                     <div>
-                                        <div className="text-[15px] font-bold text-neutral-900">{setting.label}</div>
-                                        <div className="text-[13px] text-neutral-900 font-medium mt-0.5">{setting.hint}</div>
+                                        <div className="text-[14px] font-bold text-neutral-900 tracking-tight">{setting.label}</div>
+                                        <div className="text-[12px] text-neutral-500 font-medium mt-0.5">{setting.hint}</div>
                                     </div>
                                     {setting.type === 'select' ? (
                                         <select
-                                            className="w-[160px] bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-1.5 text-[13px] font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all cursor-pointer"
+                                            className="w-[120px] bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-1.5 text-[14px] font-mono focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 outline-none transition-all cursor-pointer font-bold text-neutral-900"
                                             value={setting.val as string} onChange={e => (setting.setter as (val: string) => void)(e.target.value)}
                                             disabled={currentModel.disabled}
                                         >
@@ -500,8 +458,8 @@ log_level: "INFO"
                                     ) : (
                                         <label className={cn("relative w-10 h-6 shrink-0", currentModel.disabled ? "opacity-50" : "cursor-pointer")}>
                                             <input type="checkbox" className="peer sr-only" checked={setting.val as boolean} onChange={e => (setting.setter as (val: boolean) => void)(e.target.checked)} disabled={currentModel.disabled} />
-                                            <div className="absolute inset-0 bg-neutral-200 rounded-full transition-colors peer-checked:bg-emerald-500" />
-                                            <div className="absolute left-[3px] top-[3px] w-4.5 h-4.5 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-4" />
+                                            <div className="absolute inset-0 bg-neutral-200 rounded-full transition-colors peer-checked:bg-neutral-900" />
+                                            <div className="absolute left-[3px] top-[3px] w-4.5 h-4.5 bg-white rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform peer-checked:translate-x-4" />
                                         </label>
                                     )}
                                 </div>
@@ -515,8 +473,8 @@ log_level: "INFO"
                                 onClick={handleSubmit}
                                 disabled={!pdbFile || isSubmitting || currentModel.disabled}
                                 className={cn(
-                                    "w-full h-14 text-[15px] font-black tracking-wide uppercase transition-all shadow-lg",
-                                    currentModel.disabled ? "bg-neutral-200 text-neutral-400 border-neutral-300 shadow-none cursor-not-allowed hover:bg-neutral-200" : "bg-emerald-500 hover:bg-emerald-600 border-emerald-600 hover:shadow-emerald-500/20"
+                                    "w-full h-14 text-[13px] font-black tracking-[0.15em] uppercase transition-all shadow-md rounded-2xl",
+                                    currentModel.disabled ? "bg-neutral-100 text-neutral-400 border border-neutral-200 shadow-none cursor-not-allowed hover:bg-neutral-100" : "bg-neutral-900 border border-neutral-900 text-white hover:bg-black hover:shadow-xl hover:shadow-neutral-900/20"
                                 )}
                             >
                                 {isSubmitting ? (
@@ -532,15 +490,15 @@ log_level: "INFO"
                                 {status.type === "error" ? (
                                     <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
                                 ) : status.type === "success" ? (
-                                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                                    <Check className="w-4 h-4 text-neutral-900 shrink-0" />
                                 ) : (
-                                    <div className={cn("w-2 h-2 rounded-full shrink-0", status.type === "idle" ? "bg-neutral-300" : "bg-emerald-500 animate-pulse")} />
+                                    <div className={cn("w-2 h-2 rounded-full shrink-0", status.type === "idle" ? "bg-neutral-300" : "bg-neutral-900 animate-pulse")} />
                                 )}
-                                <span className={cn("text-[14px] font-bold leading-none mt-0.5", status.type === "error" ? "text-rose-600" : "text-neutral-900")}>
+                                <span className={cn("text-[13px] font-bold leading-none mt-0.5 tracking-tight", status.type === "error" ? "text-rose-600" : "text-neutral-900")}>
                                     {status.msg}
                                 </span>
                                 {!pdbFile && status.type === "error" && (
-                                    <Button variant="secondary" size="sm" onClick={() => router.push('/app/new')} className="ml-auto h-7 text-[11px] px-3">
+                                    <Button variant="secondary" size="sm" onClick={() => router.push('/app/new')} className="ml-auto h-7 text-[11px] px-3 font-semibold transition-all">
                                         Go to Upload
                                     </Button>
                                 )}
