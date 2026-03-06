@@ -2,7 +2,8 @@ import os
 import ssl
 import uuid
 import logging
-import asyncio
+import subprocess
+import time
 import shutil
 from pathlib import Path
 
@@ -140,48 +141,25 @@ async def run_subprocess(cmd, timeout=3600):
     logger.info("Running command:")
     logger.info(" ".join(str(c) for c in cmd))
 
-    proc = await asyncio.create_subprocess_exec(
-        *[str(c) for c in cmd],
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT
+    proc = subprocess.Popen(
+        [str(c) for c in cmd],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1
     )
 
-    async def heartbeat():
-        while True:
-            await asyncio.sleep(10)
-            logger.info("GPU still running...")
-
-    heartbeat_task = asyncio.create_task(heartbeat())
-
     stdout_chunks = []
+    
+    # Read output line by line as it is generated
+    if proc.stdout:
+        for line in proc.stdout:
+            stdout_chunks.append(line)
+            print(line, end="", flush=True)
 
-    try:
-
-        while True:
-
-            try:
-                line = await asyncio.wait_for(proc.stdout.readline(), timeout)
-            except asyncio.TimeoutError:
-                proc.kill()
-                raise RuntimeError("GPU timeout")
-
-            if not line:
-                break
-
-            decoded = line.decode(errors="replace")
-
-            stdout_chunks.append(decoded)
-
-            print(decoded, end="", flush=True)
-
-        await proc.wait()
-
-    finally:
-
-        heartbeat_task.cancel()
+    proc.wait(timeout=timeout)
 
     if proc.returncode != 0:
-
         raise RuntimeError(
             f"Process failed (exit {proc.returncode})"
         )
@@ -191,7 +169,7 @@ async def run_subprocess(cmd, timeout=3600):
 
 # ---------------- HANDLER ----------------
 
-async def handler(event):
+def handler(event):
     """
     Main RunPod Serverless handler.
 
@@ -270,7 +248,7 @@ async def handler(event):
 
         # ---------- RUN MODEL ----------
 
-        await run_subprocess(cmd)
+        run_subprocess(cmd)
 
         # ---------- FIND OUTPUT ----------
 
@@ -316,30 +294,14 @@ async def handler(event):
 
     finally:
 
-        # Give any async logging time to flush and then clean the workspace.
-        await asyncio.sleep(1)
+        # Give any logging time to flush and then clean the workspace.
+        time.sleep(1)
         shutil.rmtree(job_path, ignore_errors=True)
         logger.info("Workspace cleaned")
 
 
 # ---------------- START ----------------
 
-def sync_handler(event):
-    """
-    Synchronous wrapper to safely execute the async handler.
-    RunPod serverless SDK can instantly crash if it incorrectly
-    handles async loop resolution depending on the installed version.
-    """
-    try:
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(handler(event))
-    except RuntimeError as e:
-        if "There is no current event loop" in str(e):
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            return loop.run_until_complete(handler(event))
-        raise
-
 if __name__ == "__main__":
     logger.info("Starting Foldexa RunPod worker...")
-    runpod.serverless.start({"handler": sync_handler})
+    runpod.serverless.start({"handler": handler})

@@ -1,6 +1,6 @@
 FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
-# kanseu/foldexa-diffab:v1.10.6 — Fix asyncio event loop conflict in RunPod Serverless SDK
-LABEL version="1.10.6" maintainer="foldexa"
+# kanseu/foldexa-diffab:v1.10.7 — Rewrite RunPod worker to be 100% synchronous to avoid Event Loop conflicts
+LABEL version="1.10.7" maintainer="foldexa"
 
 WORKDIR /workspace
 
