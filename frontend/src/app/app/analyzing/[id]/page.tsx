@@ -1,23 +1,17 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import {
-    Activity,
     Cpu,
     Zap,
     Database,
     Layers,
-    Code,
-    ChevronRight,
     AlertCircle,
     Loader2,
     CheckCircle2,
-    FlaskConical,
     Dna,
-    Network,
     Terminal,
-    Clock,
     RefreshCw
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -55,19 +49,19 @@ const QUOTES = [
 
 // --- COMPONENTS ---
 
-/** Animated DNA Helix / Molecule Visualization */
+/** Animated DNA Helix / Molecule Visualization (Light Theme) */
 function MoleculeVisualization() {
     return (
         <div className="relative w-full h-[400px] flex items-center justify-center">
             {/* Background Glow */}
-            <div className="absolute inset-0 bg-emerald-500/5 blur-[120px] rounded-full scale-150" />
+            <div className="absolute inset-0 bg-neutral-100 blur-[100px] rounded-full scale-150" />
 
             <div className="relative w-64 h-64">
                 {/* Rotating Circles */}
                 {[...Array(3)].map((_, i) => (
                     <motion.div
                         key={i}
-                        className="absolute inset-0 border border-emerald-500/10 rounded-full"
+                        className="absolute inset-0 border border-neutral-200 rounded-full"
                         animate={{
                             rotate: 360,
                             scale: [1, 1.1, 1],
@@ -84,7 +78,7 @@ function MoleculeVisualization() {
                 {[...Array(12)].map((_, i) => (
                     <motion.div
                         key={i}
-                        className="absolute w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                        className="absolute w-2 h-2 rounded-full bg-neutral-800 shadow-sm"
                         initial={{
                             top: `${Math.random() * 100}%`,
                             left: `${Math.random() * 100}%`,
@@ -92,7 +86,7 @@ function MoleculeVisualization() {
                         animate={{
                             y: [0, -20, 0],
                             x: [0, 10, 0],
-                            opacity: [0.4, 1, 0.4],
+                            opacity: [0.3, 0.8, 0.3],
                         }}
                         transition={{
                             duration: 3 + Math.random() * 4,
@@ -103,16 +97,16 @@ function MoleculeVisualization() {
                 ))}
 
                 {/* Center Core */}
-                <div className="absolute inset-4 rounded-full bg-emerald-500/5 backdrop-blur-3xl border border-emerald-500/20 flex items-center justify-center">
+                <div className="absolute inset-4 rounded-full bg-white/60 backdrop-blur-xl border border-neutral-200 shadow-sm flex items-center justify-center">
                     <motion.div
                         animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 4, repeat: Infinity }}
                         className="relative"
                     >
-                        <Dna className="w-16 h-16 text-emerald-500 opacity-80" />
+                        <Dna className="w-16 h-16 text-neutral-800 opacity-90" />
                         <motion.div
-                            className="absolute inset-0 bg-emerald-500/20 blur-2xl"
-                            animate={{ opacity: [0.3, 0.6, 0.3] }}
+                            className="absolute inset-0 bg-neutral-200/50 blur-xl"
+                            animate={{ opacity: [0.2, 0.5, 0.2] }}
                             transition={{ duration: 2, repeat: Infinity }}
                         />
                     </motion.div>
@@ -122,7 +116,7 @@ function MoleculeVisualization() {
     );
 }
 
-/** Live Log Stream */
+/** Live Log Stream (Light Theme) */
 function LogStream({ logs }: { logs: string[] }) {
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -133,13 +127,13 @@ function LogStream({ logs }: { logs: string[] }) {
     }, [logs]);
 
     return (
-        <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-5 w-full h-[240px] flex flex-col font-mono">
-            <div className="flex items-center gap-2 mb-4 border-b border-white/5 pb-3">
-                <Terminal className="w-4 h-4 text-emerald-500" />
-                <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Foldexa Engine Logs</span>
+        <div className="bg-white border border-neutral-200 shadow-sm rounded-2xl p-5 w-full h-[240px] flex flex-col font-mono">
+            <div className="flex items-center gap-2 mb-4 border-b border-neutral-100 pb-3">
+                <Terminal className="w-4 h-4 text-neutral-500" />
+                <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-widest">Foldexa Engine Logs</span>
                 <div className="ml-auto flex gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/20" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
                 </div>
             </div>
             <div
@@ -151,9 +145,9 @@ function LogStream({ logs }: { logs: string[] }) {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         key={i}
-                        className="text-[12px] text-neutral-500 flex gap-3"
+                        className="text-[12px] text-neutral-600 flex gap-3"
                     >
-                        <span className="text-emerald-500/40 shrink-0">[{new Date().toLocaleTimeString([], { hour12: false })}]</span>
+                        <span className="text-neutral-400 shrink-0">[{new Date().toLocaleTimeString([], { hour12: false })}]</span>
                         <span>{log}</span>
                     </motion.div>
                 ))}
@@ -199,21 +193,27 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
         if (job.status === "queued" || job.status === "provisioning") {
             setActiveSubStage(1); // Preprocessing
             setStatusText("Preparing structure for inference...");
-            if (logs.length < 5) {
-                setLogs(prev => [...prev, "Resource allocated on GPU cluster.", "Scaling container environment...", "Uploading structure to MinIO storage..."]);
-            }
+            setLogs(prev => {
+                const newLogs = ["Resource allocated on GPU cluster.", "Scaling container environment...", "Uploading structure to MinIO storage..."];
+                // Only add if not already present
+                return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
+            });
         }
         else if (job.status === "running") {
             setActiveSubStage(2); // Diffusion
             setStatusText("Diffusion Sampling in progress...");
-            if (!logs.includes("Loading DiffAb model weights into VRAM...")) {
-                setLogs(prev => [...prev, "Loading DiffAb model weights into VRAM...", "Diffusion step 1/100 initialized.", "Batch sampling started..."]);
-            }
+            setLogs(prev => {
+                const newLogs = ["Loading DiffAb model weights into VRAM...", "Diffusion step 1/100 initialized.", "Batch sampling started..."];
+                return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
+            });
         }
         else if (job.status === "completed") {
             setActiveSubStage(4); // Finalizing
             setStatusText("Task completed. Redirecting...");
-            setLogs(prev => [...prev, "Validation metrics passed (pLDDT > 0.9).", "Result artifact uploaded successfully.", "Synthesized PDB ready for download."]);
+            setLogs(prev => {
+                const newLogs = ["Validation metrics passed (pLDDT > 0.9).", "Result artifact uploaded successfully.", "Synthesized PDB ready for download."];
+                return prev.includes(newLogs[0]) ? prev : [...prev, ...newLogs];
+            });
         }
     }, [job]);
 
@@ -263,30 +263,30 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
     }, [activeSubStage, job]);
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white flex flex-col font-sans overflow-hidden">
-            <Navbar variant="contrast" />
+        <div className="min-h-screen bg-[#fafafa] text-neutral-900 flex flex-col font-sans overflow-hidden">
+            <Navbar variant="white" />
 
             {/* --- TOP: Global Progress --- */}
-            <div className="pt-24 pb-8 flex justify-center border-b border-white/5 bg-[#080808]">
+            <div className="pt-24 pb-8 flex justify-center border-b border-neutral-200 bg-white shadow-sm z-10 relative">
                 <div className="flex items-center gap-12">
                     {PIPELINE_GLOBAL.map((step, i) => (
                         <div key={step.id} className="flex items-center gap-3">
                             <div className={cn(
                                 "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold border transition-all duration-500",
-                                step.status === "active" ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.3)]" :
-                                    step.status === "completed" ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-500" :
-                                        "bg-neutral-900 border-neutral-800 text-neutral-500"
+                                step.status === "active" ? "bg-neutral-900 border-neutral-900 text-white shadow-sm" :
+                                    step.status === "completed" ? "bg-neutral-100 border-neutral-200 text-neutral-900" :
+                                        "bg-white border-neutral-200 text-neutral-400"
                             )}>
                                 {step.status === "completed" ? "✓" : step.id}
                             </div>
                             <span className={cn(
                                 "text-[12px] font-black uppercase tracking-widest",
-                                step.status === "active" ? "text-white" : "text-neutral-600"
+                                step.status === "active" ? "text-neutral-900" : "text-neutral-400"
                             )}>
                                 {step.label}
                             </span>
                             {i < PIPELINE_GLOBAL.length - 1 && (
-                                <div className="ml-8 w-12 h-px bg-neutral-800/50" />
+                                <div className="ml-8 w-12 h-px bg-neutral-200" />
                             )}
                         </div>
                     ))}
@@ -301,8 +301,8 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
                     <div className="space-y-1">
                         <h2 className="text-neutral-500 text-[11px] font-black uppercase tracking-[0.3em]">Engine Cluster Status</h2>
                         <div className="flex items-center gap-3">
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                            <h3 className="text-xl font-bold tracking-tight">Active Analysis</h3>
+                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-sm" />
+                            <h3 className="text-xl font-bold tracking-tight text-neutral-900">Active Analysis</h3>
                         </div>
                     </div>
 
@@ -314,35 +314,35 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
                             return (
                                 <div key={s.id} className="flex items-center gap-4 group">
                                     <div className={cn(
-                                        "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 border",
-                                        isActive ? "bg-emerald-500 border-emerald-500 text-black translate-x-1" :
-                                            isDone ? "bg-white/5 border-emerald-500/30 text-emerald-500" :
-                                                "bg-white/5 border-white/5 text-neutral-700"
+                                        "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 border shadow-sm",
+                                        isActive ? "bg-white border-neutral-300 text-neutral-900 translate-x-1 shadow-md" :
+                                            isDone ? "bg-neutral-100 border-neutral-200 text-neutral-500" :
+                                                "bg-transparent border-transparent text-neutral-300"
                                     )}>
                                         <s.icon className="w-5 h-5" />
                                     </div>
                                     <div className="flex flex-col">
                                         <span className={cn(
                                             "text-[13px] font-bold tracking-tight transition-colors",
-                                            isActive ? "text-white" : isDone ? "text-neutral-400" : "text-neutral-700"
+                                            isActive ? "text-neutral-900" : isDone ? "text-neutral-500" : "text-neutral-300"
                                         )}>
                                             {s.label}
                                         </span>
-                                        {isActive && <motion.span layoutId="activeSub" className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-0.5">Processing...</motion.span>}
+                                        {isActive && <motion.span layoutId="activeSub" className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mt-0.5">Processing...</motion.span>}
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
 
-                    <div className="pt-8 border-t border-white/5">
+                    <div className="pt-8 border-t border-neutral-200">
                         <div className="flex justify-between items-center text-[11px] text-neutral-500 font-mono mb-2">
-                            <span>JOB_ID: {jobId}</span>
+                            <span>JOB_ID: <span className="text-neutral-900">{jobId.substring(0, 16)}...</span></span>
                             <span>ETA: ~1m 40s</span>
                         </div>
-                        <div className="bg-neutral-900 h-1 rounded-full overflow-hidden">
+                        <div className="bg-neutral-200/60 h-1.5 rounded-full overflow-hidden shadow-inner">
                             <motion.div
-                                className="h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+                                className="h-full bg-neutral-900"
                                 initial={{ width: 0 }}
                                 animate={{ width: `${progress}%` }}
                                 transition={{ duration: 1 }}
@@ -361,9 +361,9 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 1.05 }}
-                            className="bg-black/40 backdrop-blur-md px-10 py-6 rounded-[30px] border border-white/10 shadow-2xl"
+                            className="bg-white/80 backdrop-blur-md px-10 py-6 rounded-[24px] border border-neutral-200 shadow-xl"
                         >
-                            <p className="text-xl md:text-2xl font-medium tracking-tight text-white/90 italic leading-relaxed">
+                            <p className="text-xl md:text-2xl font-medium tracking-tight text-neutral-800 italic leading-relaxed">
                                 &quot;{QUOTES[quoteIndex]}&quot;
                             </p>
                         </motion.div>
@@ -371,8 +371,8 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
 
                     <div className="mt-8 text-center space-y-2">
                         <div className="flex items-center justify-center gap-3">
-                            <Loader2 className="w-5 h-5 animate-spin text-emerald-500" />
-                            <span className="text-2xl font-black tracking-tight uppercase">{statusText}</span>
+                            <Loader2 className="w-5 h-5 animate-spin text-neutral-800" />
+                            <span className="text-2xl font-black tracking-tight uppercase text-neutral-900">{statusText}</span>
                         </div>
                         <p className="text-neutral-500 font-mono text-sm tracking-widest">DIFFUSION SAMPLING // CORE_DESIGN_V3</p>
                     </div>
@@ -382,18 +382,18 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
                 <div className="lg:col-span-3 flex flex-col justify-center space-y-8 order-3">
                     <LogStream logs={logs} />
 
-                    <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-6 space-y-4">
-                        <div className="flex items-center gap-2 text-emerald-500">
-                            <Zap className="w-4 h-4" />
+                    <div className="bg-white border border-neutral-200 shadow-sm rounded-2xl p-6 space-y-4">
+                        <div className="flex items-center gap-2 text-neutral-900">
+                            <Zap className="w-4 h-4 fill-emerald-500 stroke-none text-emerald-500" />
                             <span className="text-[11px] font-black uppercase tracking-widest">Pipeline Health</span>
                         </div>
-                        <p className="text-[13px] text-neutral-400 leading-relaxed">
+                        <p className="text-[13px] text-neutral-600 leading-relaxed">
                             Your structure is being processed on a distributed cluster of NVIDIA A100 GPUs. Diffusion sampling accuracy is optimized for biological fidelity.
                         </p>
                         <div className="flex items-center gap-4 pt-2">
                             <div className="flex -space-x-2">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="w-6 h-6 rounded-full bg-neutral-800 border-2 border-[#050505] flex items-center justify-center text-[8px] font-black">NV</div>
+                                    <div key={i} className="w-6 h-6 rounded-full bg-white border-2 border-neutral-200 flex items-center justify-center text-[8px] font-black text-neutral-900 shadow-sm">NV</div>
                                 ))}
                             </div>
                             <span className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Node Connectivity: 100%</span>
@@ -404,16 +404,16 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-red-500/10 border border-red-500/30 p-5 rounded-2xl"
+                            className="bg-red-50 border border-red-100 p-5 rounded-2xl shadow-sm"
                         >
-                            <div className="flex items-center gap-2 text-red-500 mb-2">
+                            <div className="flex items-center gap-2 text-red-600 mb-2">
                                 <AlertCircle className="w-4 h-4" />
                                 <span className="font-bold uppercase tracking-widest text-[11px]">Analysis Error</span>
                             </div>
-                            <p className="text-xs text-red-100/70 mb-4">{job.error_message || "Engine timeout during sampling."}</p>
+                            <p className="text-xs text-red-800/80 mb-4">{job.error_message || "Engine timeout during sampling."}</p>
                             <Button
-                                variant="secondary"
-                                className="w-full bg-white text-black hover:bg-neutral-200 h-9 text-[11px]"
+                                variant="outline"
+                                className="w-full bg-white text-neutral-900 border-neutral-200 hover:bg-neutral-50 h-9 text-[11px]"
                                 onClick={() => router.push('/app/new')}
                             >
                                 Try Different Scafffold
@@ -425,11 +425,11 @@ export default function AnalyzingPage({ params }: { params: { id: string } }) {
             </main>
 
             {/* --- BOTTOM: Subtle Decors --- */}
-            <div className="fixed bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
-            <div className="fixed bottom-8 left-12 font-mono text-[10px] text-neutral-800 tracking-widest uppercase pointer-events-none">
+            <div className="fixed bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent" />
+            <div className="fixed bottom-8 left-12 font-mono text-[10px] text-neutral-400 tracking-widest uppercase pointer-events-none">
                 Foldexa // Project_Foldexa_V1.9.3
             </div>
-            <div className="fixed bottom-8 right-12 font-mono text-[10px] text-neutral-800 tracking-widest uppercase pointer-events-none">
+            <div className="fixed bottom-8 right-12 font-mono text-[10px] text-neutral-400 tracking-widest uppercase pointer-events-none">
                 System_Status: Optimal
             </div>
         </div>
