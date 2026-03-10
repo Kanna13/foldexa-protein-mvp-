@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Annotated, Optional
 from datetime import datetime, timezone
 from enum import Enum
+import json
 import logging
 
 from app.domain.services.job_service import JobService
@@ -219,9 +220,8 @@ async def create_job(
         # Parse optional DiffAb config JSON
         parsed_diffab_config = None
         if diffab_config:
-            import json as _json
             try:
-                parsed_diffab_config = _json.loads(diffab_config)
+                parsed_diffab_config = json.loads(diffab_config)
             except Exception:
                 logger.warning(f"Failed to parse diffab_config JSON: {diffab_config!r}")
 

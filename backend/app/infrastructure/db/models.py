@@ -53,7 +53,6 @@ class Job(Base):
     retry_count = Column(Integer, default=0)
     
     # Execution identifiers
-    celery_task_id = Column(String, nullable=True, index=True)
     runpod_job_id = Column(String, nullable=True, index=True)
     
     # Relationships
