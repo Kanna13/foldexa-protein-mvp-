@@ -381,8 +381,19 @@ async def get_job_status(
                 await db.commit()
                 await db.refresh(job)
 
-            elif rp_status in ("IN_PROGRESS", "IN_QUEUE"):
-                logger.info(f"[RUNNING] job={job_id} | rp_status={rp_status}")
+            elif rp_status == "IN_QUEUE":
+                # Job is waiting in RunPod's queue — no worker has picked it up yet.
+                # Map to PROVISIONING so the UI shows the correct state.
+                logger.info(f"[QUEUED] job={job_id} | rp_status=IN_QUEUE — waiting for worker")
+                if job.status != JobStatus.PROVISIONING:
+                    job.status = JobStatus.PROVISIONING
+                await db.flush()
+                await db.commit()
+                await db.refresh(job)
+
+            elif rp_status == "IN_PROGRESS":
+                # Worker has picked up the job and is actively executing.
+                logger.info(f"[RUNNING] job={job_id} | rp_status=IN_PROGRESS")
                 if job.status != JobStatus.RUNNING:
                     job.status = JobStatus.RUNNING
                 if not job.started_at:
@@ -390,6 +401,7 @@ async def get_job_status(
                 await db.flush()
                 await db.commit()
                 await db.refresh(job)
+
 
             elif rp_status == "CANCELLED":
                 # RunPod cancelled the job (e.g., worker was killed manually or from the UI).
