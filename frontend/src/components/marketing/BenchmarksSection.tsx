@@ -253,8 +253,8 @@ export function BenchmarksSection() {
 
                 {/* Detailed Footer */}
                 <div className="pt-7 border-t border-[#1A1A1A] flex flex-col md:flex-row justify-between items-end gap-8 mt-12">
-                    <div className="text-[15px] text-[#2A2A2A] md:max-w-[78%] leading-[1.6]">
-                        <strong className="text-[#333]">Sources:</strong> Bennett et al., <em>Nature</em> (2025); Luo et al., <em>ICML</em> (2022); Chai Discovery, <em>bioRxiv</em> (2025); Jin et al., <em>Nat. Commun.</em> (2021)<br />
+                    <div className="text-[15px] text-white md:max-w-[78%] leading-[1.6]">
+                        <strong className="text-white">Sources:</strong> Bennett et al., <em>Nature</em> (2025); Luo et al., <em>ICML</em> (2022); Chai Discovery, <em>bioRxiv</em> (2025); Jin et al., <em>Nat. Commun.</em> (2021)<br />
                         Note: Foldexa.bio metrics from AF2-multimer predictions. Cross-platform metrics not directly comparable.
                     </div>
                     <div className="text-[36px] font-extrabold tracking-tight text-white">
