@@ -102,8 +102,15 @@ def get_minio_client(s3_config=None):
         ssl_ctx.check_hostname = False
         ssl_ctx.verify_mode = ssl.CERT_NONE
 
-        # Use urllib3 with the custom SSL context
+        # Use urllib3 with explicit timeouts to prevent infinite RunPod execution
+        # if the MinIO connection hangs or Railway drops connections.
         http_client = urllib3.PoolManager(
+            timeout=urllib3.Timeout(connect=15.0, read=60.0),
+            retries=urllib3.Retry(
+                total=4,
+                backoff_factor=0.5,
+                status_forcelist=[500, 502, 503, 504, 520, 524]
+            ),
             ssl_context=ssl_ctx
         )
 
@@ -263,13 +270,15 @@ def handler(event):
 
         # ---------- UPLOAD RESULT ----------
 
+        logger.info(f"Uploading result to s3://{bucket_name}/{output_s3_key}")
+
         minio.fput_object(
             bucket_name,
             output_s3_key,
             str(result_file)
         )
 
-        logger.info("Job finished successfully")
+        logger.info("Upload complete. Job finished successfully")
 
         # Structured payload that matches backend expectations:
         # jobs.py can read output["result_s3_key"] or output["output_s3_key"]

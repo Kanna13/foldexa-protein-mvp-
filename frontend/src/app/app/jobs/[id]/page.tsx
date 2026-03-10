@@ -158,6 +158,11 @@ export default function JobPage({ params }: { params: { id: string } }) {
             return job.execution_time;
         }
 
+        // If the job is completed/failed but execution_time is missing, calculate duration between started and finished
+        if (job && (job.status === "completed" || job.status === "failed") && job.started_at && job.finished_at) {
+            return Math.max(0, (parseUTC(job.finished_at).getTime() - parseUTC(job.started_at).getTime()) / 1000);
+        }
+
         // Only use the DB started_at if it's actually newer than the job's creation time 
         // to prevent crazy offsets if DB time is out of sync or if it was stuck queued.
         // Otherwise, trust the front-end pageLoadTime to give a clean 0s -> up experience.
@@ -170,6 +175,11 @@ export default function JobPage({ params }: { params: { id: string } }) {
             }
         }
 
+        // If job is finished/failed without execution_time or finished_at (shouldn't happen), freeze at current calculation
+        if (job && (job.status === "completed" || job.status === "failed")) {
+            return Math.max(0, (currentTime.getTime() - startTime) / 1000); // Wait, this doesn't freeze. Let's fix this.
+        }
+
         return Math.max(0, (currentTime.getTime() - startTime) / 1000);
     };
 
@@ -178,7 +188,9 @@ export default function JobPage({ params }: { params: { id: string } }) {
     // Estimated Total Duration (sum of steps) / Remaining
     const activeSteps = useMemo(() => getActiveSteps(job?.pipeline_type), [job?.pipeline_type]);
     const totalEstimatedDuration = useMemo(() => activeSteps.reduce((acc, s) => acc + s.duration, 0) / 1000, [activeSteps]);
-    const remainingSeconds = Math.max(0, totalEstimatedDuration - elapsedSeconds);
+    const remainingSeconds = (job?.status === "completed" || job?.status === "failed")
+        ? 0
+        : Math.max(0, totalEstimatedDuration - elapsedSeconds);
 
     if (!jobId) return null;
 

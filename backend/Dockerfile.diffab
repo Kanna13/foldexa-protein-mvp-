@@ -1,6 +1,6 @@
 FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
-# kanseu/foldexa-diffab:v1.10.8 — Remove leftover async keyword on run_subprocess in synchronous RunPod handler
-LABEL version="1.10.8" maintainer="foldexa"
+# kanseu/foldexa-diffab:v1.10.9 — Added explicit timeouts and auto-retries to MinIO PoolManager to fix RunPod infinite hang on Railway connection drop.
+LABEL version="1.10.9" maintainer="foldexa"
 
 WORKDIR /workspace
 
