@@ -23,7 +23,7 @@ export function BenchmarksSection() {
                         Pipeline Benchmark vs.<br className="hidden md:block" /> World-Class Platforms
                     </h2>
                     <p className="text-2xl text-[#525252] mt-2.5 mb-16">
-                        In silico metrics · Anti-Tie2 CDR redesign · AF2-multimer predicted metrics · February 2026
+                        Anti-Tie2 CDR redesign · AF2-multimer predicted metrics · in silico
                     </p>
                 </div>
 
