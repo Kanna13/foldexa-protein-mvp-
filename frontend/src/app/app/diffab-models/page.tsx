@@ -410,7 +410,7 @@ log_level: "INFO"
                                     </div>
                                     <input type="number"
                                         className="w-[80px] bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-1.5 text-[14px] font-mono focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 outline-none transition-all text-center font-bold text-neutral-900"
-                                        value={numDesigns} min={1} max={500} onChange={e => setNumDesigns(parseInt(e.target.value) || 10)}
+                                        value={numDesigns} min={1} max={10000} onChange={e => setNumDesigns(parseInt(e.target.value) || 10)}
                                         disabled={currentModel.disabled}
                                     />
                                 </div>
