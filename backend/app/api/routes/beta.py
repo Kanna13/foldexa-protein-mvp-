@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 import uuid
@@ -8,7 +8,7 @@ import httpx
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.infrastructure.db.session import get_db
 from app.infrastructure.db.models import BetaAccessRequest
@@ -108,7 +108,7 @@ def send_email_notification(request: BetaAccessRequest):
 async def request_beta_access(
     data: BetaAccessCreate,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     # Check if email is already registered (optional logic, skipping for MVP)
     
@@ -123,12 +123,12 @@ async def request_beta_access(
         description=data.description,
         contact_preference=data.contactPref,
         contact_handle=data.contactHandle,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     
     db.add(db_request)
-    db.commit()
-    db.refresh(db_request)
+    await db.commit()
+    await db.refresh(db_request)
     
     # Queue Notifications
     background_tasks.add_task(send_telegram_notification, db_request)

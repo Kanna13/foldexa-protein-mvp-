@@ -4,7 +4,7 @@ Database models for the Foldexa platform.
 from sqlalchemy import Column, String, Integer, Float, DateTime, Enum, JSON, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from datetime import datetime
+from datetime import datetime, timezone
 import enum
 from app.infrastructure.db.session import Base
 
@@ -116,4 +116,4 @@ class BetaAccessRequest(Base):
     # Status
     status = Column(String, default="pending", index=True)  # pending, approved, rejected
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)

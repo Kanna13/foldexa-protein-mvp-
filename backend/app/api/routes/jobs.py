@@ -22,6 +22,7 @@ from app.infrastructure.compute.runpod_runner import RunPodRunner
 from app.infrastructure.storage.s3_service import storage_service
 from app.core.validation import validate_file_extension, validate_file_content, validate_pdb_structure, get_file_info
 from app.core.pdb_analyzer import PDBAnalyzer
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/jobs", tags=["jobs"])
@@ -284,9 +285,10 @@ async def get_job_status(
         # Ensure comparison is timezone-aware on both sides
         created_tz = job.created_at if job.created_at.tzinfo else job.created_at.replace(tzinfo=timezone.utc)
         age_minutes = (now_utc - created_tz).total_seconds() / 60
-        if age_minutes > 30:
+        timeout_minutes = settings.job_timeout_seconds / 60
+        if age_minutes > timeout_minutes:
             logger.error(
-                f"Job {job_id} exceeded 30-minute timeout (age={age_minutes:.1f}m). "
+                f"Job {job_id} exceeded {timeout_minutes:.0f}-minute timeout (age={age_minutes:.1f}m). "
                 "Marking FAILED."
             )
             job.status = JobStatus.FAILED
@@ -328,7 +330,7 @@ async def get_job_status(
                         f"full_data={runpod_data}"
                     )
                     job.status = JobStatus.FAILED
-                    job.finished_at = datetime.utcnow()
+                    job.finished_at = datetime.now(timezone.utc)
                     job.error_message = (
                         "RunPod job not found (worker likely crashed or was evicted)."
                     )
