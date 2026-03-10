@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
+import { Footer } from "@/components/layout/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,10 +49,6 @@ export const metadata: Metadata = {
   },
 };
 
-import { Footer } from "@/components/layout/Footer";
-
-// ... (previous imports)
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -59,10 +57,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased text-foreground bg-background min-h-screen flex flex-col">
-        <div className="flex-grow">
-          {children}
-        </div>
-        <Footer />
+        <Providers>
+          <div className="flex-grow">
+            {children}
+          </div>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

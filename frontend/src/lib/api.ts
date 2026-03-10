@@ -45,6 +45,13 @@ export interface JobResult {
   metrics: Metric[];
 }
 
+/** Statuses from which a job will never transition — polling can stop. */
+export const TERMINAL_STATUSES = new Set<Job["status"]>([
+  "completed",
+  "failed",
+  "cancelled",
+]);
+
 export const api = {
   /** Create a new job with a PDB file or direct FormData (for advanced configs) */
   createJob: async (
@@ -71,24 +78,35 @@ export const api = {
     return response.data;
   },
 
-  /** Get job status */
-  getJob: async (jobId: string): Promise<Job> => {
-    const response = await axios.get(`${API_BASE}/api/v1/jobs/${jobId}`);
+  /**
+   * Get job status.
+   * Accepts an optional AbortSignal so React Query can cancel the in-flight
+   * request when the component unmounts — preventing stale setState calls.
+   */
+  getJob: async (jobId: string, signal?: AbortSignal): Promise<Job> => {
+    const response = await axios.get(`${API_BASE}/api/v1/jobs/${jobId}`, {
+      signal,
+    });
     return response.data;
   },
 
   /** Get job results (artifacts & metrics) */
-  getJobResults: async (jobId: string): Promise<JobResult> => {
+  getJobResults: async (jobId: string, signal?: AbortSignal): Promise<JobResult> => {
     const response = await axios.get(
       `${API_BASE}/api/v1/jobs/${jobId}/results`,
+      { signal },
     );
     return response.data;
   },
 
-  /** List all jobs (History) */
-  listJobs: async (limit: number = 20): Promise<Job[]> => {
+  /**
+   * List all jobs (History).
+   * Accepts AbortSignal for proper fetch cancellation.
+   */
+  listJobs: async (limit: number = 20, signal?: AbortSignal): Promise<Job[]> => {
     const response = await axios.get(`${API_BASE}/api/v1/jobs/`, {
       params: { limit },
+      signal,
     });
     return response.data;
   },
