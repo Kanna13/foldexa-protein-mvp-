@@ -143,7 +143,7 @@ def ensure_directories():
 
 # ---------------- SUBPROCESS ----------------
 
-def run_subprocess(cmd, timeout=3600):
+def run_subprocess(cmd, timeout=10800):
 
     logger.info("Running command:")
     logger.info(" ".join(str(c) for c in cmd))

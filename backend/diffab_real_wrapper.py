@@ -127,7 +127,7 @@ def main():
         for line in iter(process.stdout.readline, ""):
             print(f"[DiffAb] {line}", end="", flush=True)
         process.stdout.close()
-        process.wait(timeout=900)   # 15-minute hard timeout
+        process.wait(timeout=2700)   # 45-minute hard timeout (tripled from 900s)
 
         if process.returncode != 0:
             print(f"[Wrapper] Error: exit code {process.returncode}", file=sys.stderr, flush=True)
